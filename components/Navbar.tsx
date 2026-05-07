@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
-import { Menu, X, MapPin, ShoppingCart, LogOut, Heart, ShoppingBag, Package, User as UserIcon } from 'lucide-react';
+import { Menu, X, MapPin, ShoppingCart, LogOut, Heart, ShoppingBag, Package, User as UserIcon, Store, PackageSearch } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useCart } from '@/context/CartContext';
 import { useWishlist } from '@/context/WishlistContext';
@@ -23,7 +23,7 @@ export default function Navbar() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [user, setUser] = useState<User | null>(null);
-  const [isAdmin, setIsAdmin] = useState(false);
+  const [isSeller, setIsSeller] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
   const { setIsCartOpen, totalItems } = useCart();
@@ -36,21 +36,14 @@ export default function Navbar() {
     window.addEventListener('scroll', handleScroll);
 
     async function checkAdmin(userId: string) {
-      const { data, error } = await supabase
+      const { data } = await supabase
         .from('profiles')
-        .select('is_admin')
-        .eq('id', userId);
+        .select('is_admin, is_seller')
+        .eq('id', userId)
+        .maybeSingle();
 
-      if (error) {
-        console.error('Error checking admin:', error);
-        return;
-      }
-
-      if (data && data.length > 0) {
-        setIsAdmin(data[0].is_admin ?? false);
-      } else {
-        // Fallback: If no profile yet, not an admin
-        setIsAdmin(false);
+      if (data) {
+        setIsSeller(data.is_seller || false);
       }
     }
 
@@ -64,7 +57,6 @@ export default function Navbar() {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
       if (session?.user) checkAdmin(session.user.id);
-      else setIsAdmin(false);
     });
 
     return () => {
@@ -78,7 +70,7 @@ export default function Navbar() {
     router.push('/');
   };
 
-  if (pathname === '/login' || pathname === '/register') {
+  if (pathname === '/login' || pathname === '/register' || pathname === '/daftar-penjual') {
     return null;
   }
 
@@ -275,6 +267,27 @@ export default function Navbar() {
                   Profil
                 </Link>
               )}
+              
+              {user && isSeller && (
+                <>
+                  <Link
+                    href="/admin/store-profile"
+                    onClick={() => setIsOpen(false)}
+                    className="flex items-center gap-2 text-lg font-medium text-gray-700 hover:text-[#00AA13] transition-colors border-t border-gray-50 pt-4"
+                  >
+                    <Store size={20} className="text-[#00AA13]" />
+                    Profil Penjual
+                  </Link>
+                  <Link
+                    href="/admin/products"
+                    onClick={() => setIsOpen(false)}
+                    className="flex items-center gap-2 text-lg font-medium text-gray-700 hover:text-[#00AA13] transition-colors border-t border-gray-50 pt-4"
+                  >
+                    <PackageSearch size={20} className="text-[#00AA13]" />
+                    Manajemen Produk
+                  </Link>
+                </>
+              )}
 
               {user && (
                 <Link
@@ -349,6 +362,24 @@ export default function Navbar() {
                     <UserIcon size={20} /> Profil
                   </Link>
                 )}
+                {user && isSeller && (
+                  <>
+                    <Link
+                      href="/admin/store-profile"
+                      onClick={() => setIsSidebarOpen(false)}
+                      className="flex items-center gap-3 text-white/90 hover:text-white hover:bg-white/10 p-3 rounded-xl transition-all font-bold"
+                    >
+                      <Store size={20} /> Profil Penjual
+                    </Link>
+                    <Link
+                      href="/admin/products"
+                      onClick={() => setIsSidebarOpen(false)}
+                      className="flex items-center gap-3 text-white/90 hover:text-white hover:bg-white/10 p-3 rounded-xl transition-all font-bold"
+                    >
+                      <PackageSearch size={20} /> Manajemen Produk
+                    </Link>
+                  </>
+                )}
                 <Link
                   href="/ecommerce"
                   onClick={() => setIsSidebarOpen(false)}
@@ -377,6 +408,8 @@ export default function Navbar() {
                 >
                   <MapPin size={20} /> Cari Lokasi
                 </Link>
+
+
                 <div className="h-px bg-white/20 my-4"></div>
                 <button
                   onClick={() => {

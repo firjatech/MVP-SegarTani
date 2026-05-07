@@ -83,8 +83,10 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
 
   // Save to localStorage as backup/for guest sessions
   useEffect(() => {
-    localStorage.setItem('segar-tani-wishlist', JSON.stringify(wishlist));
-  }, [wishlist]);
+    if (!loading) {
+      localStorage.setItem('segar-tani-wishlist', JSON.stringify(wishlist));
+    }
+  }, [wishlist, loading]);
 
   const addToWishlist = async (item: WishlistItem) => {
     try {

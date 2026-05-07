@@ -44,7 +44,17 @@ const locations = [
 
 export default function LocationPage() {
 	const [searchQuery, setSearchQuery] = useState("");
+	const [mapQuery, setMapQuery] = useState("Bandung");
 	const router = useRouter();
+
+	React.useEffect(() => {
+		const timer = setTimeout(() => {
+			setMapQuery(searchQuery.trim() ? searchQuery : "Bandung");
+		}, 800);
+		return () => clearTimeout(timer);
+	}, [searchQuery]);
+
+	const mapUrl = `https://maps.google.com/maps?q=${encodeURIComponent(mapQuery)}&output=embed`;
 
 	return (
 		<div className="bg-white min-h-screen font-sans">
@@ -73,7 +83,10 @@ export default function LocationPage() {
 						</p>
 
 						{/* Search Bar */}
-						<div className="relative max-w-2xl mx-auto bg-white rounded-full shadow-2xl shadow-gray-200/50 p-2 flex items-center border border-gray-100">
+						<form 
+							onSubmit={(e) => { e.preventDefault(); setMapQuery(searchQuery.trim() || "Bandung"); }}
+							className="relative max-w-2xl mx-auto bg-white rounded-full shadow-2xl shadow-gray-200/50 p-2 flex items-center border border-gray-100"
+						>
 							<div className="flex-grow flex items-center px-4">
 								<MapPin className="text-gray-400 mr-3" size={20} />
 								<input
@@ -84,10 +97,10 @@ export default function LocationPage() {
 									className="w-full py-3 focus:outline-none text-gray-700 font-medium"
 								/>
 							</div>
-							<button className="bg-[#00AA13] text-white px-8 py-3.5 rounded-full font-bold hover:bg-[#00880F] transition-all shadow-lg active:scale-95">
+							<button type="submit" className="bg-[#00AA13] text-white px-8 py-3.5 rounded-full font-bold hover:bg-[#00880F] transition-all shadow-lg active:scale-95">
 								Cek Lokasi
 							</button>
-						</div>
+						</form>
 					</div>
 				</div>
 			</section>
@@ -152,7 +165,7 @@ export default function LocationPage() {
 							data-aos="fade-left"
 						>
 							<iframe
-								src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d126748.56347862248!2d107.573116!3d-6.903444!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e68e63982570777%3A0x3015766a410b0!2sBandung%2C%20Bandung%20City%2C%20West%20Java!5e0!3m2!1sen!2sid!4v1700000000000!5m2!1sen!2sid"
+								src={mapUrl}
 								width="100%"
 								height="100%"
 								style={{ border: 0 }}

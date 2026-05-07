@@ -4,6 +4,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { Search, Star, ShoppingCart, ChevronDown, Loader2, Heart } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import Link from 'next/link';
+import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import { useCart } from '@/context/CartContext';
 import { useWishlist } from '@/context/WishlistContext';
 
@@ -27,13 +28,16 @@ const formatIDR = (amount: number) => {
   }).format(amount).replace(/\s/g, '');
 };
 
-export default function EcommercePage() {
+function EcommerceContent() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const pathname = usePathname();
   const { addToCart } = useCart();
   const { toggleWishlist, isInWishlist } = useWishlist();
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [activeCategory, setActiveCategory] = useState('Semua');
+  const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || '');
+  const [activeCategory, setActiveCategory] = useState(searchParams.get('category') || 'Semua');
 
   const categories = ['Semua', 'Sayuran', 'Buah', 'Daging', 'Bumbu Masak'];
 
@@ -65,6 +69,24 @@ export default function EcommercePage() {
       return matchesSearch && matchesCategory;
     });
   }, [searchQuery, activeCategory, products]);
+
+  // Sync to URL
+  useEffect(() => {
+    const params = new URLSearchParams(searchParams.toString());
+    if (searchQuery) {
+      params.set('q', searchQuery);
+    } else {
+      params.delete('q');
+    }
+    
+    if (activeCategory && activeCategory !== 'Semua') {
+      params.set('category', activeCategory);
+    } else {
+      params.delete('category');
+    }
+
+    router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+  }, [searchQuery, activeCategory, pathname, router, searchParams]);
 
   if (loading) {
     return (
@@ -252,5 +274,18 @@ export default function EcommercePage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function EcommercePage() {
+  return (
+    <React.Suspense fallback={
+      <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50">
+        <Loader2 className="w-12 h-12 text-[#00AA13] animate-spin mb-4" />
+        <p className="text-gray-500 font-bold animate-pulse">Memuat...</p>
+      </div>
+    }>
+      <EcommerceContent />
+    </React.Suspense>
   );
 }

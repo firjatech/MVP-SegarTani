@@ -2,6 +2,7 @@
 
 import React, { useState, useMemo } from 'react';
 import Link from 'next/link';
+import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import { Search, Star, ShoppingCart, ChevronDown, ArrowRight } from 'lucide-react';
 
 // Data Katalog Bahan Masakan SegarTani (Static Data untuk Demo Berkualitas)
@@ -44,9 +45,12 @@ const formatIDR = (amount: number) => {
   }).format(amount).replace(/\s/g, '');
 };
 
-export default function ProductPage() {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [activeCategory, setActiveCategory] = useState('Semua');
+function ProductContent() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const pathname = usePathname();
+  const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || '');
+  const [activeCategory, setActiveCategory] = useState(searchParams.get('category') || 'Semua');
 
   const categories = ['Semua', 'Sayuran', 'Buah', 'Daging', 'Bumbu Masak'];
 
@@ -58,6 +62,23 @@ export default function ProductPage() {
       return matchesSearch && matchesCategory;
     });
   }, [searchQuery, activeCategory]);
+
+  React.useEffect(() => {
+    const params = new URLSearchParams(searchParams.toString());
+    if (searchQuery) {
+      params.set('q', searchQuery);
+    } else {
+      params.delete('q');
+    }
+    
+    if (activeCategory && activeCategory !== 'Semua') {
+      params.set('category', activeCategory);
+    } else {
+      params.delete('category');
+    }
+
+    router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+  }, [searchQuery, activeCategory, pathname, router, searchParams]);
 
   return (
     <div className="bg-white min-h-screen pb-20 font-sans">
@@ -193,5 +214,17 @@ export default function ProductPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function ProductPage() {
+  return (
+    <React.Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-white">
+        <p className="text-gray-500 font-bold animate-pulse">Memuat...</p>
+      </div>
+    }>
+      <ProductContent />
+    </React.Suspense>
   );
 }

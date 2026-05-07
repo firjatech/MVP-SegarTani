@@ -190,9 +190,51 @@ export default function CheckoutPage() {
         if (decreaseError) console.error(`Gagal mengurangi stok ${item.name}:`, decreaseError);
       }
 
-      // 4. Success handling
-      setOrderSuccess(true);
+      // 5. Integrasi Midtrans Payment Gateway
+      const customerDetails = {
+        first_name: formData.full_name,
+        phone: formData.phone,
+        billing_address: {
+            address: formData.address,
+            city: formData.city,
+            postal_code: formData.postal_code,
+            country_code: 'IDN'
+        }
+      };
+
+      const midtransItems = selectedItems.map(item => ({
+        id: item.id.toString(),
+        price: item.price,
+        quantity: item.quantity,
+        name: item.name.substring(0, 50)
+      }));
+
+      const response = await fetch('/api/payment/midtrans', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          order_id: orderData.id,
+          gross_amount: finalPrice,
+          customer_details: customerDetails,
+          item_details: midtransItems
+        })
+      });
+
+      const paymentData = await response.json();
+      if (!response.ok) throw new Error(paymentData.error || 'Gagal memproses pembayaran Midtrans');
+
+      // Update order dengan URL pembayaran
+      await supabase.from('orders').update({
+        payment_url: paymentData.redirect_url,
+        payment_token: paymentData.token
+      }).eq('id', orderData.id);
+
+      // Bersihkan keranjang
       clearCart();
+
+      // Redirect pembeli ke halaman pembayaran Midtrans yang aman
+      window.location.href = paymentData.redirect_url;
+      return;
     } catch (err: any) {
       // Log full error details for debugging
       const errMsg = err?.message || err?.error_description || JSON.stringify(err) || 'Unknown error';
@@ -298,7 +340,7 @@ export default function CheckoutPage() {
                           type="tel" 
                           required
                           value={formData.phone}
-                          onChange={(e) => setFormData({...formData, phone: e.target.value})}
+                          onChange={(e) => setFormData({...formData, phone: e.target.value.replace(/\D/g, '')})}
                           placeholder="0812xxxx" 
                           className="w-full bg-gray-50 border-none rounded-2xl px-14 py-4 focus:ring-4 focus:ring-[#00AA13]/5 text-gray-700 font-medium transition-all" 
                         />

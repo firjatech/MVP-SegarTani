@@ -39,25 +39,8 @@ export default function RegisterPage() {
       if (signUpError) throw signUpError;
 
       if (data.user) {
-        // 2. Create Profile entry
-        // Catatan: Jika konfirmasi email aktif, insert ini mungkin gagal karena RLS 
-        // yang membutuhkan user terautentikasi. User baru bisa mengupdate profile setelah konfirmasi email & login.
-        const { error: profileError } = await supabase
-          .from('profiles')
-          .insert([
-            {
-              id: data.user.id,
-              full_name: fullName,
-            },
-          ]);
-
-        if (profileError) {
-          console.error('Error creating profile:', profileError.message);
-          // Kita tidak lempar error di sini karena user utamanya sudah berhasil terbuat di Auth
-        }
-
+        // Data profil sekarang dibuat otomatis oleh TRIGGER di database.
         setSuccess(true);
-        // Otomatis redirect ke login setelah 4 detik
         setTimeout(() => {
           router.push('/login');
         }, 4000);
