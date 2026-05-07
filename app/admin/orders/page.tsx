@@ -88,15 +88,22 @@ export default function AdminOrdersPage() {
   }, []);
 
   const updateStatus = async (orderId: string, newStatus: string) => {
+    // Simpan status lama untuk rollback
+    const oldStatus = orders.find(o => o.id === orderId)?.status;
+    
+    // Optimistic update: langsung update state
+    setOrders(prev => prev.map(o => o.id === orderId ? { ...o, status: newStatus } : o));
     setUpdatingId(orderId);
+
+    // Kirim ke server di background
     const { error } = await supabase
       .from('orders')
       .update({ status: newStatus })
       .eq('id', orderId);
 
-    if (!error) {
-      setOrders(prev => prev.map(o => o.id === orderId ? { ...o, status: newStatus } : o));
-    } else {
+    if (error) {
+      // Rollback jika gagal
+      setOrders(prev => prev.map(o => o.id === orderId ? { ...o, status: oldStatus || 'pending' } : o));
       alert('Gagal mengupdate status: ' + error.message);
     }
     setUpdatingId(null);

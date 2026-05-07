@@ -7,6 +7,7 @@ import { Mail, Lock, User, ArrowRight, Loader2, AlertCircle, CheckCircle2 } from
 import { motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
+import { registerFormSchema } from '@/lib/validations';
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -16,12 +17,26 @@ export default function RegisterPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
     setError(null);
     setSuccess(false);
+
+    // Validasi dengan Zod safeParse
+    const result = registerFormSchema.safeParse({ fullName, email, password });
+    if (!result.success) {
+      const errors: Record<string, string> = {};
+      result.error.issues.forEach((err) => {
+        const field = err.path[0] as string;
+        if (!errors[field]) errors[field] = err.message;
+      });
+      setFieldErrors(errors);
+      return;
+    }
+    setFieldErrors({});
+    setLoading(true);
 
     try {
       // 1. Sign Up User
@@ -121,11 +136,12 @@ export default function RegisterPage() {
                     type="text" 
                     required
                     value={fullName}
-                    onChange={(e) => setFullName(e.target.value)}
+                    onChange={(e) => { setFullName(e.target.value); if (fieldErrors.fullName) setFieldErrors(prev => ({...prev, fullName: ''})); }}
                     placeholder="Masukkan nama lengkap kamu" 
-                    className="w-full bg-white border border-gray-100 rounded-2xl px-14 py-5 focus:outline-none focus:border-[#00AA13] focus:ring-4 focus:ring-[#00AA13]/5 text-gray-700 font-medium transition-all" 
+                    className={`w-full bg-white border rounded-2xl px-14 py-5 focus:outline-none focus:border-[#00AA13] focus:ring-4 focus:ring-[#00AA13]/5 text-gray-700 font-medium transition-all ${fieldErrors.fullName ? 'border-red-400 bg-red-50/30' : 'border-gray-100'}`}
                   />
                 </div>
+                {fieldErrors.fullName && <p className="text-xs font-bold text-red-500 mt-2 px-2">{fieldErrors.fullName}</p>}
               </div>
 
               <div>
@@ -136,11 +152,12 @@ export default function RegisterPage() {
                     type="email" 
                     required
                     value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    onChange={(e) => { setEmail(e.target.value); if (fieldErrors.email) setFieldErrors(prev => ({...prev, email: ''})); }}
                     placeholder="Masukkan email kamu" 
-                    className="w-full bg-white border border-gray-100 rounded-2xl px-14 py-5 focus:outline-none focus:border-[#00AA13] focus:ring-4 focus:ring-[#00AA13]/5 text-gray-700 font-medium transition-all" 
+                    className={`w-full bg-white border rounded-2xl px-14 py-5 focus:outline-none focus:border-[#00AA13] focus:ring-4 focus:ring-[#00AA13]/5 text-gray-700 font-medium transition-all ${fieldErrors.email ? 'border-red-400 bg-red-50/30' : 'border-gray-100'}`}
                   />
                 </div>
+                {fieldErrors.email && <p className="text-xs font-bold text-red-500 mt-2 px-2">{fieldErrors.email}</p>}
               </div>
 
               <div>
@@ -151,12 +168,13 @@ export default function RegisterPage() {
                     type="password" 
                     required
                     value={password}
-                    onChange={(e) => setPassword(e.target.value)}
+                    onChange={(e) => { setPassword(e.target.value); if (fieldErrors.password) setFieldErrors(prev => ({...prev, password: ''})); }}
                     placeholder="Minimal 6 karakter" 
                     minLength={6}
-                    className="w-full bg-white border border-gray-100 rounded-2xl px-14 py-5 focus:outline-none focus:border-[#00AA13] focus:ring-4 focus:ring-[#00AA13]/5 text-gray-700 font-medium transition-all" 
+                    className={`w-full bg-white border rounded-2xl px-14 py-5 focus:outline-none focus:border-[#00AA13] focus:ring-4 focus:ring-[#00AA13]/5 text-gray-700 font-medium transition-all ${fieldErrors.password ? 'border-red-400 bg-red-50/30' : 'border-gray-100'}`}
                   />
                 </div>
+                {fieldErrors.password && <p className="text-xs font-bold text-red-500 mt-2 px-2">{fieldErrors.password}</p>}
               </div>
 
               <button 

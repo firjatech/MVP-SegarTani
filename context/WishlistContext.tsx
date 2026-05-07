@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 import { supabase } from '@/lib/supabase';
 
 export interface WishlistItem {
@@ -26,6 +26,7 @@ const WishlistContext = createContext<WishlistContextType | undefined>(undefined
 export function WishlistProvider({ children }: { children: React.ReactNode }) {
   const [wishlist, setWishlist] = useState<WishlistItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const isLoaded = useRef(false);
 
   // Load wishlist
   useEffect(() => {
@@ -74,6 +75,7 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
       } catch (err) {
         console.error('Error loading wishlist:', err);
       } finally {
+        isLoaded.current = true;
         setLoading(false);
       }
     }
@@ -82,11 +84,19 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   // Save to localStorage as backup/for guest sessions
+  // PENTING: Hanya save setelah data awal sudah di-load agar tidak menimpa data lama
   useEffect(() => {
+    if (!isLoaded.current) return;
     localStorage.setItem('segar-tani-wishlist', JSON.stringify(wishlist));
   }, [wishlist]);
 
   const addToWishlist = async (item: WishlistItem) => {
+    // Optimistic update: langsung update state
+    setWishlist((prev) => {
+      if (prev.find(i => i.id === item.id)) return prev;
+      return [...prev, item];
+    });
+
     try {
       const { data: { user } } = await supabase.auth.getUser();
 
@@ -96,20 +106,23 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
           .insert({ user_id: user.id, product_id: item.id });
         
         if (error && error.code !== '23505') { // 23505 is unique violation
+          // Rollback on error
+          setWishlist((prev) => prev.filter(i => i.id !== item.id));
           throw error;
         }
       }
-
-      setWishlist((prev) => {
-        if (prev.find(i => i.id === item.id)) return prev;
-        return [...prev, item];
-      });
     } catch (err) {
       console.error('Error adding to wishlist:', err);
     }
   };
 
   const removeFromWishlist = async (id: number) => {
+    // Simpan item untuk rollback
+    const removedItem = wishlist.find(i => i.id === id);
+    
+    // Optimistic update: langsung hapus dari state
+    setWishlist((prev) => prev.filter(i => i.id !== id));
+
     try {
       const { data: { user } } = await supabase.auth.getUser();
 
@@ -120,10 +133,14 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
           .eq('user_id', user.id)
           .eq('product_id', id);
         
-        if (error) throw error;
+        if (error) {
+          // Rollback on error
+          if (removedItem) {
+            setWishlist((prev) => [...prev, removedItem]);
+          }
+          throw error;
+        }
       }
-
-      setWishlist((prev) => prev.filter(i => i.id !== id));
     } catch (err) {
       console.error('Error removing from wishlist:', err);
     }

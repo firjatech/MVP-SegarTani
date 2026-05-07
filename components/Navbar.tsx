@@ -377,6 +377,18 @@ export default function Navbar() {
                 >
                   <MapPin size={20} /> Cari Lokasi
                 </Link>
+                {isAdmin && (
+                  <>
+                    <div className="h-px bg-white/20 my-4"></div>
+                    <Link
+                      href="/admin"
+                      onClick={() => setIsSidebarOpen(false)}
+                      className="flex items-center gap-3 text-yellow-300 hover:text-white hover:bg-white/10 p-3 rounded-xl transition-all font-bold"
+                    >
+                      <Package size={20} /> Admin Panel
+                    </Link>
+                  </>
+                )}
                 <div className="h-px bg-white/20 my-4"></div>
                 <button
                   onClick={() => {

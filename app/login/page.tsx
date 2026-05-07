@@ -7,6 +7,7 @@ import { Mail, Lock, ArrowRight, Loader2, AlertCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
+import { loginFormSchema } from '@/lib/validations';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -14,11 +15,25 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
     setError(null);
+
+    // Validasi dengan Zod safeParse
+    const result = loginFormSchema.safeParse({ email, password });
+    if (!result.success) {
+      const errors: Record<string, string> = {};
+      result.error.issues.forEach((err) => {
+        const field = err.path[0] as string;
+        if (!errors[field]) errors[field] = err.message;
+      });
+      setFieldErrors(errors);
+      return;
+    }
+    setFieldErrors({});
+    setLoading(true);
 
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
@@ -79,11 +94,12 @@ export default function LoginPage() {
                     type="email" 
                     required
                     value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    onChange={(e) => { setEmail(e.target.value); if (fieldErrors.email) setFieldErrors(prev => ({...prev, email: ''})); }}
                     placeholder="Masukkan email kamu" 
-                    className="w-full bg-white border border-gray-100 rounded-2xl px-14 py-5 focus:outline-none focus:border-[#00AA13] focus:ring-4 focus:ring-[#00AA13]/5 text-gray-700 font-medium transition-all" 
+                    className={`w-full bg-white border rounded-2xl px-14 py-5 focus:outline-none focus:border-[#00AA13] focus:ring-4 focus:ring-[#00AA13]/5 text-gray-700 font-medium transition-all ${fieldErrors.email ? 'border-red-400 bg-red-50/30' : 'border-gray-100'}`}
                   />
                 </div>
+                {fieldErrors.email && <p className="text-xs font-bold text-red-500 mt-2 px-2">{fieldErrors.email}</p>}
               </div>
 
               <div>
@@ -97,11 +113,12 @@ export default function LoginPage() {
                     type="password" 
                     required
                     value={password}
-                    onChange={(e) => setPassword(e.target.value)}
+                    onChange={(e) => { setPassword(e.target.value); if (fieldErrors.password) setFieldErrors(prev => ({...prev, password: ''})); }}
                     placeholder="........." 
-                    className="w-full bg-white border border-gray-100 rounded-2xl px-14 py-5 focus:outline-none focus:border-[#00AA13] focus:ring-4 focus:ring-[#00AA13]/5 text-gray-700 font-medium transition-all" 
+                    className={`w-full bg-white border rounded-2xl px-14 py-5 focus:outline-none focus:border-[#00AA13] focus:ring-4 focus:ring-[#00AA13]/5 text-gray-700 font-medium transition-all ${fieldErrors.password ? 'border-red-400 bg-red-50/30' : 'border-gray-100'}`}
                   />
                 </div>
+                {fieldErrors.password && <p className="text-xs font-bold text-red-500 mt-2 px-2">{fieldErrors.password}</p>}
               </div>
 
               <button 

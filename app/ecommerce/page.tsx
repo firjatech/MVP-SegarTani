@@ -1,11 +1,12 @@
 'use client';
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { Search, Star, ShoppingCart, ChevronDown, Loader2, Heart } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import Link from 'next/link';
 import { useCart } from '@/context/CartContext';
 import { useWishlist } from '@/context/WishlistContext';
+import { useSearchParams, usePathname, useRouter } from 'next/navigation';
 
 interface Product {
   id: number;
@@ -32,10 +33,39 @@ export default function EcommercePage() {
   const { toggleWishlist, isInWishlist } = useWishlist();
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [activeCategory, setActiveCategory] = useState('Semua');
+
+  // URL-persistent search: baca dari URL params
+  const searchParams = useSearchParams();
+  const pathname = usePathname();
+  const router = useRouter();
+
+  const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || '');
+  const [activeCategory, setActiveCategory] = useState(searchParams.get('category') || 'Semua');
 
   const categories = ['Semua', 'Sayuran', 'Buah', 'Daging', 'Bumbu Masak'];
+
+  // Update URL saat search/category berubah (tanpa reload)
+  const updateURL = useCallback((query: string, category: string) => {
+    const params = new URLSearchParams();
+    if (query) params.set('q', query);
+    if (category && category !== 'Semua') params.set('category', category);
+
+    const paramString = params.toString();
+    const newUrl = paramString ? `${pathname}?${paramString}` : pathname;
+    router.replace(newUrl);
+  }, [pathname, router]);
+
+  // Handle search input
+  const handleSearchChange = (value: string) => {
+    setSearchQuery(value);
+    updateURL(value, activeCategory);
+  };
+
+  // Handle category change
+  const handleCategoryChange = (value: string) => {
+    setActiveCategory(value);
+    updateURL(searchQuery, value);
+  };
 
   useEffect(() => {
     async function fetchProducts() {
@@ -88,7 +118,7 @@ export default function EcommercePage() {
                 type="text"
                 placeholder="Cari bahan masakan..."
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                onChange={(e) => handleSearchChange(e.target.value)}
                 className="w-full pl-14 pr-6 py-4 md:py-5 focus:outline-none bg-transparent text-gray-800 placeholder-gray-400 font-bold"
               />
               <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-[#2E7D32] h-6 w-6" />
@@ -98,7 +128,7 @@ export default function EcommercePage() {
             <div className="relative w-full sm:w-72 bg-white">
               <select
                 value={activeCategory}
-                onChange={(e) => setActiveCategory(e.target.value)}
+                onChange={(e) => handleCategoryChange(e.target.value)}
                 className="w-full appearance-none bg-transparent text-gray-700 py-4 md:py-5 px-6 pr-12 focus:outline-none font-black cursor-pointer text-xs uppercase tracking-wider"
               >
                 {categories.map((cat) => (
@@ -242,7 +272,7 @@ export default function EcommercePage() {
                 Maaf, bahan masakan yang Anda cari tidak tersedia.
               </p>
               <button
-                onClick={() => { setSearchQuery(''); setActiveCategory('Semua'); }}
+                onClick={() => { handleSearchChange(''); handleCategoryChange('Semua'); }}
                 className="bg-[#2E7D32] text-white px-10 py-4 rounded-full font-bold shadow-xl hover:shadow-[#2E7D32]/30 active:scale-95 transition-all"
               >
                 Reset Pencarian

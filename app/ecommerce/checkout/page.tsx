@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { ArrowLeft, MapPin, Phone, User, Home, CreditCard, ShoppingBag, Loader2, CheckCircle2 } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { checkoutFormSchema } from '@/lib/validations';
 
 const formatIDR = (amount: number) => {
   return new Intl.NumberFormat('id-ID', {
@@ -34,6 +35,9 @@ export default function CheckoutPage() {
     province: '',
     postal_code: ''
   });
+
+  // State untuk error validasi per field
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
   const [voucherInput, setVoucherInput] = useState('');
   const [isApplyingVoucher, setIsApplyingVoucher] = useState(false);
@@ -71,6 +75,17 @@ export default function CheckoutPage() {
 
     loadProfile();
   }, [router]);
+
+  // Filter hanya angka untuk input telepon
+  const handlePhoneChange = (value: string) => {
+    // Hanya boleh angka dan +
+    const filtered = value.replace(/[^0-9+]/g, '');
+    setFormData({ ...formData, phone: filtered });
+    // Clear error saat user mengetik
+    if (fieldErrors.phone) {
+      setFieldErrors(prev => ({ ...prev, phone: '' }));
+    }
+  };
 
   const handleApplyVoucher = async () => {
     if (!voucherInput) return;
@@ -113,6 +128,25 @@ export default function CheckoutPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Validasi form menggunakan Zod safeParse
+    const result = checkoutFormSchema.safeParse(formData);
+    
+    if (!result.success) {
+      // Ambil error per-field dari Zod
+      const errors: Record<string, string> = {};
+      result.error.issues.forEach((err) => {
+        const field = err.path[0] as string;
+        if (!errors[field]) {
+          errors[field] = err.message;
+        }
+      });
+      setFieldErrors(errors);
+      return;
+    }
+
+    // Clear errors jika valid
+    setFieldErrors({});
     setLoading(true);
 
     try {
@@ -284,11 +318,19 @@ export default function CheckoutPage() {
                           type="text" 
                           required
                           value={formData.full_name}
-                          onChange={(e) => setFormData({...formData, full_name: e.target.value})}
+                          onChange={(e) => {
+                            setFormData({...formData, full_name: e.target.value});
+                            if (fieldErrors.full_name) setFieldErrors(prev => ({...prev, full_name: ''}));
+                          }}
                           placeholder="Nama lengkap Anda" 
-                          className="w-full bg-gray-50 border-none rounded-2xl px-14 py-4 focus:ring-4 focus:ring-[#00AA13]/5 text-gray-700 font-medium transition-all" 
+                          className={`w-full bg-gray-50 border rounded-2xl px-14 py-4 focus:ring-4 focus:ring-[#00AA13]/5 text-gray-700 font-medium transition-all ${
+                            fieldErrors.full_name ? 'border-red-400 bg-red-50/30' : 'border-transparent'
+                          }`}
                         />
                       </div>
+                      {fieldErrors.full_name && (
+                        <p className="text-xs font-bold text-red-500 mt-2 px-2">{fieldErrors.full_name}</p>
+                      )}
                     </div>
                     <div>
                       <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3">NOMOR TELEPON / WA</label>
@@ -298,11 +340,18 @@ export default function CheckoutPage() {
                           type="tel" 
                           required
                           value={formData.phone}
-                          onChange={(e) => setFormData({...formData, phone: e.target.value})}
-                          placeholder="0812xxxx" 
-                          className="w-full bg-gray-50 border-none rounded-2xl px-14 py-4 focus:ring-4 focus:ring-[#00AA13]/5 text-gray-700 font-medium transition-all" 
+                          onChange={(e) => handlePhoneChange(e.target.value)}
+                          placeholder="081234567890" 
+                          inputMode="numeric"
+                          className={`w-full bg-gray-50 border rounded-2xl px-14 py-4 focus:ring-4 focus:ring-[#00AA13]/5 text-gray-700 font-medium transition-all ${
+                            fieldErrors.phone ? 'border-red-400 bg-red-50/30' : 'border-transparent'
+                          }`}
                         />
                       </div>
+                      {fieldErrors.phone && (
+                        <p className="text-xs font-bold text-red-500 mt-2 px-2">{fieldErrors.phone}</p>
+                      )}
+                      <p className="text-[10px] font-bold text-gray-300 mt-1 px-2">Format: 08xxxxxxxxxx</p>
                     </div>
                   </div>
 
@@ -313,12 +362,20 @@ export default function CheckoutPage() {
                       <textarea 
                         required
                         value={formData.address}
-                        onChange={(e) => setFormData({...formData, address: e.target.value})}
+                        onChange={(e) => {
+                          setFormData({...formData, address: e.target.value});
+                          if (fieldErrors.address) setFieldErrors(prev => ({...prev, address: ''}));
+                        }}
                         placeholder="Nama jalan, nomor rumah, RT/RW, kelurahan..." 
                         rows={3}
-                        className="w-full bg-gray-50 border-none rounded-2xl px-14 py-4 focus:ring-4 focus:ring-[#00AA13]/5 text-gray-700 font-medium transition-all" 
+                        className={`w-full bg-gray-50 border rounded-2xl px-14 py-4 focus:ring-4 focus:ring-[#00AA13]/5 text-gray-700 font-medium transition-all ${
+                          fieldErrors.address ? 'border-red-400 bg-red-50/30' : 'border-transparent'
+                        }`}
                       />
                     </div>
+                    {fieldErrors.address && (
+                      <p className="text-xs font-bold text-red-500 mt-2 px-2">{fieldErrors.address}</p>
+                    )}
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -328,10 +385,18 @@ export default function CheckoutPage() {
                         type="text" 
                         required
                         value={formData.city}
-                        onChange={(e) => setFormData({...formData, city: e.target.value})}
+                        onChange={(e) => {
+                          setFormData({...formData, city: e.target.value});
+                          if (fieldErrors.city) setFieldErrors(prev => ({...prev, city: ''}));
+                        }}
                         placeholder="Contoh: Batu" 
-                        className="w-full bg-gray-50 border-none rounded-2xl px-6 py-4 focus:ring-4 focus:ring-[#00AA13]/5 text-gray-700 font-medium transition-all" 
+                        className={`w-full bg-gray-50 border rounded-2xl px-6 py-4 focus:ring-4 focus:ring-[#00AA13]/5 text-gray-700 font-medium transition-all ${
+                          fieldErrors.city ? 'border-red-400 bg-red-50/30' : 'border-transparent'
+                        }`}
                       />
+                      {fieldErrors.city && (
+                        <p className="text-xs font-bold text-red-500 mt-2 px-2">{fieldErrors.city}</p>
+                      )}
                     </div>
                     <div>
                       <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3">PROVINSI</label>
@@ -339,10 +404,18 @@ export default function CheckoutPage() {
                         type="text" 
                         required
                         value={formData.province}
-                        onChange={(e) => setFormData({...formData, province: e.target.value})}
+                        onChange={(e) => {
+                          setFormData({...formData, province: e.target.value});
+                          if (fieldErrors.province) setFieldErrors(prev => ({...prev, province: ''}));
+                        }}
                         placeholder="Jawa Timur" 
-                        className="w-full bg-gray-50 border-none rounded-2xl px-6 py-4 focus:ring-4 focus:ring-[#00AA13]/5 text-gray-700 font-medium transition-all" 
+                        className={`w-full bg-gray-50 border rounded-2xl px-6 py-4 focus:ring-4 focus:ring-[#00AA13]/5 text-gray-700 font-medium transition-all ${
+                          fieldErrors.province ? 'border-red-400 bg-red-50/30' : 'border-transparent'
+                        }`}
                       />
+                      {fieldErrors.province && (
+                        <p className="text-xs font-bold text-red-500 mt-2 px-2">{fieldErrors.province}</p>
+                      )}
                     </div>
                     <div>
                       <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3">KODE POS</label>
@@ -350,10 +423,21 @@ export default function CheckoutPage() {
                         type="text" 
                         required
                         value={formData.postal_code}
-                        onChange={(e) => setFormData({...formData, postal_code: e.target.value})}
-                        placeholder="65311" 
-                        className="w-full bg-gray-50 border-none rounded-2xl px-6 py-4 focus:ring-4 focus:ring-[#00AA13]/5 text-gray-700 font-medium transition-all" 
+                        onChange={(e) => {
+                          const val = e.target.value.replace(/[^0-9]/g, '').slice(0, 5);
+                          setFormData({...formData, postal_code: val});
+                          if (fieldErrors.postal_code) setFieldErrors(prev => ({...prev, postal_code: ''}));
+                        }}
+                        placeholder="65311"
+                        inputMode="numeric"
+                        maxLength={5}
+                        className={`w-full bg-gray-50 border rounded-2xl px-6 py-4 focus:ring-4 focus:ring-[#00AA13]/5 text-gray-700 font-medium transition-all ${
+                          fieldErrors.postal_code ? 'border-red-400 bg-red-50/30' : 'border-transparent'
+                        }`}
                       />
+                      {fieldErrors.postal_code && (
+                        <p className="text-xs font-bold text-red-500 mt-2 px-2">{fieldErrors.postal_code}</p>
+                      )}
                     </div>
                   </div>
 

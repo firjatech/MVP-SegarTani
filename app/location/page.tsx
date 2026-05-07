@@ -42,9 +42,41 @@ const locations = [
 	},
 ];
 
+// Generate Google Maps embed URL dari alamat
+function getMapEmbedUrl(address: string): string {
+	const encoded = encodeURIComponent(address);
+	return `https://maps.google.com/maps?q=${encoded}&t=&z=15&ie=UTF8&iwloc=&output=embed`;
+}
+
 export default function LocationPage() {
 	const [searchQuery, setSearchQuery] = useState("");
+	const [selectedAddress, setSelectedAddress] = useState(
+		locations[0].address // Default ke alamat pusat
+	);
+	const [activeLocationId, setActiveLocationId] = useState<number>(1);
 	const router = useRouter();
+
+	// Handle cek lokasi dari search bar
+	const handleSearch = () => {
+		if (searchQuery.trim()) {
+			setSelectedAddress(searchQuery.trim());
+			setActiveLocationId(0); // Deselect semua lokasi
+		}
+	};
+
+	// Handle klik lokasi cabang
+	const handleSelectLocation = (loc: typeof locations[0]) => {
+		setSelectedAddress(loc.address);
+		setActiveLocationId(loc.id);
+		setSearchQuery(""); // Clear search
+	};
+
+	// Handle enter key pada search
+	const handleKeyDown = (e: React.KeyboardEvent) => {
+		if (e.key === 'Enter') {
+			handleSearch();
+		}
+	};
 
 	return (
 		<div className="bg-white min-h-screen font-sans">
@@ -78,13 +110,17 @@ export default function LocationPage() {
 								<MapPin className="text-gray-400 mr-3" size={20} />
 								<input
 									type="text"
-									placeholder="Masukkan kota atau kodepos Anda..."
+									placeholder="Masukkan alamat lengkap, kota, atau kodepos..."
 									value={searchQuery}
 									onChange={(e) => setSearchQuery(e.target.value)}
+									onKeyDown={handleKeyDown}
 									className="w-full py-3 focus:outline-none text-gray-700 font-medium"
 								/>
 							</div>
-							<button className="bg-[#00AA13] text-white px-8 py-3.5 rounded-full font-bold hover:bg-[#00880F] transition-all shadow-lg active:scale-95">
+							<button 
+								onClick={handleSearch}
+								className="bg-[#00AA13] text-white px-8 py-3.5 rounded-full font-bold hover:bg-[#00880F] transition-all shadow-lg active:scale-95"
+							>
 								Cek Lokasi
 							</button>
 						</div>
@@ -108,10 +144,15 @@ export default function LocationPage() {
 							{locations.map((loc) => (
 								<div
 									key={loc.id}
-									className={`p-6 rounded-[1.5rem] border transition-all duration-300 hover:shadow-lg ${
-										loc.isPusat
-											? "bg-[#e8f5e9]/40 border-[#00AA13]/10"
-											: "bg-white border-gray-100"
+									onClick={() => handleSelectLocation(loc)}
+									className={`p-6 rounded-[1.5rem] border transition-all duration-300 hover:shadow-lg cursor-pointer ${
+										activeLocationId === loc.id
+											? loc.isPusat
+												? "bg-[#e8f5e9]/60 border-[#00AA13]/30 ring-2 ring-[#00AA13]/20"
+												: "bg-blue-50/40 border-blue-200 ring-2 ring-blue-100"
+											: loc.isPusat
+												? "bg-[#e8f5e9]/40 border-[#00AA13]/10"
+												: "bg-white border-gray-100"
 									}`}
 									data-aos="fade-right"
 									data-aos-delay="100"
@@ -123,6 +164,11 @@ export default function LocationPage() {
 										{loc.isPusat && (
 											<span className="bg-[#00AA13] text-white text-[9px] font-black px-2 py-0.5 rounded-full">
 												PUSAT
+											</span>
+										)}
+										{activeLocationId === loc.id && (
+											<span className="bg-blue-500 text-white text-[9px] font-black px-2 py-0.5 rounded-full animate-pulse">
+												DITAMPILKAN
 											</span>
 										)}
 									</div>
@@ -146,13 +192,14 @@ export default function LocationPage() {
 							))}
 						</div>
 
-						{/* Right Column: Sticky Map */}
+						{/* Right Column: Sticky Map - Realtime berdasarkan alamat */}
 						<div
 							className="lg:sticky lg:top-32 h-[500px] md:h-[580px] rounded-[2.5rem] overflow-hidden border border-gray-100 shadow-xl"
 							data-aos="fade-left"
 						>
 							<iframe
-								src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d126748.56347862248!2d107.573116!3d-6.903444!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e68e63982570777%3A0x3015766a410b0!2sBandung%2C%20Bandung%20City%2C%20West%20Java!5e0!3m2!1sen!2sid!4v1700000000000!5m2!1sen!2sid"
+								key={selectedAddress}
+								src={getMapEmbedUrl(selectedAddress)}
 								width="100%"
 								height="100%"
 								style={{ border: 0 }}
