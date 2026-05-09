@@ -139,6 +139,8 @@ export default function AboutPage() {
 								<Image
 									src="/images/trust.jfif"
 									alt="Kejujuran"
+									width={80}
+									height={80}
 									className="w-full h-full object-contain"
 								/>
 							</div>
@@ -154,9 +156,11 @@ export default function AboutPage() {
 							data-aos-delay="200"
 						>
 							<div className="mb-4 flex items-center justify-center h-20 w-20 rounded-full bg-white overflow-hidden p-3 shadow-sm border border-gray-100">
-								<img
+								<Image
 									src="/images/keberlanjutan.jfif"
 									alt="Keberlanjutan"
+									width={80}
+									height={80}
 									className="w-full h-full object-contain"
 								/>
 							</div>
@@ -174,9 +178,11 @@ export default function AboutPage() {
 							data-aos-delay="300"
 						>
 							<div className="mb-4 flex items-center justify-center h-20 w-20 rounded-full bg-white overflow-hidden shadow-sm border border-gray-100">
-								<img
+								<Image
 									src="/images/preview.jpg"
 									alt="Kebersamaan"
+									width={80}
+									height={80}
 									className="w-full h-full object-cover"
 								/>
 							</div>
