@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
+import { User } from "@supabase/supabase-js";
 import {
 	Star,
 	ShoppingCart,
@@ -34,6 +35,13 @@ interface Product {
 	stock: number;
 }
 
+interface Review {
+	user_name: string;
+	created_at: string;
+	rating: number;
+	comment: string;
+}
+
 const formatIDR = (amount: number) => {
 	return new Intl.NumberFormat("id-ID", {
 		style: "currency",
@@ -53,10 +61,10 @@ export default function ProductDetailPage() {
 	const { addToCart } = useCart();
 	const { toggleWishlist, isInWishlist } = useWishlist();
 	const [quantity, setQuantity] = useState(1);
-	const [reviews, setReviews] = useState<any[]>([]);
+	const [reviews, setReviews] = useState<Review[]>([]);
 	const [newReview, setNewReview] = useState({ rating: 5, comment: "" });
 	const [submittingReview, setSubmittingReview] = useState(false);
-	const [user, setUser] = useState<any>(null);
+	const [user, setUser] = useState<User | null>(null);
 
 	useEffect(() => {
 		async function fetchProduct() {
@@ -415,7 +423,7 @@ export default function ProductDetailPage() {
 											</div>
 										</div>
 										<p className="text-gray-600 font-medium leading-relaxed italic">
-											"{review.comment}"
+											&quot;{review.comment}&quot;
 										</p>
 									</div>
 								))

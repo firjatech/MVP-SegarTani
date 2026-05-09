@@ -46,8 +46,9 @@ export default function LoginPage() {
       if (data.user) {
         router.push('/ecommerce');
       }
-    } catch (err: any) {
-      setError(err.message || 'Gagal masuk. Silakan periksa kembali email dan password Anda.');
+    } catch (err) {
+      const error = err as Error;
+      setError(error.message || 'Gagal masuk. Silakan periksa kembali email dan password Anda.');
     } finally {
       setLoading(false);
     }

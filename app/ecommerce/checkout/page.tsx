@@ -227,13 +227,12 @@ export default function CheckoutPage() {
       // 4. Success handling
       setOrderSuccess(true);
       clearCart();
-    } catch (err: any) {
+    } catch (err) {
+      const error = err as Error;
       // Log full error details for debugging
-      const errMsg = err?.message || err?.error_description || JSON.stringify(err) || 'Unknown error';
-      const errCode = err?.code || '';
-      const errDetails = err?.details || '';
-      console.error('Checkout Error Full:', { message: errMsg, code: errCode, details: errDetails, raw: err });
-      alert(`Gagal memproses pesanan:\nCode: ${errCode}\nPesan: ${errMsg}\nDetail: ${errDetails}`);
+      const errMsg = error?.message || 'Unknown error';
+      console.error('Checkout Error Full:', { message: errMsg, raw: err });
+      alert(`Gagal memproses pesanan:\nPesan: ${errMsg}`);
     } finally {
       setLoading(false);
     }

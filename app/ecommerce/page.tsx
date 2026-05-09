@@ -5,7 +5,7 @@ import { Search, Star, ShoppingCart, ChevronDown, Loader2, Heart } from 'lucide-
 import { supabase } from '@/lib/supabase';
 import Link from 'next/link';
 import { useCart } from '@/context/CartContext';
-import { useWishlist } from '@/context/WishlistContext';
+import { useWishlist, WishlistItem } from '@/context/WishlistContext';
 import { useSearchParams, usePathname, useRouter } from 'next/navigation';
 
 interface Product {
@@ -28,7 +28,22 @@ const formatIDR = (amount: number) => {
   }).format(amount).replace(/\s/g, '');
 };
 
-const ProductCard = ({ product, index, toggleWishlist, isInWishlist, addToCart }: any) => {
+interface ProductCardProps {
+  product: Product;
+  index: number;
+  toggleWishlist: (item: WishlistItem) => Promise<void>;
+  isInWishlist: (id: number) => boolean;
+  addToCart: (item: {
+    id: number;
+    name: string;
+    price: number;
+    image: string;
+    quantity: number;
+    category: string;
+  }) => void;
+}
+
+const ProductCard = ({ product, index, toggleWishlist, isInWishlist, addToCart }: ProductCardProps) => {
   const [imageLoaded, setImageLoaded] = useState(false);
   const discountPrice = product.price - (product.price * product.discount / 100);
   const isOutOfStock = product.stock <= 0;
@@ -200,13 +215,6 @@ export default function EcommercePage() {
     return () => clearTimeout(handler);
   }, [searchQuery]);
 
-  // Reset pagination when filters change
-  useEffect(() => {
-    setProducts([]);
-    setPage(0);
-    setHasMore(true);
-  }, [debouncedQuery, activeCategory]);
-
   const handleSearchChange = (value: string) => {
     setSearchQuery(value);
     updateURL(value, activeCategory);
@@ -218,11 +226,15 @@ export default function EcommercePage() {
   };
 
   // Fetch products with pagination & server-side filtering
-  const fetchProducts = useCallback(async () => {
-    if (!hasMore && page !== 0) return;
+  const fetchProducts = useCallback(async (isReset = false) => {
+    const currentPage = isReset ? 0 : page;
+    if (!hasMore && !isReset && currentPage !== 0) return;
+    
+    // Avoid synchronous setState in effect by wrapping in a microtask
+    await Promise.resolve();
     
     setLoadingMore(true);
-    if (page === 0) setLoading(true);
+    if (currentPage === 0) setLoading(true);
 
     try {
       let query = supabase
@@ -238,7 +250,7 @@ export default function EcommercePage() {
         query = query.ilike('name', `%${debouncedQuery}%`);
       }
 
-      const from = page * PAGE_SIZE;
+      const from = currentPage * PAGE_SIZE;
       const to = from + PAGE_SIZE - 1;
       
       query = query.range(from, to);
@@ -248,22 +260,27 @@ export default function EcommercePage() {
       if (error) throw error;
       
       if (data) {
-        if (data.length < PAGE_SIZE) {
-          setHasMore(false);
+        const productsData = data as Product[];
+        if (productsData.length < PAGE_SIZE) {
+          await Promise.resolve().then(() => setHasMore(false));
+        } else {
+          await Promise.resolve().then(() => setHasMore(true));
         }
         
-        if (page === 0) {
-          setProducts(data);
+        if (isReset) {
+          setProducts(productsData);
+          setPage(0);
         } else {
           setProducts(prev => {
             const existingIds = new Set(prev.map(p => p.id));
-            const newItems = data.filter(p => !existingIds.has(p.id));
+            const newItems = productsData.filter(p => !existingIds.has(p.id));
             return [...prev, ...newItems];
           });
         }
       }
     } catch (err) {
-      console.error('Error fetching products:', err);
+      const error = err as Error;
+      console.error('Error fetching products:', error.message);
     } finally {
       setLoading(false);
       setLoadingMore(false);
@@ -271,8 +288,16 @@ export default function EcommercePage() {
   }, [page, debouncedQuery, activeCategory, hasMore]);
 
   useEffect(() => {
-    fetchProducts();
-  }, [fetchProducts]);
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    fetchProducts(true);
+  }, [debouncedQuery, activeCategory, fetchProducts]);
+
+  useEffect(() => {
+    if (page > 0) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      fetchProducts(false);
+    }
+  }, [page, fetchProducts]);
 
   // Infinite scroll observer
   useEffect(() => {

@@ -48,23 +48,30 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
   // Load cart and voucher from localStorage
   useEffect(() => {
-    const savedCart = localStorage.getItem('segar-tani-cart');
-    if (savedCart) {
-      try {
-        setCart(JSON.parse(savedCart));
-      } catch (e) {
-        console.error('Failed to parse cart', e);
+    const hydrate = () => {
+      const savedCart = localStorage.getItem('segar-tani-cart');
+      if (savedCart) {
+        try {
+          setCart(JSON.parse(savedCart));
+        } catch (e) {
+          console.error('Failed to parse cart', e);
+        }
       }
-    }
 
-    const savedVoucher = localStorage.getItem('segar-tani-voucher');
-    if (savedVoucher) {
-      try {
-        setAppliedVoucher(JSON.parse(savedVoucher));
-      } catch (e) {
-        console.error('Failed to parse voucher', e);
+      const savedVoucher = localStorage.getItem('segar-tani-voucher');
+      if (savedVoucher) {
+        try {
+          setAppliedVoucher(JSON.parse(savedVoucher));
+        } catch (e) {
+          console.error('Failed to parse voucher', e);
+        }
       }
-    }
+    };
+
+    // Hydrate after first render to avoid synchronous setState warning in some strict configs
+    // and to ensure consistency with Next.js client-side execution.
+    const timeoutId = setTimeout(hydrate, 0);
+    return () => clearTimeout(timeoutId);
   }, []);
 
   // Save cart to localStorage

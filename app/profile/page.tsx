@@ -89,8 +89,9 @@ export default function ProfilePage() {
 			if (error) throw error;
 			setSuccess(true);
 			setTimeout(() => setSuccess(false), 3000);
-		} catch (err: any) {
-			alert("Gagal menyimpan profil: " + err.message);
+		} catch (err) {
+			const error = err as Error;
+			alert("Gagal menyimpan profil: " + error.message);
 		} finally {
 			setSaving(false);
 		}

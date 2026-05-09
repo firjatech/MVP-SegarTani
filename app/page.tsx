@@ -223,7 +223,7 @@ export default function Home() {
 							5000+ Ibu Rumah Tangga
 						</h2>
 						<p className="text-xl text-gray-500 font-medium">
-							Jangan Lewatkan Promo "Dapur Sehat" Setiap Minggunya.
+							Jangan Lewatkan Promo &quot;Dapur Sehat&quot; Setiap Minggunya.
 						</p>
 					</div>
 
@@ -235,8 +235,8 @@ export default function Home() {
 							data-aos-delay={100}
 						>
 							<p className="text-gray-600 italic text-lg mb-10 leading-relaxed">
-								"Sayurnya segar banget, pengiriman juga cepat. Sangat membantu
-								untuk ibu pekerja seperti saya!"
+								&quot;Sayurnya segar banget, pengiriman juga cepat. Sangat membantu
+								untuk ibu pekerja seperti saya!&quot;
 							</p>
 							<p className="text-[#00AA13] font-bold text-lg">
 								- Rina, Jakarta
@@ -250,8 +250,8 @@ export default function Home() {
 							data-aos-delay={200}
 						>
 							<p className="text-gray-600 italic text-lg mb-10 leading-relaxed">
-								"Harganya lebih murah dari supermarket, kualitasnya jauh lebih
-								bagus. Mantap SegarTani!"
+								&quot;Harganya lebih murah dari supermarket, kualitasnya jauh lebih
+								bagus. Mantap SegarTani!&quot;
 							</p>
 							<p className="text-[#00AA13] font-bold text-lg">- Siti, Depok</p>
 						</div>
@@ -263,8 +263,8 @@ export default function Home() {
 							data-aos-delay={300}
 						>
 							<p className="text-gray-600 italic text-lg mb-10 leading-relaxed">
-								"Bumbu dapurnya lengkap dan selalu fresh. Langganan bulanan
-								sekarang."
+								&quot;Bumbu dapurnya lengkap dan selalu fresh. Langganan bulanan
+								sekarang.&quot;
 							</p>
 							<p className="text-[#00AA13] font-bold text-lg">
 								- Anisa, Tangerang
