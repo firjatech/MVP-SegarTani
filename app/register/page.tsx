@@ -45,8 +45,8 @@ export default function RegisterPage() {
           router.push('/login');
         }, 4000);
       }
-    } catch (err: any) {
-      setError(err.message || 'Gagal mendaftar. Silakan coba lagi.');
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Gagal mendaftar. Silakan coba lagi.');
     } finally {
       setLoading(false);
     }

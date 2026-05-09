@@ -23,6 +23,26 @@ const nextConfig: NextConfig = {
         protocol: 'https',
         hostname: 'i1.wp.com',
       },
+      {
+        protocol: 'https',
+        hostname: 'www.gstatic.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'qjfuebkxlnnrdjgakdrm.supabase.co',
+      },
+      {
+        protocol: 'https',
+        hostname: 'image.astronauts.cloud',
+      },
+      {
+        protocol: 'https',
+        hostname: 'down-id.img.susercontent.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'desagrogol.gunungkidulkab.go.id',
+      },
     ],
   },
 };

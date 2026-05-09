@@ -7,6 +7,7 @@ import {
   PackageSearch, Plus, Edit2, Trash2, Image as ImageIcon,
   Loader2, AlertCircle, CheckCircle2, Search, X, Upload, ArrowLeft
 } from 'lucide-react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -55,9 +56,19 @@ function AdminProductsContent() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    checkUserAndFetch();
-  }, []);
+  const fetchProducts = async (sellerId: string) => {
+    setLoading(true);
+    const { data, error } = await supabase
+      .from('products')
+      .select('*')
+      .eq('seller_id', sellerId)
+      .order('created_at', { ascending: false });
+
+    if (!error && data) {
+      setProducts(data);
+    }
+    setLoading(false);
+  };
 
   const checkUserAndFetch = async () => {
     const { data: { user } } = await supabase.auth.getUser();
@@ -78,19 +89,9 @@ function AdminProductsContent() {
     fetchProducts(user.id);
   };
 
-  const fetchProducts = async (sellerId: string) => {
-    setLoading(true);
-    const { data, error } = await supabase
-      .from('products')
-      .select('*')
-      .eq('seller_id', sellerId)
-      .order('created_at', { ascending: false });
-
-    if (!error && data) {
-      setProducts(data);
-    }
-    setLoading(false);
-  };
+  useEffect(() => {
+    Promise.resolve().then(() => checkUserAndFetch());
+  }, []);
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -145,8 +146,8 @@ function AdminProductsContent() {
         }
         setIsModalOpen(false);
       }
-    } catch (err: any) {
-      setError(err.message || 'Gagal menyimpan produk');
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Gagal menyimpan produk');
     } finally {
       setSaving(false);
     }
@@ -256,7 +257,7 @@ function AdminProductsContent() {
                   {/* Image */}
                   <div className="relative h-48 bg-gray-100 overflow-hidden">
                     {p.image ? (
-                      <img src={p.image} alt={p.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                      <Image src={p.image} alt={p.name} fill className="object-cover group-hover:scale-105 transition-transform duration-500" />
                     ) : (
                       <div className="w-full h-full flex flex-col items-center justify-center text-gray-300">
                         <ImageIcon size={32} />
@@ -328,7 +329,9 @@ function AdminProductsContent() {
                     <div className="flex gap-6 items-center">
                       <div className="w-32 h-32 rounded-2xl bg-gray-50 border-2 border-dashed border-gray-200 overflow-hidden flex items-center justify-center shrink-0">
                         {currentProduct.image ? (
-                          <img src={currentProduct.image} alt="Preview" className="w-full h-full object-cover" />
+                          <div className="relative w-full h-full">
+                            <Image src={currentProduct.image} alt="Preview" fill className="object-cover" />
+                          </div>
                         ) : (
                           <ImageIcon size={32} className="text-gray-300" />
                         )}

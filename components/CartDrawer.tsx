@@ -3,6 +3,7 @@
 import React from 'react';
 import { useCart } from '@/context/CartContext';
 import { X, Minus, Plus, Trash2, ShoppingBag, ArrowRight, Check } from 'lucide-react';
+import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 
@@ -93,8 +94,8 @@ export default function CartDrawer() {
                       {item.selected && <Check size={14} className="text-white" strokeWidth={4} />}
                     </button>
 
-                    <div className="w-20 h-20 bg-gray-50 rounded-2xl overflow-hidden flex-shrink-0 border border-gray-100">
-                      <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+                    <div className="w-20 h-20 bg-gray-50 rounded-2xl overflow-hidden flex-shrink-0 border border-gray-100 relative">
+                      <Image src={item.image} alt={item.name} fill className="object-cover" />
                     </div>
                     <div className="flex-1 flex flex-col justify-center">
                       <div className="flex justify-between items-start mb-1">

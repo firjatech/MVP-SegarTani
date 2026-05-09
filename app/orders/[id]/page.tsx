@@ -9,6 +9,7 @@ import {
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { useParams, useRouter } from 'next/navigation';
+import Image from 'next/image';
 
 interface OrderItem {
   id: number;
@@ -271,8 +272,8 @@ export default function OrderDetailPage() {
               <div className="space-y-6">
                 {order.order_items.map((item, idx) => (
                   <div key={idx} className="flex items-center gap-5 pb-6 border-b border-gray-50 last:border-0 last:pb-0">
-                    <div className="w-20 h-20 bg-gray-50 rounded-2xl overflow-hidden flex-shrink-0 border border-gray-100 shadow-sm">
-                      <img src={item.image_url} alt={item.product_name} className="w-full h-full object-cover" />
+                    <div className="w-20 h-20 bg-gray-50 rounded-2xl overflow-hidden flex-shrink-0 border border-gray-100 shadow-sm relative">
+                      <Image src={item.image_url} alt={item.product_name} fill className="object-cover" />
                     </div>
                     <div className="flex-1 min-w-0">
                       <h4 className="text-sm font-black text-gray-900 mb-1">{item.product_name}</h4>

@@ -4,15 +4,12 @@ import React, { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 import {
 	User,
-	Mail,
 	Phone,
-	MapPin,
 	Home,
 	Camera,
 	Loader2,
 	CheckCircle2,
 	ArrowLeft,
-	Package,
 	ShoppingBag,
 	ChevronRight,
 	Store,
@@ -93,8 +90,8 @@ export default function ProfilePage() {
 			if (error) throw error;
 			setSuccess(true);
 			setTimeout(() => setSuccess(false), 3000);
-		} catch (err: any) {
-			alert("Gagal menyimpan profil: " + err.message);
+		} catch (err: unknown) {
+			alert("Gagal menyimpan profil: " + (err instanceof Error ? err.message : String(err)));
 		} finally {
 			setSaving(false);
 		}

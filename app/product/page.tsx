@@ -4,6 +4,7 @@ import React, { useState, useMemo } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import { Search, Star, ShoppingCart, ChevronDown, ArrowRight } from 'lucide-react';
+import Image from 'next/image';
 
 // Data Katalog Bahan Masakan SegarTani (Static Data untuk Demo Berkualitas)
 const products = [
@@ -152,10 +153,11 @@ function ProductContent() {
                         </span>
                       </div>
                     )}
-                    <img
+                    <Image
                       src={product.image}
                       alt={product.name}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-in-out"
+                      fill
+                      className="object-cover group-hover:scale-110 transition-transform duration-700 ease-in-out"
                     />
                     <div className="absolute top-5 right-5">
                       <span className="bg-white/90 backdrop-blur-sm text-[#2E7D32] text-[10px] font-black px-3 py-1 rounded-lg border border-[#2E7D32]/20">

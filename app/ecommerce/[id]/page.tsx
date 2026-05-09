@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
+import { User } from "@supabase/supabase-js";
 import {
 	Star,
 	ShoppingCart,
@@ -35,6 +36,16 @@ interface Product {
 	seller_id: string;
 }
 
+interface Review {
+	id: number;
+	product_id: string;
+	user_id: string;
+	user_name: string;
+	rating: number;
+	comment: string;
+	created_at: string;
+}
+
 const formatIDR = (amount: number) => {
 	return new Intl.NumberFormat("id-ID", {
 		style: "currency",
@@ -54,10 +65,10 @@ export default function ProductDetailPage() {
 	const { addToCart } = useCart();
 	const { toggleWishlist, isInWishlist } = useWishlist();
 	const [quantity, setQuantity] = useState(1);
-	const [reviews, setReviews] = useState<any[]>([]);
+	const [reviews, setReviews] = useState<Review[]>([]);
 	const [newReview, setNewReview] = useState({ rating: 5, comment: "" });
 	const [submittingReview, setSubmittingReview] = useState(false);
-	const [user, setUser] = useState<any>(null);
+	const [user, setUser] = useState<User | null>(null);
 
 	useEffect(() => {
 		async function fetchProduct() {
@@ -198,10 +209,11 @@ export default function ProductDetailPage() {
 									</div>
 								)}
 
-								<img
+								<Image
 									src={product.image}
 									alt={product.name}
-									className={`w-full h-full object-contain transition-transform duration-500 ${isOutOfStock ? "opacity-50" : "hover:scale-105"}`}
+									fill
+									className={`object-contain transition-transform duration-500 ${isOutOfStock ? "opacity-50" : "hover:scale-105"}`}
 								/>
 							</div>
 						</div>
@@ -418,7 +430,7 @@ export default function ProductDetailPage() {
 											</div>
 										</div>
 										<p className="text-gray-600 font-medium leading-relaxed italic">
-											"{review.comment}"
+											&quot;{review.comment}&quot;
 										</p>
 									</div>
 								))

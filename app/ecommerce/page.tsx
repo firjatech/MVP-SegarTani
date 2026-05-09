@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useState, useEffect, useMemo } from 'react';
-import { Search, Star, ShoppingCart, ChevronDown, Loader2, Heart } from 'lucide-react';
+import { Search, Star, ShoppingCart, ChevronDown, Heart } from 'lucide-react';
+import Image from 'next/image';
 import { supabase } from '@/lib/supabase';
 import Link from 'next/link';
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
@@ -193,10 +194,11 @@ function EcommerceContent() {
                         </div>
                       )}
 
-                      <img
+                      <Image
                         src={product.image}
                         alt={product.name}
-                        className={`w-full h-full object-cover transition-transform duration-700 ease-in-out ${isOutOfStock ? '' : 'group-hover:scale-110'}`}
+                        fill
+                        className={`object-cover transition-transform duration-700 ease-in-out ${isOutOfStock ? '' : 'group-hover:scale-110'}`}
                       />
                       <div className="absolute top-5 right-5 flex flex-col items-end gap-2 z-10">
                         <span className="bg-white/90 backdrop-blur-sm text-[#2E7D32] text-[10px] font-black px-3 py-1 rounded-lg border border-[#2E7D32]/20">
