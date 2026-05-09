@@ -45,6 +45,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [appliedVoucher, setAppliedVoucher] = useState<Voucher | null>(null);
+  const [isInitialized, setIsInitialized] = useState(false);
 
   // Load cart and voucher from localStorage
   useEffect(() => {
@@ -76,17 +77,21 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
   // Save cart to localStorage
   useEffect(() => {
-    localStorage.setItem('segar-tani-cart', JSON.stringify(cart));
-  }, [cart]);
+    if (isInitialized) {
+      localStorage.setItem('segar-tani-cart', JSON.stringify(cart));
+    }
+  }, [cart, isInitialized]);
 
   // Save voucher to localStorage
   useEffect(() => {
-    if (appliedVoucher) {
-      localStorage.setItem('segar-tani-voucher', JSON.stringify(appliedVoucher));
-    } else {
-      localStorage.removeItem('segar-tani-voucher');
+    if (isInitialized) {
+      if (appliedVoucher) {
+        localStorage.setItem('segar-tani-voucher', JSON.stringify(appliedVoucher));
+      } else {
+        localStorage.removeItem('segar-tani-voucher');
+      }
     }
-  }, [appliedVoucher]);
+  }, [appliedVoucher, isInitialized]);
 
   const addToCart = (item: Omit<CartItem, 'selected'>) => {
     setCart((prevCart) => {

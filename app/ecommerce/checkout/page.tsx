@@ -224,8 +224,7 @@ export default function CheckoutPage() {
         if (decreaseError) console.error(`Gagal mengurangi stok ${item.name}:`, decreaseError);
       }
 
-      // 4. Success handling
-      setOrderSuccess(true);
+      // 5. Bersihkan keranjang
       clearCart();
     } catch (err) {
       const error = err as Error;
@@ -452,7 +451,7 @@ export default function CheckoutPage() {
                         </>
                       ) : (
                         <>
-                          Bayar Sekarang ({formatIDR(finalPrice)})
+                          Buat Pesanan ({formatIDR(finalPrice)})
                         </>
                       )}
                     </button>

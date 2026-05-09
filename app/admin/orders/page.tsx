@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import { ShoppingBag, Package, Clock, CheckCircle2, Truck, AlertCircle, Search, Loader2, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
+import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import { motion } from 'framer-motion';
 
 interface OrderItem {
@@ -42,12 +43,16 @@ const statusOptions = [
   { value: 'cancelled', label: 'Cancelled', color: 'text-red-600 bg-red-50' },
 ];
 
-export default function AdminOrdersPage() {
+function AdminOrdersContent() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const pathname = usePathname();
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [isSeller, setIsSeller] = useState(false);
   const [updatingId, setUpdatingId] = useState<string | null>(null);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || '');
 
   useEffect(() => {
     async function checkAdminAndFetch() {
@@ -59,12 +64,13 @@ export default function AdminOrdersPage() {
 
       const { data: profile } = await supabase
         .from('profiles')
-        .select('is_admin')
+        .select('is_admin, is_seller')
         .eq('id', user.id)
         .single();
 
-      if (profile?.is_admin) {
-        setIsAdmin(true);
+      if (profile?.is_admin || profile?.is_seller) {
+        setIsAdmin(profile.is_admin || false);
+        setIsSeller(profile.is_seller || false);
         fetchOrders();
       } else {
         setLoading(false);
@@ -114,6 +120,16 @@ export default function AdminOrdersPage() {
     (String(order.id).toLowerCase()).includes(searchQuery.toLowerCase())
   );
 
+  useEffect(() => {
+    const params = new URLSearchParams(searchParams.toString());
+    if (searchQuery) {
+      params.set('q', searchQuery);
+    } else {
+      params.delete('q');
+    }
+    router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+  }, [searchQuery, pathname, router, searchParams]);
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -122,7 +138,7 @@ export default function AdminOrdersPage() {
     );
   }
 
-  if (!isAdmin) {
+  if (!isAdmin && !isSeller) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 p-6 text-center">
         <AlertCircle size={60} className="text-red-500 mb-4" />
@@ -250,5 +266,17 @@ export default function AdminOrdersPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function AdminOrdersPage() {
+  return (
+    <React.Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <Loader2 className="animate-spin text-[#00AA13]" size={40} />
+      </div>
+    }>
+      <AdminOrdersContent />
+    </React.Suspense>
   );
 }

@@ -33,6 +33,7 @@ interface Product {
 	image: string;
 	description: string;
 	stock: number;
+	seller_id: string;
 }
 
 interface Review {
@@ -294,7 +295,7 @@ export default function ProductDetailPage() {
 								</div>
 							)}
 
-							<div className="flex flex-col sm:flex-row gap-4">
+							<div className="flex flex-col sm:flex-row gap-4 mb-4">
 								<button
 									disabled={isOutOfStock}
 									onClick={() =>
@@ -338,6 +339,8 @@ export default function ProductDetailPage() {
 									/>
 								</button>
 							</div>
+
+
 
 							{/* Badges */}
 							<div className="mt-12 grid grid-cols-2 gap-4">

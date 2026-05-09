@@ -14,6 +14,8 @@ import {
 	ArrowLeft,
 	Package,
 	ShoppingBag,
+	ChevronRight,
+	Store,
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
@@ -32,6 +34,7 @@ export default function ProfilePage() {
 		province: "",
 		postal_code: "",
 		is_admin: false,
+		is_seller: false,
 	});
 	const [userEmail, setUserEmail] = useState("");
 
@@ -61,6 +64,7 @@ export default function ProfilePage() {
 					province: data.province || "",
 					postal_code: data.postal_code || "",
 					is_admin: data.is_admin || false,
+					is_seller: data.is_seller || false,
 				});
 			}
 			setLoading(false);
@@ -162,9 +166,28 @@ export default function ProfilePage() {
 											Pesanan Saya
 										</span>
 									</div>
-									<CheckCircle2 size={16} className="text-gray-300" />
+									<ChevronRight size={16} className="text-gray-300 group-hover:text-[#00AA13]" />
 								</Link>
-								{/* Add more quick links if needed */}
+
+								<Link
+									href={profile.is_seller ? "/admin/store-profile" : "/daftar-penjual"}
+									className="w-full flex items-center justify-between p-4 bg-gradient-to-r from-[#00AA13]/5 to-emerald-50 rounded-2xl hover:from-[#00AA13]/10 hover:to-emerald-100 transition-all group border border-[#00AA13]/10"
+								>
+									<div className="flex items-center gap-3">
+										<div className="w-8 h-8 rounded-xl bg-[#00AA13]/10 flex items-center justify-center">
+											<Store size={16} className="text-[#00AA13]" />
+										</div>
+										<div className="text-left">
+											<span className="text-sm font-black text-gray-700 group-hover:text-[#00AA13] block">
+												{profile.is_seller ? "Profil Penjual" : "Daftar Akun Penjual"}
+											</span>
+											<span className="text-[9px] font-bold text-gray-400">
+												{profile.is_seller ? "Kelola toko dan produk Anda" : "Mulai jualan di SegarTani"}
+											</span>
+										</div>
+									</div>
+									<ChevronRight size={16} className="text-[#00AA13]/40 group-hover:text-[#00AA13] group-hover:translate-x-0.5 transition-all" />
+								</Link>
 							</div>
 						</div>
 					</div>

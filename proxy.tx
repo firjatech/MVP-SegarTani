@@ -1,0 +1,24 @@
+import { NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
+
+export function middleware(request: NextRequest) {
+  // Simulasikan login dengan mengecek keberadaan cookie auth dari Supabase
+  // Secara default Supabase v2 menyimpan session di cookie dengan nama yang mengandung '-auth-token'
+  const cookies = request.cookies.getAll();
+  const hasAuthCookie = cookies.some(cookie => cookie.name.includes('-auth-token'));
+
+  // Jika cookie otentikasi tidak ditemukan, redirect user ke halaman login
+  if (!hasAuthCookie) {
+    return NextResponse.redirect(new URL('/login', request.url));
+  }
+
+  // Jika ada, biarkan user melanjutkan akses ke rute tersebut
+  return NextResponse.next();
+}
+
+// Implementasikan config matcher untuk menentukan rute sensitif yang harus dijaga
+export const config = {
+  matcher: [
+    '/admin/:path*', // Menjaga semua rute di bawah /admin (dashboard admin/penjual)
+  ],
+};

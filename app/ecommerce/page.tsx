@@ -4,6 +4,7 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Search, Star, ShoppingCart, ChevronDown, Loader2, Heart } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import Link from 'next/link';
+import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import { useCart } from '@/context/CartContext';
 import { useWishlist, WishlistItem } from '@/context/WishlistContext';
 import { useSearchParams, usePathname, useRouter } from 'next/navigation';
@@ -439,5 +440,33 @@ export default function EcommercePage() {
         <div ref={observerTarget} className="h-10 w-full mt-4" />
       </div>
     </div>
+  );
+}
+
+export default function EcommercePage() {
+  return (
+    <React.Suspense fallback={
+      <div className="bg-white min-h-screen pb-20 font-sans pt-10">
+        <div className="container mx-auto px-6 max-w-7xl">
+          <div className="max-w-6xl mx-auto py-12 px-0 md:px-6">
+            <div className="h-16 bg-gray-100 rounded-3xl w-full animate-pulse"></div>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            {[...Array(8)].map((_, i) => (
+              <div key={i} className="bg-white rounded-[2rem] border border-gray-100 overflow-hidden shadow-sm h-[400px] animate-pulse">
+                <div className="aspect-square bg-gray-100"></div>
+                <div className="p-6 space-y-4">
+                  <div className="h-4 bg-gray-100 rounded w-1/4"></div>
+                  <div className="h-6 bg-gray-100 rounded w-full"></div>
+                  <div className="h-6 bg-gray-100 rounded w-2/3"></div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    }>
+      <EcommerceContent />
+    </React.Suspense>
   );
 }

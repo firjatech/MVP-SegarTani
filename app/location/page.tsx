@@ -105,7 +105,10 @@ export default function LocationPage() {
 						</p>
 
 						{/* Search Bar */}
-						<div className="relative max-w-2xl mx-auto bg-white rounded-full shadow-2xl shadow-gray-200/50 p-2 flex items-center border border-gray-100">
+						<form 
+							onSubmit={(e) => { e.preventDefault(); setMapQuery(searchQuery.trim() || "Bandung"); }}
+							className="relative max-w-2xl mx-auto bg-white rounded-full shadow-2xl shadow-gray-200/50 p-2 flex items-center border border-gray-100"
+						>
 							<div className="flex-grow flex items-center px-4">
 								<MapPin className="text-gray-400 mr-3" size={20} />
 								<input
@@ -123,7 +126,7 @@ export default function LocationPage() {
 							>
 								Cek Lokasi
 							</button>
-						</div>
+						</form>
 					</div>
 				</div>
 			</section>
