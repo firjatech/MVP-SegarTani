@@ -8,6 +8,7 @@ import Link from 'next/link';
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import { useCart } from '@/context/CartContext';
 import { useWishlist } from '@/context/WishlistContext';
+import WishlistButton from '@/components/WishlistButton';
 
 interface Product {
   id: number;
@@ -57,7 +58,6 @@ function EcommerceContent() {
   const searchParams = useSearchParams();
   const pathname = usePathname();
   const { addToCart } = useCart();
-  const { toggleWishlist, isInWishlist } = useWishlist();
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || '');
@@ -204,26 +204,15 @@ function EcommerceContent() {
                         <span className="bg-white/90 backdrop-blur-sm text-[#2E7D32] text-[10px] font-black px-3 py-1 rounded-lg border border-[#2E7D32]/20">
                           {product.category}
                         </span>
-                        <button
-                          onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            toggleWishlist({
-                              id: product.id,
-                              name: product.name,
-                              price: discountPrice,
-                              image: product.image,
-                              category: product.category
-                            });
-                          }}
-                          className={`w-10 h-10 flex items-center justify-center rounded-full backdrop-blur-md transition-all shadow-md ${
-                            isInWishlist(product.id) 
-                              ? 'bg-red-500 text-white shadow-red-200' 
-                              : 'bg-white/80 text-gray-400 hover:text-red-500'
-                          }`}
-                        >
-                          <Heart size={18} className={isInWishlist(product.id) ? "fill-current" : ""} />
-                        </button>
+                        <WishlistButton 
+                          product={{
+                            id: product.id,
+                            name: product.name,
+                            price: discountPrice,
+                            image: product.image,
+                            category: product.category
+                          }} 
+                        />
                       </div>
                     </div>
 
