@@ -47,7 +47,19 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
           if (error) throw error;
 
           if (data) {
-            const items: WishlistItem[] = data.map((item: any) => {
+            type WishlistQueryResult = {
+              product_id: number;
+              products: {
+                id: number;
+                name: string;
+                price: number;
+                discount: number;
+                image: string;
+                category: string;
+              };
+            };
+
+            const items: WishlistItem[] = (data as unknown as WishlistQueryResult[]).map((item) => {
               const p = item.products;
               const discountPrice = p.price - (p.price * p.discount / 100);
               return {

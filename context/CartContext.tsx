@@ -49,24 +49,28 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
   // Load cart and voucher from localStorage
   useEffect(() => {
-    const savedCart = localStorage.getItem('segar-tani-cart');
-    if (savedCart) {
-      try {
-        setCart(JSON.parse(savedCart));
-      } catch (e) {
-        console.error('Failed to parse cart', e);
+    if (typeof window !== 'undefined') {
+      const savedCart = localStorage.getItem('segar-tani-cart');
+      if (savedCart) {
+        try {
+          const parsed = JSON.parse(savedCart);
+          Promise.resolve().then(() => setCart(parsed));
+        } catch (e) {
+          console.error('Failed to parse cart', e);
+        }
       }
-    }
 
-    const savedVoucher = localStorage.getItem('segar-tani-voucher');
-    if (savedVoucher) {
-      try {
-        setAppliedVoucher(JSON.parse(savedVoucher));
-      } catch (e) {
-        console.error('Failed to parse voucher', e);
+      const savedVoucher = localStorage.getItem('segar-tani-voucher');
+      if (savedVoucher) {
+        try {
+          const parsed = JSON.parse(savedVoucher);
+          Promise.resolve().then(() => setAppliedVoucher(parsed));
+        } catch (e) {
+          console.error('Failed to parse voucher', e);
+        }
       }
+      Promise.resolve().then(() => setIsInitialized(true));
     }
-    setIsInitialized(true);
   }, []);
 
   // Save cart to localStorage

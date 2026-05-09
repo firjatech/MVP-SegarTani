@@ -5,6 +5,7 @@ import { useCart } from '@/context/CartContext';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { ArrowLeft, MapPin, Phone, User, Home, CreditCard, ShoppingBag, Loader2, CheckCircle2 } from 'lucide-react';
+import Image from 'next/image';
 import { motion } from 'framer-motion';
 
 const formatIDR = (amount: number) => {
@@ -196,13 +197,11 @@ export default function CheckoutPage() {
       // 6. Tampilkan sukses
       setOrderSuccess(true);
       return;
-    } catch (err: any) {
+    } catch (err: unknown) {
       // Log full error details for debugging
-      const errMsg = err?.message || err?.error_description || JSON.stringify(err) || 'Unknown error';
-      const errCode = err?.code || '';
-      const errDetails = err?.details || '';
-      console.error('Checkout Error Full:', { message: errMsg, code: errCode, details: errDetails, raw: err });
-      alert(`Gagal memproses pesanan:\nCode: ${errCode}\nPesan: ${errMsg}\nDetail: ${errDetails}`);
+      const errMsg = err instanceof Error ? err.message : String(err);
+      console.error('Checkout Error Full:', { message: errMsg, raw: err });
+      alert(`Gagal memproses pesanan:\nPesan: ${errMsg}`);
     } finally {
       setLoading(false);
     }
@@ -441,8 +440,8 @@ export default function CheckoutPage() {
               <div className="space-y-6 mb-8 max-h-80 overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-100">
                 {selectedItems.map((item) => (
                   <div key={item.id} className="flex gap-4">
-                    <div className="w-16 h-16 bg-gray-50 rounded-xl overflow-hidden flex-shrink-0 border border-gray-100">
-                      <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+                    <div className="w-16 h-16 bg-gray-50 rounded-xl overflow-hidden flex-shrink-0 border border-gray-100 relative">
+                      <Image src={item.image} alt={item.name} fill className="object-cover" />
                     </div>
                     <div className="flex-1 min-w-0">
                       <h4 className="text-sm font-bold text-gray-900 truncate">{item.name}</h4>

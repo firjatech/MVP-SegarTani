@@ -10,6 +10,7 @@ import {
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
+import { Session } from '@supabase/supabase-js';
 
 export default function SellerRegisterPage() {
   const router = useRouter();
@@ -23,7 +24,7 @@ export default function SellerRegisterPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
-  const [session, setSession] = useState<any>(null);
+  const [session, setSession] = useState<Session | null>(null);
 
   React.useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -87,8 +88,8 @@ export default function SellerRegisterPage() {
           setTimeout(() => router.push('/login'), 4000);
         }
       }
-    } catch (err: any) {
-      setError(err.message || 'Gagal mendaftar. Silakan coba lagi.');
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Gagal mendaftar. Silakan coba lagi.');
     } finally {
       setLoading(false);
     }

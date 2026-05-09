@@ -55,9 +55,19 @@ function AdminProductsContent() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    checkUserAndFetch();
-  }, []);
+  const fetchProducts = async (sellerId: string) => {
+    setLoading(true);
+    const { data, error } = await supabase
+      .from('products')
+      .select('*')
+      .eq('seller_id', sellerId)
+      .order('created_at', { ascending: false });
+
+    if (!error && data) {
+      setProducts(data);
+    }
+    setLoading(false);
+  };
 
   const checkUserAndFetch = async () => {
     const { data: { user } } = await supabase.auth.getUser();
@@ -78,19 +88,9 @@ function AdminProductsContent() {
     fetchProducts(user.id);
   };
 
-  const fetchProducts = async (sellerId: string) => {
-    setLoading(true);
-    const { data, error } = await supabase
-      .from('products')
-      .select('*')
-      .eq('seller_id', sellerId)
-      .order('created_at', { ascending: false });
-
-    if (!error && data) {
-      setProducts(data);
-    }
-    setLoading(false);
-  };
+  useEffect(() => {
+    Promise.resolve().then(() => checkUserAndFetch());
+  }, []);
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -145,8 +145,8 @@ function AdminProductsContent() {
         }
         setIsModalOpen(false);
       }
-    } catch (err: any) {
-      setError(err.message || 'Gagal menyimpan produk');
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Gagal menyimpan produk');
     } finally {
       setSaving(false);
     }

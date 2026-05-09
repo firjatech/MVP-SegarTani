@@ -31,8 +31,8 @@ export default function LoginPage() {
       if (data.user) {
         router.push('/ecommerce');
       }
-    } catch (err: any) {
-      setError(err.message || 'Gagal masuk. Silakan periksa kembali email dan password Anda.');
+      } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Gagal masuk. Silakan periksa kembali email dan password Anda.');
     } finally {
       setLoading(false);
     }
@@ -128,7 +128,7 @@ export default function LoginPage() {
             </div>
 
             <button className="mt-10 w-full bg-white border border-gray-100 py-5 rounded-2xl font-bold text-gray-600 hover:bg-gray-50 transition-all flex items-center justify-center gap-3 shadow-sm border border-gray-100">
-              <img src="https://www.gstatic.com/images/branding/product/1x/gsa_512dp.png" alt="Google" className="h-6 w-6" />
+              <Image src="https://www.gstatic.com/images/branding/product/1x/gsa_512dp.png" alt="Google" width={24} height={24} className="h-6 w-6" />
               Masuk dengan Google
             </button>
 

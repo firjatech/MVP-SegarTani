@@ -196,8 +196,8 @@ export default function ServicePage() {
 								))}
 							</div>
 							<p className="text-gray-700 italic mb-8 leading-relaxed">
-								"Sayurnya segar banget, pengiriman juga cepat. Sangat membantu
-								untuk ibu pekerja seperti saya!"
+								&quot;Sayurnya segar banget, pengiriman juga cepat. Sangat membantu
+								untuk ibu pekerja seperti saya!&quot;
 							</p>
 							<p className="text-[#00AA13] font-bold">- Rina, Jakarta</p>
 						</div>
@@ -216,8 +216,8 @@ export default function ServicePage() {
 								))}
 							</div>
 							<p className="text-gray-700 italic mb-8 leading-relaxed">
-								"Harganya lebih murah dari supermarket, kualitasnya jauh lebih
-								bagus. Mantap SegarTani!"
+								&quot;Harganya lebih murah dari supermarket, kualitasnya jauh lebih
+								bagus. Mantap SegarTani!&quot;
 							</p>
 							<p className="text-[#00AA13] font-bold">- Siti, Depok</p>
 						</div>
@@ -236,8 +236,8 @@ export default function ServicePage() {
 								))}
 							</div>
 							<p className="text-gray-700 italic mb-8 leading-relaxed">
-								"Bumbu dapurnya lengkap dan selalu fresh. Langganan bulanan
-								sekarang."
+								&quot;Bumbu dapurnya lengkap dan selalu fresh. Langganan bulanan
+								sekarang.&quot;
 							</p>
 							<p className="text-[#00AA13] font-bold">- Anisa, Tangerang</p>
 						</div>

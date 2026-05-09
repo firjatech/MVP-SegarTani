@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import { supabase } from '@/lib/supabase';
 import {
   Store, ArrowLeft, Loader2, CheckCircle2, AlertCircle,
@@ -195,7 +196,7 @@ export default function StoreProfilePage() {
         {/* Banner Preview */}
         <div className="relative w-full h-44 rounded-[2rem] overflow-hidden mb-6 bg-gradient-to-br from-[#00AA13]/20 to-emerald-100 shadow-xl">
           {bannerPreview ? (
-            <img src={bannerPreview} alt="Banner Toko" className="w-full h-full object-cover" />
+            <Image src={bannerPreview} alt="Banner Toko" fill className="object-cover" />
           ) : (
             <div className="w-full h-full flex items-center justify-center gap-3 text-[#00AA13]/40">
               <ImageIcon size={32} />
@@ -203,9 +204,9 @@ export default function StoreProfilePage() {
             </div>
           )}
           {/* Logo overlay */}
-          <div className="absolute -bottom-6 left-8 w-20 h-20 rounded-2xl border-4 border-white shadow-xl overflow-hidden bg-white">
+          <div className="absolute -bottom-6 left-8 w-20 h-20 rounded-2xl border-4 border-white shadow-xl overflow-hidden bg-white relative">
             {logoPreview ? (
-              <img src={logoPreview} alt="Logo Toko" className="w-full h-full object-cover" />
+              <Image src={logoPreview} alt="Logo Toko" fill className="object-cover" />
             ) : (
               <div className="w-full h-full bg-[#00AA13]/10 flex items-center justify-center text-[#00AA13]">
                 <Store size={28} />
@@ -286,9 +287,9 @@ export default function StoreProfilePage() {
                   <label className={labelCls}>Logo Toko</label>
                   <p className="text-xs text-gray-400 font-bold mb-4">Disarankan: 400×400 px, format PNG/JPG/WEBP</p>
                   <div className="flex items-center gap-6">
-                    <div className="w-24 h-24 rounded-2xl border-2 border-dashed border-gray-200 overflow-hidden bg-gray-50 flex items-center justify-center shrink-0">
+                    <div className="w-24 h-24 rounded-2xl border-2 border-dashed border-gray-200 overflow-hidden bg-gray-50 flex items-center justify-center shrink-0 relative">
                       {logoPreview
-                        ? <img src={logoPreview} alt="Logo" className="w-full h-full object-cover" />
+                        ? <Image src={logoPreview} alt="Logo" fill className="object-cover" />
                         : <Camera size={28} className="text-gray-300" />}
                     </div>
                     <div className="flex-1 space-y-3">
@@ -319,9 +320,9 @@ export default function StoreProfilePage() {
                 <div>
                   <label className={labelCls}>Banner Toko</label>
                   <p className="text-xs text-gray-400 font-bold mb-4">Disarankan: 1200×400 px, format PNG/JPG/WEBP</p>
-                  <div className="w-full h-36 rounded-2xl border-2 border-dashed border-gray-200 overflow-hidden bg-gray-50 flex items-center justify-center mb-4">
+                  <div className="w-full h-36 rounded-2xl border-2 border-dashed border-gray-200 overflow-hidden bg-gray-50 flex items-center justify-center mb-4 relative">
                     {bannerPreview
-                      ? <img src={bannerPreview} alt="Banner" className="w-full h-full object-cover" />
+                      ? <Image src={bannerPreview} alt="Banner" fill className="object-cover" />
                       : <div className="flex flex-col items-center gap-2 text-gray-300">
                           <ImageIcon size={32} />
                           <span className="text-xs font-bold">Belum ada banner</span>
@@ -376,7 +377,7 @@ export default function StoreProfilePage() {
                     <div key={f.key}>
                       <label className={labelCls}>{f.label}</label>
                       <input type="text" placeholder={f.placeholder}
-                        value={(store as any)[f.key] || ''}
+                        value={store[f.key as keyof StoreProfile] || ''}
                         onChange={e => setStore(p => ({ ...p, [f.key]: e.target.value }))}
                         className={inputCls} />
                     </div>
