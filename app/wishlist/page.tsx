@@ -11,6 +11,7 @@ import {
 	ShoppingBag,
 } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 
 const formatIDR = (amount: number) => {
@@ -92,10 +93,11 @@ export default function WishlistPage() {
 									className="bg-white rounded-[2.5rem] shadow-lg border border-gray-100 overflow-hidden group hover:shadow-2xl transition-all duration-500"
 								>
 									<div className="relative aspect-square">
-										<img
+										<Image
 											src={item.image}
 											alt={item.name}
-											className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+											fill
+											className="object-cover group-hover:scale-110 transition-transform duration-700"
 										/>
 										<div className="absolute top-5 left-5">
 											<span className="bg-white/90 backdrop-blur-sm text-[#00AA13] text-[10px] font-black px-3 py-1 rounded-lg border border-[#00AA13]/20 uppercase">

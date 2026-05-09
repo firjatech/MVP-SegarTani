@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import { ShoppingBag, Package, Clock, CheckCircle2, Truck, AlertCircle, Search, Loader2, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import { motion } from 'framer-motion';
 
@@ -213,8 +214,8 @@ function AdminOrdersContent() {
                     <td className="px-10 py-8">
                       <div className="flex -space-x-4">
                         {order.order_items.slice(0, 3).map((item, i) => (
-                          <div key={i} className="w-12 h-12 rounded-2xl border-4 border-white overflow-hidden shadow-sm bg-white group-hover:scale-110 transition-transform">
-                            <img src={item.image_url} alt="" className="w-full h-full object-cover" />
+                          <div key={i} className="w-12 h-12 rounded-2xl border-4 border-white overflow-hidden shadow-sm bg-white group-hover:scale-110 transition-transform relative">
+                            <Image src={item.image_url} alt="" fill className="object-cover" />
                           </div>
                         ))}
                         {order.order_items.length > 3 && (

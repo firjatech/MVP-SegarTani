@@ -136,7 +136,7 @@ export default function AboutPage() {
 							data-aos-delay="100"
 						>
 							<div className="mb-4 flex items-center justify-center h-20 w-20 rounded-full bg-white overflow-hidden p-3 shadow-sm border border-gray-100">
-								<img
+								<Image
 									src="/images/trust.jfif"
 									alt="Kejujuran"
 									className="w-full h-full object-contain"

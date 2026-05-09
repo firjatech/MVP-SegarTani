@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import { ShoppingBag, ChevronRight, Package, Clock, CheckCircle2, Truck, AlertCircle, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { motion } from 'framer-motion';
 
 interface OrderItem {
@@ -164,8 +165,8 @@ export default function OrdersPage() {
                     <div className="space-y-6 mb-8 bg-gray-50/50 rounded-3xl p-6 border border-gray-50">
                       {order.order_items.map((item, idx) => (
                         <div key={idx} className="flex items-center gap-4">
-                          <div className="w-16 h-16 bg-white rounded-xl overflow-hidden shadow-sm flex-shrink-0 border border-gray-100">
-                            <img src={item.image_url} alt={item.product_name} className="w-full h-full object-cover" />
+                          <div className="w-16 h-16 bg-white rounded-xl overflow-hidden shadow-sm flex-shrink-0 border border-gray-100 relative">
+                            <Image src={item.image_url} alt={item.product_name} fill className="object-cover" />
                           </div>
                           <div className="flex-1 min-w-0">
                             <h4 className="text-sm font-bold text-gray-900 truncate">{item.product_name}</h4>
