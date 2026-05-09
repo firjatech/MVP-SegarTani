@@ -190,50 +190,11 @@ export default function CheckoutPage() {
         if (decreaseError) console.error(`Gagal mengurangi stok ${item.name}:`, decreaseError);
       }
 
-      // 5. Integrasi Midtrans Payment Gateway
-      const customerDetails = {
-        first_name: formData.full_name,
-        phone: formData.phone,
-        billing_address: {
-            address: formData.address,
-            city: formData.city,
-            postal_code: formData.postal_code,
-            country_code: 'IDN'
-        }
-      };
-
-      const midtransItems = selectedItems.map(item => ({
-        id: item.id.toString(),
-        price: item.price,
-        quantity: item.quantity,
-        name: item.name.substring(0, 50)
-      }));
-
-      const response = await fetch('/api/payment/midtrans', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          order_id: orderData.id,
-          gross_amount: finalPrice,
-          customer_details: customerDetails,
-          item_details: midtransItems
-        })
-      });
-
-      const paymentData = await response.json();
-      if (!response.ok) throw new Error(paymentData.error || 'Gagal memproses pembayaran Midtrans');
-
-      // Update order dengan URL pembayaran
-      await supabase.from('orders').update({
-        payment_url: paymentData.redirect_url,
-        payment_token: paymentData.token
-      }).eq('id', orderData.id);
-
-      // Bersihkan keranjang
+      // 5. Bersihkan keranjang
       clearCart();
 
-      // Redirect pembeli ke halaman pembayaran Midtrans yang aman
-      window.location.href = paymentData.redirect_url;
+      // 6. Tampilkan sukses
+      setOrderSuccess(true);
       return;
     } catch (err: any) {
       // Log full error details for debugging
@@ -411,7 +372,7 @@ export default function CheckoutPage() {
                         </>
                       ) : (
                         <>
-                          Bayar Sekarang ({formatIDR(finalPrice)})
+                          Buat Pesanan ({formatIDR(finalPrice)})
                         </>
                       )}
                     </button>

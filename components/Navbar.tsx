@@ -80,15 +80,13 @@ export default function Navbar() {
     >
       <div className="container mx-auto px-6 flex justify-between items-center relative">
         <div className="flex items-center gap-4">
-          {/* Hamburger Icon - Only show on ecommerce */}
-          {pathname.startsWith('/ecommerce') && (
-            <button
-              onClick={() => setIsSidebarOpen(true)}
-              className="p-2 hover:bg-gray-50 rounded-lg text-gray-700 transition-colors"
-            >
-              <Menu size={24} />
-            </button>
-          )}
+          {/* Hamburger Icon - Show on all pages */}
+          <button
+            onClick={() => setIsSidebarOpen(true)}
+            className="p-2 hover:bg-gray-50 rounded-lg text-gray-700 transition-colors"
+          >
+            <Menu size={24} />
+          </button>
 
           {/* Conditional Logo: Link if not on ecommerce, Static if on ecommerce */}
           {pathname.startsWith('/ecommerce') ? (
@@ -343,71 +341,131 @@ export default function Navbar() {
               className="fixed left-0 top-0 h-full w-64 bg-[#00AA13] shadow-2xl z-[70] p-6"
             >
               <div className="flex justify-between items-center mb-8">
-                <span className="text-white font-black text-xl">Menu</span>
+                <div className="flex items-center gap-2">
+                  <Image src="/images/logo.jpg" alt="Logo" width={32} height={32} className="rounded-lg" />
+                  <span className="text-white font-black text-xl">SegarTani</span>
+                </div>
                 <button
                   onClick={() => setIsSidebarOpen(false)}
-                  className="text-white/80 hover:text-white"
+                  className="text-white/80 hover:text-white bg-white/10 p-2 rounded-xl transition-all"
                 >
-                  <X size={24} />
+                  <X size={20} />
                 </button>
               </div>
               {/* Sidebar Menu Items */}
-              <div className="space-y-2">
-                {user && (
+              <div className="space-y-1.5">
+                {/* General Links for All */}
+                {navLinks.map((link) => (
                   <Link
-                    href="/profile"
+                    key={link.name}
+                    href={link.href}
                     onClick={() => setIsSidebarOpen(false)}
-                    className="flex items-center gap-3 text-white/90 hover:text-white hover:bg-white/10 p-3 rounded-xl transition-all font-bold"
+                    className={`flex items-center gap-3 p-3 rounded-xl transition-all font-bold ${
+                      pathname === link.href 
+                        ? 'bg-white text-[#00AA13] shadow-lg' 
+                        : 'text-white/90 hover:text-white hover:bg-white/10'
+                    }`}
                   >
-                    <UserIcon size={20} /> Profil
+                    {link.name === 'Beranda' && <Package size={20} />}
+                    {link.name === 'Tentang Kami' && <UserIcon size={20} />}
+                    {link.name === 'Layanan' && <Store size={20} />}
+                    {link.name === 'Kontak' && <MapPin size={20} />}
+                    {link.name}
                   </Link>
-                )}
-                {user && isSeller && (
-                  <>
-                    <Link
-                      href="/admin/store-profile"
-                      onClick={() => setIsSidebarOpen(false)}
-                      className="flex items-center gap-3 text-white/90 hover:text-white hover:bg-white/10 p-3 rounded-xl transition-all font-bold"
-                    >
-                      <Store size={20} /> Profil Penjual
-                    </Link>
-                    <Link
-                      href="/admin/products"
-                      onClick={() => setIsSidebarOpen(false)}
-                      className="flex items-center gap-3 text-white/90 hover:text-white hover:bg-white/10 p-3 rounded-xl transition-all font-bold"
-                    >
-                      <PackageSearch size={20} /> Manajemen Produk
-                    </Link>
-                  </>
-                )}
+                ))}
+
+                <div className="h-px bg-white/10 my-4"></div>
+                <p className="text-[10px] font-black text-white/40 uppercase tracking-widest px-3 mb-2">E-Commerce</p>
+
                 <Link
                   href="/ecommerce"
                   onClick={() => setIsSidebarOpen(false)}
-                  className="flex items-center gap-3 text-white/90 hover:text-white hover:bg-white/10 p-3 rounded-xl transition-all font-bold"
+                  className={`flex items-center gap-3 p-3 rounded-xl transition-all font-bold ${
+                    pathname.startsWith('/ecommerce') 
+                      ? 'bg-white text-[#00AA13] shadow-lg' 
+                      : 'text-white/90 hover:text-white hover:bg-white/10'
+                  }`}
                 >
-                  <Package size={20} /> Katalog Produk
-                </Link>
-                <Link
-                  href="/wishlist"
-                  onClick={() => setIsSidebarOpen(false)}
-                  className="flex items-center gap-3 text-white/90 hover:text-white hover:bg-white/10 p-3 rounded-xl transition-all font-bold"
-                >
-                  <Heart size={20} /> Wishlist Saya
-                </Link>
-                <Link
-                  href="/orders"
-                  onClick={() => setIsSidebarOpen(false)}
-                  className="flex items-center gap-3 text-white/90 hover:text-white hover:bg-white/10 p-3 rounded-xl transition-all font-bold"
-                >
-                  <ShoppingBag size={20} /> Pesanan Saya
+                  <ShoppingBag size={20} /> Katalog Produk
                 </Link>
                 <Link
                   href="/location"
                   onClick={() => setIsSidebarOpen(false)}
-                  className="flex items-center gap-3 text-white/90 hover:text-white hover:bg-white/10 p-3 rounded-xl transition-all font-bold"
+                  className={`flex items-center gap-3 p-3 rounded-xl transition-all font-bold ${
+                    pathname === '/location' 
+                      ? 'bg-white text-[#00AA13] shadow-lg' 
+                      : 'text-white/90 hover:text-white hover:bg-white/10'
+                  }`}
                 >
                   <MapPin size={20} /> Cari Lokasi
                 </Link>
+
+                {user && (
+                  <>
+                    <Link
+                      href="/wishlist"
+                      onClick={() => setIsSidebarOpen(false)}
+                      className={`flex items-center gap-3 p-3 rounded-xl transition-all font-bold ${
+                        pathname === '/wishlist' 
+                          ? 'bg-white text-[#00AA13] shadow-lg' 
+                          : 'text-white/90 hover:text-white hover:bg-white/10'
+                      }`}
+                    >
+                      <Heart size={20} /> Wishlist Saya
+                    </Link>
+                    <Link
+                      href="/orders"
+                      onClick={() => setIsSidebarOpen(false)}
+                      className={`flex items-center gap-3 p-3 rounded-xl transition-all font-bold ${
+                        pathname === '/orders' 
+                          ? 'bg-white text-[#00AA13] shadow-lg' 
+                          : 'text-white/90 hover:text-white hover:bg-white/10'
+                      }`}
+                    >
+                      <ShoppingBag size={20} /> Pesanan Saya
+                    </Link>
+                  </>
+                )}
+
+                <div className="h-px bg-white/10 my-4"></div>
+                <p className="text-[10px] font-black text-white/40 uppercase tracking-widest px-3 mb-2">Akun Saya</p>
+
+                {user ? (
+                  <>
+                    <Link
+                      href="/profile"
+                      onClick={() => setIsSidebarOpen(false)}
+                      className={`flex items-center gap-3 p-3 rounded-xl transition-all font-bold ${
+                        pathname === '/profile' 
+                          ? 'bg-white text-[#00AA13] shadow-lg' 
+                          : 'text-white/90 hover:text-white hover:bg-white/10'
+                      }`}
+                    >
+                      <UserIcon size={20} /> Profil Saya
+                    </Link>
+                    {isSeller && (
+                      <Link
+                        href="/admin/products"
+                        onClick={() => setIsSidebarOpen(false)}
+                        className={`flex items-center gap-3 p-3 rounded-xl transition-all font-bold ${
+                          pathname.startsWith('/admin') 
+                            ? 'bg-white text-[#00AA13] shadow-lg' 
+                            : 'text-white/90 hover:text-white hover:bg-white/10'
+                        }`}
+                      >
+                        <PackageSearch size={20} /> Panel Penjual
+                      </Link>
+                    )}
+                  </>
+                ) : (
+                  <Link
+                    href="/register"
+                    onClick={() => setIsSidebarOpen(false)}
+                    className="flex items-center gap-3 text-white/90 hover:text-white hover:bg-white/10 p-3 rounded-xl transition-all font-bold"
+                  >
+                    <UserIcon size={20} /> Daftar Sekarang
+                  </Link>
+                )}
 
 
                 <div className="h-px bg-white/20 my-4"></div>

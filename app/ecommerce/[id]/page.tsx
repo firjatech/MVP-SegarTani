@@ -332,24 +332,7 @@ export default function ProductDetailPage() {
 								</button>
 							</div>
 
-							<button
-								onClick={() => {
-									if (!user) {
-										alert("Silakan login untuk chat dengan penjual");
-										router.push('/login');
-										return;
-									}
-									if (product.seller_id) {
-										router.push(`/chat?seller_id=${product.seller_id}&product_id=${product.id}`);
-									} else {
-										alert("Produk ini belum memiliki penjual terdaftar");
-									}
-								}}
-								className="w-full bg-[#e8f5e9] hover:bg-[#c8e6c9] text-[#00AA13] font-black py-4 rounded-2xl transition-all flex items-center justify-center gap-3 text-sm active:scale-95"
-							>
-								<MessageSquare size={18} />
-								Chat Penjual
-							</button>
+
 
 							{/* Badges */}
 							<div className="mt-12 grid grid-cols-2 gap-4">

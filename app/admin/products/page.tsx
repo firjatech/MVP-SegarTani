@@ -185,13 +185,18 @@ function AdminProductsContent() {
   );
 
   useEffect(() => {
-    const params = new URLSearchParams(searchParams.toString());
+    const currentParams = new URLSearchParams(searchParams.toString());
+    const newParams = new URLSearchParams(searchParams.toString());
+    
     if (search) {
-      params.set('q', search);
+      newParams.set('q', search);
     } else {
-      params.delete('q');
+      newParams.delete('q');
     }
-    router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+
+    if (currentParams.toString() !== newParams.toString()) {
+      router.replace(`${pathname}?${newParams.toString()}`, { scroll: false });
+    }
   }, [search, pathname, router, searchParams]);
 
   const inputCls = 'w-full bg-gray-50 border border-gray-100 rounded-2xl px-5 py-3 focus:ring-4 focus:ring-[#00AA13]/10 focus:border-[#00AA13] text-gray-700 font-bold transition-all text-sm outline-none';

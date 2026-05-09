@@ -28,6 +28,29 @@ const formatIDR = (amount: number) => {
   }).format(amount).replace(/\s/g, '');
 };
 
+const ProductSkeleton = () => (
+  <div className="bg-white rounded-[2rem] border border-gray-100 overflow-hidden shadow-sm h-full flex flex-col animate-pulse">
+    <div className="relative aspect-square w-full bg-gray-100 overflow-hidden">
+      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full animate-[shimmer_2s_infinite]"></div>
+    </div>
+    <div className="p-6 flex flex-col flex-grow">
+      <div className="flex items-center gap-2 mb-2">
+        <div className="h-4 bg-gray-100 rounded-lg w-12"></div>
+        <div className="h-4 bg-gray-100 rounded-lg w-16"></div>
+      </div>
+      <div className="h-6 bg-gray-100 rounded-xl w-full mb-2"></div>
+      <div className="h-6 bg-gray-100 rounded-xl w-2/3 mb-4"></div>
+      <div className="mt-auto pt-4 flex items-center justify-between border-t border-gray-50">
+        <div className="flex flex-col gap-2">
+          <div className="h-3 bg-gray-100 rounded-lg w-16"></div>
+          <div className="h-6 bg-gray-100 rounded-xl w-24"></div>
+        </div>
+        <div className="h-12 w-12 bg-gray-100 rounded-2xl"></div>
+      </div>
+    </div>
+  </div>
+);
+
 function EcommerceContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -72,30 +95,25 @@ function EcommerceContent() {
 
   // Sync to URL
   useEffect(() => {
-    const params = new URLSearchParams(searchParams.toString());
+    const currentParams = new URLSearchParams(searchParams.toString());
+    const newParams = new URLSearchParams(searchParams.toString());
+    
     if (searchQuery) {
-      params.set('q', searchQuery);
+      newParams.set('q', searchQuery);
     } else {
-      params.delete('q');
+      newParams.delete('q');
     }
     
     if (activeCategory && activeCategory !== 'Semua') {
-      params.set('category', activeCategory);
+      newParams.set('category', activeCategory);
     } else {
-      params.delete('category');
+      newParams.delete('category');
     }
 
-    router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+    if (currentParams.toString() !== newParams.toString()) {
+      router.replace(`${pathname}?${newParams.toString()}`, { scroll: false });
+    }
   }, [searchQuery, activeCategory, pathname, router, searchParams]);
-
-  if (loading) {
-    return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50">
-        <Loader2 className="w-12 h-12 text-[#00AA13] animate-spin mb-4" />
-        <p className="text-gray-500 font-bold animate-pulse">Memuat Produk Terbaik...</p>
-      </div>
-    );
-  }
 
   return (
     <div className="bg-white min-h-screen pb-20 font-sans pt-10">
@@ -138,7 +156,10 @@ function EcommerceContent() {
 
         {/* Product Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-          {filteredProducts.length > 0 ? (
+          {loading ? (
+            // Skeleton Loading Grid
+            [...Array(8)].map((_, i) => <ProductSkeleton key={i} />)
+          ) : filteredProducts.length > 0 ? (
             filteredProducts.map((product, index) => {
               const discountPrice = product.price - (product.price * product.discount / 100);
               const isOutOfStock = product.stock <= 0;
@@ -280,9 +301,24 @@ function EcommerceContent() {
 export default function EcommercePage() {
   return (
     <React.Suspense fallback={
-      <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50">
-        <Loader2 className="w-12 h-12 text-[#00AA13] animate-spin mb-4" />
-        <p className="text-gray-500 font-bold animate-pulse">Memuat...</p>
+      <div className="bg-white min-h-screen pb-20 font-sans pt-10">
+        <div className="container mx-auto px-6 max-w-7xl">
+          <div className="max-w-6xl mx-auto py-12 px-0 md:px-6">
+            <div className="h-16 bg-gray-100 rounded-3xl w-full animate-pulse"></div>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            {[...Array(8)].map((_, i) => (
+              <div key={i} className="bg-white rounded-[2rem] border border-gray-100 overflow-hidden shadow-sm h-[400px] animate-pulse">
+                <div className="aspect-square bg-gray-100"></div>
+                <div className="p-6 space-y-4">
+                  <div className="h-4 bg-gray-100 rounded w-1/4"></div>
+                  <div className="h-6 bg-gray-100 rounded w-full"></div>
+                  <div className="h-6 bg-gray-100 rounded w-2/3"></div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
     }>
       <EcommerceContent />
