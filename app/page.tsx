@@ -47,14 +47,14 @@ export default function Home() {
 			{/* Hero Section */}
 			<section className="relative flex items-start overflow-hidden bg-white pt-2 md:pt-4 lg:pt-8 pb-20 lg:pb-28">
 				{/* Background Glowing Orbs - Spaced Out for White Center */}
-				<div className="absolute top-0 right-0 w-[60vw] h-[60vw] bg-[#00AA13] rounded-full blur-[140px] opacity-[0.25] -translate-y-1/3 translate-x-1/4 pointer-events-none z-0"></div>
-				<div className="absolute bottom-0 left-0 w-[60vw] h-[60vw] bg-[#FF9F1C] rounded-full blur-[140px] opacity-[0.20] translate-y-1/3 -translate-x-1/4 pointer-events-none z-0"></div>
+				<div className="absolute top-0 right-0 w-[60vw] h-[60vw] bg-primary rounded-full blur-[140px] opacity-[0.25] -translate-y-1/3 translate-x-1/4 pointer-events-none z-0"></div>
+				<div className="absolute bottom-0 left-0 w-[60vw] h-[60vw] bg-secondary rounded-full blur-[140px] opacity-[0.20] translate-y-1/3 -translate-x-1/4 pointer-events-none z-0"></div>
 
 				<div className="container mx-auto px-6 relative z-10 flex flex-col items-center justify-center text-center">
 					{/* Text Content */}
 					<div className="flex flex-col items-center w-full max-w-4xl mx-auto">
 						<span
-							className="inline-block bg-[#00AA13] text-white px-4 py-1.5 rounded-full text-sm font-bold mb-8 mt-0"
+							className="inline-block bg-primary text-white px-4 py-1.5 rounded-full text-sm font-bold mb-8 mt-0"
 							data-aos="fade-up"
 						>
 							Kini Hadir di Bandung & Sekitarnya
@@ -65,9 +65,9 @@ export default function Home() {
 							data-aos="fade-up"
 							data-aos-delay="100"
 						>
-							Sayuran <span className="text-[#00AA13]">Segar</span>, <br />
+							Sayuran <span className="text-primary">Segar</span>, <br />
 							Langsung dari{" "}
-							<span className="text-[#FF9F1C]">Pasar Tradisional</span>
+							<span className="text-secondary">Pasar Tradisional</span>
 						</h1>
 
 						<p
@@ -159,15 +159,15 @@ export default function Home() {
 						<div className="text-center mb-16 overflow-hidden">
 							<h2 className="text-xl md:text-3xl lg:text-4xl font-black text-black leading-tight whitespace-nowrap">
 								Bersama, Kami Tumbuhkan{" "}
-								<span className="text-[#00AA13]">Pangan Sehat.</span>
+								<span className="text-primary">Pangan Sehat.</span>
 							</h2>
 						</div>
 						<div className="grid grid-cols-2 lg:grid-cols-4 gap-12 text-center">
 							<div className="flex flex-col items-center">
-								<div className="w-16 h-16 bg-[#00AA13]/10 rounded-full flex items-center justify-center mb-4">
-									<Store className="w-8 h-8 text-[#00AA13]" />
+								<div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-4">
+									<Store className="w-8 h-8 text-primary" />
 								</div>
-								<h3 className="text-4xl md:text-5xl font-black text-[#00AA13] mb-3">
+								<h3 className="text-4xl md:text-5xl font-black text-primary mb-3">
 									25+
 								</h3>
 								<p className="text-gray-500 font-bold uppercase tracking-widest text-xs md:text-sm">
@@ -175,10 +175,10 @@ export default function Home() {
 								</p>
 							</div>
 							<div className="flex flex-col items-center">
-								<div className="w-16 h-16 bg-[#FF9F1C]/10 rounded-full flex items-center justify-center mb-4">
-									<ShoppingBag className="w-8 h-8 text-[#FF9F1C]" />
+								<div className="w-16 h-16 bg-secondary/10 rounded-full flex items-center justify-center mb-4">
+									<ShoppingBag className="w-8 h-8 text-secondary" />
 								</div>
-								<h3 className="text-4xl md:text-5xl font-black text-[#FF9F1C] mb-3">
+								<h3 className="text-4xl md:text-5xl font-black text-secondary mb-3">
 									50k+
 								</h3>
 								<p className="text-gray-500 font-bold uppercase tracking-widest text-xs md:text-sm">
@@ -186,10 +186,10 @@ export default function Home() {
 								</p>
 							</div>
 							<div className="flex flex-col items-center">
-								<div className="w-16 h-16 bg-[#00AA13]/10 rounded-full flex items-center justify-center mb-4">
-									<Users className="w-8 h-8 text-[#00AA13]" />
+								<div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-4">
+									<Users className="w-8 h-8 text-primary" />
 								</div>
-								<h3 className="text-4xl md:text-5xl font-black text-[#00AA13] mb-3">
+								<h3 className="text-4xl md:text-5xl font-black text-primary mb-3">
 									10k+
 								</h3>
 								<p className="text-gray-500 font-bold uppercase tracking-widest text-xs md:text-sm">
@@ -197,10 +197,10 @@ export default function Home() {
 								</p>
 							</div>
 							<div className="flex flex-col items-center">
-								<div className="w-16 h-16 bg-[#FF9F1C]/10 rounded-full flex items-center justify-center mb-4">
-									<Headset className="w-8 h-8 text-[#FF9F1C]" />
+								<div className="w-16 h-16 bg-secondary/10 rounded-full flex items-center justify-center mb-4">
+									<Headset className="w-8 h-8 text-secondary" />
 								</div>
-								<h3 className="text-4xl md:text-5xl font-black text-[#FF9F1C] mb-3">
+								<h3 className="text-4xl md:text-5xl font-black text-secondary mb-3">
 									24/7
 								</h3>
 								<p className="text-gray-500 font-bold uppercase tracking-widest text-xs md:text-sm">
@@ -216,10 +216,10 @@ export default function Home() {
 			<section className="py-24 bg-white border-t border-gray-100">
 				<div className="container mx-auto px-6 text-left">
 					<div className="max-w-6xl mb-16 pl-4 md:pl-12" data-aos="fade-right">
-						<h2 className="text-5xl md:text-6xl font-[900] text-black leading-tight tracking-tighter mb-2">
+						<h2 className="text-5xl md:text-6xl font-black text-black leading-tight tracking-tighter mb-2">
 							Gabung Bersama
 						</h2>
-						<h2 className="text-5xl md:text-6xl font-[900] text-[#00AA13] leading-tight tracking-tighter mb-8">
+						<h2 className="text-5xl md:text-6xl font-black text-primary leading-tight tracking-tighter mb-8">
 							5000+ Ibu Rumah Tangga
 						</h2>
 						<p className="text-xl text-gray-500 font-medium">
@@ -238,7 +238,7 @@ export default function Home() {
 								&quot;Sayurnya segar banget, pengiriman juga cepat. Sangat membantu
 								untuk ibu pekerja seperti saya!&quot;
 							</p>
-							<p className="text-[#00AA13] font-bold text-lg">
+							<p className="text-primary font-bold text-lg">
 								- Rina, Jakarta
 							</p>
 						</div>
@@ -253,7 +253,7 @@ export default function Home() {
 								&quot;Harganya lebih murah dari supermarket, kualitasnya jauh lebih
 								bagus. Mantap SegarTani!&quot;
 							</p>
-							<p className="text-[#00AA13] font-bold text-lg">- Siti, Depok</p>
+							<p className="text-primary font-bold text-lg">- Siti, Depok</p>
 						</div>
 
 						{/* Card 3 */}
@@ -266,7 +266,7 @@ export default function Home() {
 								&quot;Bumbu dapurnya lengkap dan selalu fresh. Langganan bulanan
 								sekarang.&quot;
 							</p>
-							<p className="text-[#00AA13] font-bold text-lg">
+							<p className="text-primary font-bold text-lg">
 								- Anisa, Tangerang
 							</p>
 						</div>

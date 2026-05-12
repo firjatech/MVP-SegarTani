@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import {
 	Mail,
 	Phone,
@@ -11,6 +11,16 @@ import {
 } from "lucide-react";
 
 export default function ContactPage() {
+	const [name, setName] = useState("");
+	const [email, setEmail] = useState("");
+	const [message, setMessage] = useState("");
+
+	const handleSubmit = (e: React.FormEvent) => {
+		e.preventDefault();
+		const text = `Halo SegarTani, saya ingin menghubungi Anda.%0A%0A*Nama:* ${name}%0A*Email:* ${email}%0A*Pesan:*%0A${message}`;
+		window.open(`https://wa.me/6287789727616?text=${text}`, '_blank');
+	};
+
 	return (
 		<div className="flex flex-col min-h-screen bg-white">
 			{/* Header */}
@@ -60,15 +70,7 @@ export default function ContactPage() {
 									</div>
 									<div>
 										<h4 className="font-bold text-gray-900">WhatsApp</h4>
-										<p className="text-gray-600">+62 812 3456 7890</p>
-										<a
-											href="https://wa.me/6281234567890"
-											target="_blank"
-											rel="noopener noreferrer"
-											className="text-primary font-bold text-sm hover:underline mt-2 inline-block"
-										>
-											Kirim Pesan Sekarang
-										</a>
+										<p className="text-gray-600">+62 877 8972 7616</p>
 									</div>
 								</div>
 
@@ -113,13 +115,16 @@ export default function ContactPage() {
 							<h3 className="text-2xl font-bold text-gray-900 mb-8 text-center">
 								Kirim Pesan
 							</h3>
-							<form className="space-y-6">
+							<form onSubmit={handleSubmit} className="space-y-6">
 								<div>
 									<label className="block text-sm font-bold text-gray-700 mb-2">
 										Nama Lengkap
 									</label>
 									<input
 										type="text"
+										required
+										value={name}
+										onChange={(e) => setName(e.target.value)}
 										className="w-full bg-white border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/20 rounded-xl px-4 py-4 transition-all"
 										placeholder="Masukkan nama Anda"
 									/>
@@ -130,6 +135,9 @@ export default function ContactPage() {
 									</label>
 									<input
 										type="email"
+										required
+										value={email}
+										onChange={(e) => setEmail(e.target.value)}
 										className="w-full bg-white border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/20 rounded-xl px-4 py-4 transition-all"
 										placeholder="email@contoh.com"
 									/>
@@ -140,22 +148,20 @@ export default function ContactPage() {
 									</label>
 									<textarea
 										rows={4}
+										required
+										value={message}
+										onChange={(e) => setMessage(e.target.value)}
 										className="w-full bg-white border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/20 rounded-xl px-4 py-4 transition-all"
 										placeholder="Tuliskan pesan atau pesanan Anda di sini..."
 									></textarea>
 								</div>
 								<button
 									type="submit"
-									disabled
-									className="w-full bg-primary hover:bg-secondary text-white font-bold py-4 rounded-xl transition-all shadow-lg flex items-center justify-center space-x-2 opacity-50 cursor-not-allowed"
+									className="w-full bg-primary hover:bg-secondary text-white font-bold py-4 rounded-xl transition-all shadow-lg flex items-center justify-center space-x-2"
 								>
 									<Send size={20} />
-									<span>Kirim Pesan (Segera Hadir)</span>
+									<span>Kirim Pesan via WhatsApp</span>
 								</button>
-								<p className="text-center text-xs text-gray-400 mt-4">
-									Formulir ini masih dalam tahap pengembangan. Silakan hubungi
-									via WhatsApp untuk respon cepat.
-								</p>
 							</form>
 						</div>
 					</div>

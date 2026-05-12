@@ -265,7 +265,7 @@ export default function Navbar() {
                   Profil
                 </Link>
               )}
-              
+
               {user && isSeller && (
                 <>
                   <Link
@@ -342,8 +342,7 @@ export default function Navbar() {
             >
               <div className="flex justify-between items-center mb-8">
                 <div className="flex items-center gap-2">
-                  <Image src="/images/logo.jpg" alt="Logo" width={32} height={32} className="rounded-lg" />
-                  <span className="text-white font-black text-xl">SegarTani</span>
+                  <span className="text-white font-black text-lg">Pengaturan</span>
                 </div>
                 <button
                   onClick={() => setIsSidebarOpen(false)}
@@ -360,11 +359,10 @@ export default function Navbar() {
                     key={link.name}
                     href={link.href}
                     onClick={() => setIsSidebarOpen(false)}
-                    className={`flex items-center gap-3 p-3 rounded-xl transition-all font-bold ${
-                      pathname === link.href 
-                        ? 'bg-white text-[#00AA13] shadow-lg' 
+                    className={`flex items-center gap-3 p-3 rounded-xl transition-all font-bold text-sm ${pathname === link.href
+                        ? 'bg-white text-[#00AA13] shadow-lg'
                         : 'text-white/90 hover:text-white hover:bg-white/10'
-                    }`}
+                      }`}
                   >
                     {link.name === 'Beranda' && <Package size={20} />}
                     {link.name === 'Tentang Kami' && <UserIcon size={20} />}
@@ -380,22 +378,20 @@ export default function Navbar() {
                 <Link
                   href="/ecommerce"
                   onClick={() => setIsSidebarOpen(false)}
-                  className={`flex items-center gap-3 p-3 rounded-xl transition-all font-bold ${
-                    pathname.startsWith('/ecommerce') 
-                      ? 'bg-white text-[#00AA13] shadow-lg' 
+                  className={`flex items-center gap-3 p-3 rounded-xl transition-all font-bold text-sm ${pathname.startsWith('/ecommerce')
+                      ? 'bg-white text-[#00AA13] shadow-lg'
                       : 'text-white/90 hover:text-white hover:bg-white/10'
-                  }`}
+                    }`}
                 >
                   <ShoppingBag size={20} /> Katalog Produk
                 </Link>
                 <Link
                   href="/location"
                   onClick={() => setIsSidebarOpen(false)}
-                  className={`flex items-center gap-3 p-3 rounded-xl transition-all font-bold ${
-                    pathname === '/location' 
-                      ? 'bg-white text-[#00AA13] shadow-lg' 
+                  className={`flex items-center gap-3 p-3 rounded-xl transition-all font-bold text-sm ${pathname === '/location'
+                      ? 'bg-white text-[#00AA13] shadow-lg'
                       : 'text-white/90 hover:text-white hover:bg-white/10'
-                  }`}
+                    }`}
                 >
                   <MapPin size={20} /> Cari Lokasi
                 </Link>
@@ -405,22 +401,20 @@ export default function Navbar() {
                     <Link
                       href="/wishlist"
                       onClick={() => setIsSidebarOpen(false)}
-                      className={`flex items-center gap-3 p-3 rounded-xl transition-all font-bold ${
-                        pathname === '/wishlist' 
-                          ? 'bg-white text-[#00AA13] shadow-lg' 
+                      className={`flex items-center gap-3 p-3 rounded-xl transition-all font-bold text-sm ${pathname === '/wishlist'
+                          ? 'bg-white text-[#00AA13] shadow-lg'
                           : 'text-white/90 hover:text-white hover:bg-white/10'
-                      }`}
+                        }`}
                     >
                       <Heart size={20} /> Wishlist Saya
                     </Link>
                     <Link
                       href="/orders"
                       onClick={() => setIsSidebarOpen(false)}
-                      className={`flex items-center gap-3 p-3 rounded-xl transition-all font-bold ${
-                        pathname === '/orders' 
-                          ? 'bg-white text-[#00AA13] shadow-lg' 
+                      className={`flex items-center gap-3 p-3 rounded-xl transition-all font-bold text-sm ${pathname === '/orders'
+                          ? 'bg-white text-[#00AA13] shadow-lg'
                           : 'text-white/90 hover:text-white hover:bg-white/10'
-                      }`}
+                        }`}
                     >
                       <ShoppingBag size={20} /> Pesanan Saya
                     </Link>
@@ -435,11 +429,10 @@ export default function Navbar() {
                     <Link
                       href="/profile"
                       onClick={() => setIsSidebarOpen(false)}
-                      className={`flex items-center gap-3 p-3 rounded-xl transition-all font-bold ${
-                        pathname === '/profile' 
-                          ? 'bg-white text-[#00AA13] shadow-lg' 
+                      className={`flex items-center gap-3 p-3 rounded-xl transition-all font-bold text-sm ${pathname === '/profile'
+                          ? 'bg-white text-[#00AA13] shadow-lg'
                           : 'text-white/90 hover:text-white hover:bg-white/10'
-                      }`}
+                        }`}
                     >
                       <UserIcon size={20} /> Profil Saya
                     </Link>
@@ -447,11 +440,10 @@ export default function Navbar() {
                       <Link
                         href="/admin/products"
                         onClick={() => setIsSidebarOpen(false)}
-                        className={`flex items-center gap-3 p-3 rounded-xl transition-all font-bold ${
-                          pathname.startsWith('/admin') 
-                            ? 'bg-white text-[#00AA13] shadow-lg' 
+                        className={`flex items-center gap-3 p-3 rounded-xl transition-all font-bold text-sm ${pathname.startsWith('/admin')
+                            ? 'bg-white text-[#00AA13] shadow-lg'
                             : 'text-white/90 hover:text-white hover:bg-white/10'
-                        }`}
+                          }`}
                       >
                         <PackageSearch size={20} /> Panel Penjual
                       </Link>
@@ -461,23 +453,11 @@ export default function Navbar() {
                   <Link
                     href="/register"
                     onClick={() => setIsSidebarOpen(false)}
-                    className="flex items-center gap-3 text-white/90 hover:text-white hover:bg-white/10 p-3 rounded-xl transition-all font-bold"
+                    className="flex items-center gap-3 text-white/90 hover:text-white hover:bg-white/10 p-3 rounded-xl transition-all font-bold text-sm"
                   >
                     <UserIcon size={20} /> Daftar Sekarang
                   </Link>
                 )}
-
-
-                <div className="h-px bg-white/20 my-4"></div>
-                <button
-                  onClick={() => {
-                    handleLogout();
-                    setIsSidebarOpen(false);
-                  }}
-                  className="w-full flex items-center gap-3 text-white/90 hover:text-white hover:bg-red-500 p-3 rounded-xl transition-all font-bold"
-                >
-                  <LogOut size={20} /> Logout
-                </button>
               </div>
             </motion.div>
           </>

@@ -121,16 +121,7 @@ export default function LoginPage() {
               </button>
             </form>
 
-            <div className="mt-10 flex items-center gap-4">
-              <div className="flex-grow h-px bg-gray-100"></div>
-              <span className="text-[10px] font-black text-gray-300 uppercase tracking-widest">ATAU</span>
-              <div className="flex-grow h-px bg-gray-100"></div>
-            </div>
 
-            <button className="mt-10 w-full bg-white border border-gray-100 py-5 rounded-2xl font-bold text-gray-600 hover:bg-gray-50 transition-all flex items-center justify-center gap-3 shadow-sm border border-gray-100">
-              <Image src="https://www.gstatic.com/images/branding/product/1x/gsa_512dp.png" alt="Google" width={24} height={24} className="h-6 w-6" />
-              Masuk dengan Google
-            </button>
 
             <p className="mt-12 text-center text-sm font-medium text-gray-400">
               Belum punya akun? <Link href="/register" className="text-[#00AA13] font-black hover:underline">Daftar Gratis</Link>
