@@ -18,7 +18,7 @@ export default function Home() {
 			description: "Ditanam tanpa pestisida atau bahan kimia sintetis.",
 			icon: Carrot,
 			image:
-				"https://infopublik.id/resources/album/pertanian-perikanan-perkebunan-peternakan/PANEN_KANGKUNG_DARAT.JPG",
+				"/images/panen-kangkung.png",
 		},
 		{
 			title: "Kualitas Premium",
