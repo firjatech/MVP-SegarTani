@@ -28,12 +28,11 @@ export default function RegisterPage() {
     setSuccess(false);
 
     try {
-      // 1. Sign Up User
+      // 1. Sign Up User (tanpa verifikasi email)
       const { data, error: signUpError } = await supabase.auth.signUp({
         email,
         password,
         options: {
-          emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback`,
           data: {
             full_name: fullName,
           },
@@ -42,12 +41,18 @@ export default function RegisterPage() {
 
       if (signUpError) throw signUpError;
 
-      if (data.user) {
-        // Data profil sekarang dibuat otomatis oleh TRIGGER di database.
+      if (data.session) {
+        // Langsung login, redirect ke halaman utama
+        setSuccess(true);
+        setTimeout(() => {
+          router.push('/ecommerce');
+        }, 1500);
+      } else if (data.user) {
+        // Fallback jika session belum tersedia
         setSuccess(true);
         setTimeout(() => {
           router.push('/login');
-        }, 4000);
+        }, 1500);
       }
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Gagal mendaftar. Silakan coba lagi.');
@@ -95,7 +100,7 @@ export default function RegisterPage() {
                 className="mb-6 p-4 bg-green-50 border border-green-100 rounded-2xl flex items-center gap-3 text-green-700 text-sm font-bold text-left"
               >
                 <CheckCircle2 size={18} className="shrink-0" />
-                <span>Pendaftaran berhasil! Silakan cek email Anda untuk konfirmasi (jika diperlukan). Mengalihkan ke halaman login...</span>
+                <span>Pendaftaran berhasil! Mengalihkan ke halaman utama...</span>
               </motion.div>
             )}
 

@@ -66,12 +66,11 @@ export default function SellerRegisterPage() {
         setSuccess(true);
         setTimeout(() => router.push('/admin/store-profile'), 2000);
       } else {
-        // 1. Sign Up user baru
+        // 1. Sign Up user baru (tanpa verifikasi email)
         const { data, error: signUpError } = await supabase.auth.signUp({
           email,
           password,
           options: {
-            emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback`,
             data: { 
               full_name: fullName,
               phone: phone,
@@ -83,9 +82,14 @@ export default function SellerRegisterPage() {
         });
         if (signUpError) throw signUpError;
 
-        if (data.user) {
+        if (data.session) {
+          // Langsung login, redirect ke profil toko
           setSuccess(true);
-          setTimeout(() => router.push('/login'), 4000);
+          setTimeout(() => router.push('/admin/store-profile'), 1500);
+        } else if (data.user) {
+          // Fallback
+          setSuccess(true);
+          setTimeout(() => router.push('/login'), 1500);
         }
       }
     } catch (err: unknown) {
@@ -150,7 +154,7 @@ export default function SellerRegisterPage() {
                 <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}
                   className="mb-6 p-4 bg-green-50 border border-green-100 rounded-2xl flex items-center gap-3 text-green-700 text-sm font-bold">
                   <CheckCircle2 size={18} className="shrink-0" />
-                  <span>Akun penjual berhasil dibuat! Silakan cek email untuk konfirmasi. Mengalihkan ke login...</span>
+                  <span>Akun penjual berhasil dibuat! Mengalihkan ke halaman toko...</span>
                 </motion.div>
               )}
             </AnimatePresence>
