@@ -67,12 +67,12 @@ export default function ServicePage() {
 					data-aos-delay="100"
 				>
 					<h1 className="text-4xl md:text-5xl font-black text-gray-900 mb-6 tracking-tight">
-						Solusi <span className="text-[#00AA13]">Terbaik</span> Untuk Anda.
+						Solusi <span className="text-primary">Terbaik</span> Untuk Anda.
 					</h1>
 					<p className="text-lg text-gray-600 max-w-2xl mx-auto font-medium">
 						Dari kebutuhan dapur pribadi hingga pasokan bisnis restoran berskala
-						besar, <span className="text-[#00AA13] font-bold">Segar</span>
-						<span className="text-[#FF9F1C] font-bold">Tani</span> hadir dengan
+						besar, <span className="text-primary font-bold">Segar</span>
+						<span className="text-secondary font-bold">Tani</span> hadir dengan
 						layanan yang disesuaikan untuk setiap kebutuhan.
 					</p>
 				</div>
@@ -133,7 +133,7 @@ export default function ServicePage() {
 						<div className="grid grid-cols-1 lg:grid-cols-3 gap-16 lg:gap-8 relative z-10">
 							{/* Step 1 */}
 							<div className="flex flex-col items-center text-center group">
-								<div className="w-20 h-20 bg-[#00AA13] text-white rounded-full flex items-center justify-center text-2xl font-black mb-8 shadow-xl shadow-[#00AA13]/20 group-hover:scale-110 transition-transform duration-500 border-4 border-white">
+								<div className="w-20 h-20 bg-primary text-white rounded-full flex items-center justify-center text-2xl font-black mb-8 shadow-xl shadow-primary/20 group-hover:scale-110 transition-transform duration-500 border-4 border-white">
 									1
 								</div>
 								<h3 className="text-2xl font-bold mb-4">Pilih Produk</h3>
@@ -145,7 +145,7 @@ export default function ServicePage() {
 
 							{/* Step 2 */}
 							<div className="flex flex-col items-center text-center group">
-								<div className="w-20 h-20 bg-[#00AA13] text-white rounded-full flex items-center justify-center text-2xl font-black mb-8 shadow-xl shadow-[#00AA13]/20 group-hover:scale-110 transition-transform duration-500 border-4 border-white">
+								<div className="w-20 h-20 bg-primary text-white rounded-full flex items-center justify-center text-2xl font-black mb-8 shadow-xl shadow-primary/20 group-hover:scale-110 transition-transform duration-500 border-4 border-white">
 									2
 								</div>
 								<h3 className="text-2xl font-bold mb-4">Quality Control</h3>
@@ -157,7 +157,7 @@ export default function ServicePage() {
 
 							{/* Step 3 */}
 							<div className="flex flex-col items-center text-center group">
-								<div className="w-20 h-20 bg-[#00AA13] text-white rounded-full flex items-center justify-center text-2xl font-black mb-8 shadow-xl shadow-[#00AA13]/20 group-hover:scale-110 transition-transform duration-500 border-4 border-white">
+								<div className="w-20 h-20 bg-primary text-white rounded-full flex items-center justify-center text-2xl font-black mb-8 shadow-xl shadow-primary/20 group-hover:scale-110 transition-transform duration-500 border-4 border-white">
 									3
 								</div>
 								<h3 className="text-2xl font-bold mb-4">Dikirim ke Anda</h3>
@@ -199,7 +199,7 @@ export default function ServicePage() {
 								&quot;Sayurnya segar banget, pengiriman juga cepat. Sangat membantu
 								untuk ibu pekerja seperti saya!&quot;
 							</p>
-							<p className="text-[#00AA13] font-bold">- Rina, Jakarta</p>
+							<p className="text-primary font-bold">- Rina, Jakarta</p>
 						</div>
 						{/* Card 2 */}
 						<div
@@ -219,7 +219,7 @@ export default function ServicePage() {
 								&quot;Harganya lebih murah dari supermarket, kualitasnya jauh lebih
 								bagus. Mantap SegarTani!&quot;
 							</p>
-							<p className="text-[#00AA13] font-bold">- Siti, Depok</p>
+							<p className="text-primary font-bold">- Siti, Depok</p>
 						</div>
 						{/* Card 3 */}
 						<div
@@ -239,7 +239,7 @@ export default function ServicePage() {
 								&quot;Bumbu dapurnya lengkap dan selalu fresh. Langganan bulanan
 								sekarang.&quot;
 							</p>
-							<p className="text-[#00AA13] font-bold">- Anisa, Tangerang</p>
+							<p className="text-primary font-bold">- Anisa, Tangerang</p>
 						</div>
 					</div>
 				</div>
@@ -252,7 +252,7 @@ export default function ServicePage() {
 			<section className="py-20 bg-white">
 				<div className="container mx-auto px-6">
 					<div
-						className="max-w-5xl mx-auto bg-[#00AA13] rounded-[3rem] p-10 md:p-16 text-center text-white relative overflow-hidden shadow-xl shadow-[#00AA13]/20"
+						className="max-w-5xl mx-auto bg-primary rounded-5xl p-10 md:p-16 text-center text-white relative overflow-hidden shadow-xl shadow-primary/20"
 						data-aos="fade-up"
 					>
 						{/* Subtle Pattern Overlay */}
@@ -276,13 +276,13 @@ export default function ServicePage() {
 							<div className="flex flex-col sm:flex-row gap-5 justify-center items-center">
 								<Link
 									href="/product"
-									className="bg-white text-[#00AA13] px-10 py-4 rounded-[2rem] font-bold text-base hover:bg-gray-100 transition-all shadow-lg min-w-[220px]"
+									className="bg-white text-primary px-10 py-4 rounded-4xl font-bold text-base hover:bg-gray-100 transition-all shadow-lg min-w-[220px]"
 								>
 									Lihat Katalog Produk
 								</Link>
 								<Link
 									href="/contact"
-									className="bg-transparent text-white border-2 border-white/50 px-10 py-4 rounded-[2rem] font-bold text-base hover:bg-white/10 transition-all min-w-[220px]"
+									className="bg-transparent text-white border-2 border-white/50 px-10 py-4 rounded-4xl font-bold text-base hover:bg-white/10 transition-all min-w-[220px]"
 								>
 									Hubungi Tim Sales
 								</Link>

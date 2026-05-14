@@ -2,11 +2,10 @@
 
 import React, { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
-import { ShoppingBag, Package, Clock, CheckCircle2, Truck, AlertCircle, Search, Loader2, ArrowLeft } from 'lucide-react';
+import { ShoppingBag, Package, AlertCircle, Search, Loader2, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
-import { motion } from 'framer-motion';
 
 interface OrderItem {
   product_name: string;
@@ -40,7 +39,7 @@ const statusOptions = [
   { value: 'pending', label: 'Pending', color: 'text-yellow-600 bg-yellow-50' },
   { value: 'processing', label: 'Processing', color: 'text-blue-600 bg-blue-50' },
   { value: 'shipped', label: 'Shipped', color: 'text-purple-600 bg-purple-50' },
-  { value: 'completed', label: 'Completed', color: 'text-[#00AA13] bg-[#00AA13]/10' },
+  { value: 'completed', label: 'Completed', color: 'text-primary bg-primary/10' },
   { value: 'cancelled', label: 'Cancelled', color: 'text-red-600 bg-red-50' },
 ];
 
@@ -79,7 +78,7 @@ function AdminOrdersContent() {
     }
 
     async function fetchOrders() {
-      const { data, error } = await supabase
+      const { data } = await supabase
         .from('orders')
         .select(`
           *,
@@ -127,7 +126,7 @@ function AdminOrdersContent() {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <Loader2 className="animate-spin text-[#00AA13]" size={40} />
+        <Loader2 className="animate-spin text-primary" size={40} />
       </div>
     );
   }
@@ -148,7 +147,7 @@ function AdminOrdersContent() {
         <header className="mb-12">
           <Link
             href="/ecommerce"
-            className="flex items-center gap-2 text-gray-500 font-bold hover:text-[#00AA13] transition-colors mb-6 group inline-flex"
+            className="flex items-center gap-2 text-gray-500 font-bold hover:text-primary transition-colors mb-6 group"
           >
             <ArrowLeft size={20} className="group-hover:-translate-x-1 transition-transform" />
             Kembali ke Katalog
@@ -174,7 +173,7 @@ function AdminOrdersContent() {
                   placeholder="Cari Nama Pelanggan / ID..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-12 pr-4 py-4 bg-white rounded-2xl border border-gray-100 shadow-sm focus:ring-4 focus:ring-[#00AA13]/5 transition-all text-sm font-bold"
+                  className="w-full pl-12 pr-4 py-4 bg-white rounded-2xl border border-gray-100 shadow-sm focus:ring-4 focus:ring-primary/5 transition-all text-sm font-bold"
                 />
               </div>
             </div>
@@ -226,7 +225,7 @@ function AdminOrdersContent() {
                       </div>
                     </td>
                     <td className="px-10 py-8">
-                      <span className="text-lg font-black text-[#00AA13]">{formatIDR(Number(order.total_price))}</span>
+                      <span className="text-lg font-black text-primary">{formatIDR(Number(order.total_price))}</span>
                     </td>
                     <td className="px-10 py-8">
                       <div className="flex items-center gap-3">
@@ -241,7 +240,7 @@ function AdminOrdersContent() {
                             <option key={opt.value} value={opt.value}>{opt.label.toUpperCase()}</option>
                           ))}
                         </select>
-                        {updatingId === order.id && <Loader2 size={20} className="animate-spin text-[#00AA13]" />}
+                        {updatingId === order.id && <Loader2 size={20} className="animate-spin text-primary" />}
                       </div>
                     </td>
                   </tr>
@@ -267,7 +266,7 @@ export default function AdminOrdersPage() {
   return (
     <React.Suspense fallback={
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <Loader2 className="animate-spin text-[#00AA13]" size={40} />
+        <Loader2 className="animate-spin text-primary" size={40} />
       </div>
     }>
       <AdminOrdersContent />

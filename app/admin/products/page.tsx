@@ -1,11 +1,11 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import {
   PackageSearch, Plus, Edit2, Trash2, Image as ImageIcon,
-  Loader2, AlertCircle, CheckCircle2, Search, X, Upload, ArrowLeft
+  Loader2, AlertCircle, Search, X, Upload, ArrowLeft
 } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -56,7 +56,7 @@ function AdminProductsContent() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchProducts = async (sellerId: string) => {
+  const fetchProducts = useCallback(async (sellerId: string) => {
     setLoading(true);
     const { data, error } = await supabase
       .from('products')
@@ -68,9 +68,9 @@ function AdminProductsContent() {
       setProducts(data);
     }
     setLoading(false);
-  };
+  }, []);
 
-  const checkUserAndFetch = async () => {
+  const checkUserAndFetch = useCallback(async () => {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
       router.push('/login');
@@ -87,11 +87,14 @@ function AdminProductsContent() {
 
     setUserId(user.id);
     fetchProducts(user.id);
-  };
+  }, [router, fetchProducts]);
 
   useEffect(() => {
-    Promise.resolve().then(() => checkUserAndFetch());
-  }, []);
+    const timer = setTimeout(() => {
+      checkUserAndFetch();
+    }, 0);
+    return () => clearTimeout(timer);
+  }, [checkUserAndFetch]);
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -200,12 +203,12 @@ function AdminProductsContent() {
     }
   }, [search, pathname, router, searchParams]);
 
-  const inputCls = 'w-full bg-gray-50 border border-gray-100 rounded-2xl px-5 py-3 focus:ring-4 focus:ring-[#00AA13]/10 focus:border-[#00AA13] text-gray-700 font-bold transition-all text-sm outline-none';
+  const inputCls = 'w-full bg-gray-50 border border-gray-100 rounded-2xl px-5 py-3 focus:ring-4 focus:ring-primary/10 focus:border-primary text-gray-700 font-bold transition-all text-sm outline-none';
   const labelCls = 'block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2';
 
   if (loading) return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <Loader2 size={40} className="animate-spin text-[#00AA13]" />
+      <Loader2 size={40} className="animate-spin text-primary" />
     </div>
   );
 
@@ -216,25 +219,25 @@ function AdminProductsContent() {
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <Link href="/admin/store-profile" className="inline-flex items-center gap-2 text-sm font-bold text-gray-400 hover:text-[#00AA13] transition-colors mb-3">
+            <Link href="/admin/store-profile" className="inline-flex items-center gap-2 text-sm font-bold text-gray-400 hover:text-primary transition-colors mb-3">
               <ArrowLeft size={16} /> Kembali ke Profil Penjual
             </Link>
             <h1 className="text-3xl font-black text-gray-900">Manajemen Produk</h1>
             <p className="text-gray-500 font-medium">Atur barang jualan dan etalase tokomu.</p>
           </div>
           <button onClick={openModalForNew}
-            className="flex items-center gap-2 bg-[#00AA13] text-white px-6 py-3.5 rounded-2xl font-black hover:bg-[#008810] transition-all shadow-xl shadow-[#00AA13]/20">
+            className="flex items-center gap-2 bg-primary text-white px-6 py-3.5 rounded-2xl font-black hover:bg-[#008810] transition-all shadow-xl shadow-primary/20">
             <Plus size={20} /> Tambah Produk
           </button>
         </div>
 
         {/* Search & Filters */}
-        <div className="bg-white p-4 rounded-[2rem] shadow-sm border border-gray-100 flex items-center gap-4">
+        <div className="bg-white p-4 rounded-4xl shadow-sm border border-gray-100 flex items-center gap-4">
           <div className="relative flex-1">
             <Search size={18} className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400" />
             <input type="text" placeholder="Cari nama produk..." 
               value={search} onChange={e => setSearch(e.target.value)}
-              className="w-full bg-gray-50 border-none rounded-xl py-3.5 pl-12 pr-4 text-sm font-bold focus:ring-2 focus:ring-[#00AA13]/20 outline-none" />
+              className="w-full bg-gray-50 border-none rounded-xl py-3.5 pl-12 pr-4 text-sm font-bold focus:ring-2 focus:ring-primary/20 outline-none" />
           </div>
         </div>
 
@@ -252,7 +255,7 @@ function AdminProductsContent() {
             <AnimatePresence>
               {filteredProducts.map(p => (
                 <motion.div key={p.id} initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }}
-                  className="bg-white rounded-[2rem] border border-gray-100 overflow-hidden shadow-sm hover:shadow-xl hover:border-[#00AA13]/20 transition-all group flex flex-col">
+                  className="bg-white rounded-4xl border border-gray-100 overflow-hidden shadow-sm hover:shadow-xl hover:border-primary/20 transition-all group flex flex-col">
                   
                   {/* Image */}
                   <div className="relative h-48 bg-gray-100 overflow-hidden">
@@ -274,7 +277,7 @@ function AdminProductsContent() {
                     <div className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">{p.category}</div>
                     <h3 className="text-lg font-black text-gray-900 line-clamp-1 mb-2">{p.name}</h3>
                     <div className="flex items-center gap-2 mb-4">
-                      <span className="text-xl font-black text-[#00AA13]">Rp {p.price.toLocaleString('id-ID')}</span>
+                      <span className="text-xl font-black text-primary">Rp {p.price.toLocaleString('id-ID')}</span>
                       {p.discount > 0 && <span className="text-xs font-bold text-gray-400 line-through">Rp {(p.price + (p.price * p.discount / 100)).toLocaleString('id-ID')}</span>}
                     </div>
                     
@@ -396,7 +399,7 @@ function AdminProductsContent() {
                 <button type="button" onClick={() => setIsModalOpen(false)}
                   className="px-6 py-3 rounded-xl font-bold text-gray-500 hover:bg-gray-200 transition-colors">Batal</button>
                 <button type="submit" form="product-form" disabled={saving || uploading}
-                  className="px-8 py-3 bg-[#00AA13] hover:bg-[#008810] text-white font-black rounded-xl transition-all shadow-lg shadow-[#00AA13]/20 flex items-center gap-2 disabled:opacity-50">
+                  className="px-8 py-3 bg-primary hover:bg-[#008810] text-white font-black rounded-xl transition-all shadow-lg shadow-primary/20 flex items-center gap-2 disabled:opacity-50">
                   {saving ? <><Loader2 size={18} className="animate-spin" /> Menyimpan...</> : 'Simpan Produk'}
                 </button>
               </div>
@@ -414,7 +417,7 @@ export default function AdminProductsPage() {
   return (
     <React.Suspense fallback={
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <Loader2 size={40} className="animate-spin text-[#00AA13]" />
+        <Loader2 size={40} className="animate-spin text-primary" />
       </div>
     }>
       <AdminProductsContent />

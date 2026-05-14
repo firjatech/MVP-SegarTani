@@ -8,7 +8,6 @@ import {
 	ShoppingCart,
 	Trash2,
 	ArrowLeft,
-	ShoppingBag,
 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
@@ -35,7 +34,7 @@ export default function WishlistPage() {
 				<header className="mb-12">
 					<Link
 						href="/ecommerce"
-						className="flex items-center gap-2 text-gray-500 font-bold hover:text-[#00AA13] transition-colors mb-6 group inline-flex"
+						className="items-center gap-2 text-gray-500 font-bold hover:text-primary transition-colors mb-6 group inline-flex"
 					>
 						<ArrowLeft
 							size={20}
@@ -60,7 +59,7 @@ export default function WishlistPage() {
 
 				{wishlist.length === 0 ? (
 					<div
-						className="bg-white rounded-[3rem] p-16 text-center shadow-xl border border-gray-100 flex flex-col items-center"
+						className="bg-white rounded-5xl p-16 text-center shadow-xl border border-gray-100 flex flex-col items-center"
 						data-aos="fade-up"
 					>
 						<div className="w-24 h-24 bg-gray-50 rounded-full flex items-center justify-center text-gray-300 mb-8">
@@ -75,7 +74,7 @@ export default function WishlistPage() {
 						</p>
 						<Link
 							href="/ecommerce"
-							className="bg-[#00AA13] text-white px-12 py-4 rounded-2xl font-black shadow-xl shadow-[#00AA13]/20 hover:scale-105 transition-transform"
+							className="bg-primary text-white px-12 py-4 rounded-2xl font-black shadow-xl shadow-primary/20 hover:scale-105 transition-transform"
 						>
 							Cari Produk
 						</Link>
@@ -90,7 +89,7 @@ export default function WishlistPage() {
 									initial={{ opacity: 0, scale: 0.9 }}
 									animate={{ opacity: 1, scale: 1 }}
 									exit={{ opacity: 0, scale: 0.9 }}
-									className="bg-white rounded-[2.5rem] shadow-lg border border-gray-100 overflow-hidden group hover:shadow-2xl transition-all duration-500"
+									className="bg-white rounded-4xl shadow-lg border border-gray-100 overflow-hidden group hover:shadow-2xl transition-all duration-500"
 								>
 									<div className="relative aspect-square">
 										<Image
@@ -100,11 +99,12 @@ export default function WishlistPage() {
 											className="object-cover group-hover:scale-110 transition-transform duration-700"
 										/>
 										<div className="absolute top-5 left-5">
-											<span className="bg-white/90 backdrop-blur-sm text-[#00AA13] text-[10px] font-black px-3 py-1 rounded-lg border border-[#00AA13]/20 uppercase">
+											<span className="bg-white/90 backdrop-blur-sm text-primary text-[10px] font-black px-3 py-1 rounded-lg border border-primary/20 uppercase">
 												{item.category}
 											</span>
 										</div>
 										<button
+											type="button"
 											onClick={() => removeFromWishlist(item.id)}
 											className="absolute top-5 right-5 p-3 bg-white/80 backdrop-blur-md text-red-500 rounded-2xl hover:bg-red-500 hover:text-white transition-all shadow-sm"
 										>
@@ -116,7 +116,7 @@ export default function WishlistPage() {
 										<h3 className="text-xl font-black text-gray-900 mb-2 truncate">
 											{item.name}
 										</h3>
-										<p className="text-2xl font-black text-[#00AA13] mb-8">
+										<p className="text-2xl font-black text-primary mb-8">
 											{formatIDR(item.price)}
 										</p>
 
@@ -128,6 +128,7 @@ export default function WishlistPage() {
 												Detail
 											</Link>
 											<button
+												type="button"
 												onClick={() =>
 													addToCart({
 														id: item.id,
@@ -138,7 +139,7 @@ export default function WishlistPage() {
 														quantity: 1,
 													})
 												}
-												className="bg-[#00AA13] text-white p-4 rounded-2xl hover:bg-[#008810] transition-all shadow-lg shadow-[#00AA13]/20 active:scale-95"
+												className="bg-primary text-white p-4 rounded-2xl hover:bg-[#008810] transition-all shadow-lg shadow-primary/20 active:scale-95"
 											>
 												<ShoppingCart size={22} />
 											</button>

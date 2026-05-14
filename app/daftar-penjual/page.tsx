@@ -95,7 +95,7 @@ export default function SellerRegisterPage() {
     }
   };
 
-  const inputCls = 'w-full bg-white border border-gray-100 rounded-2xl px-14 py-5 focus:outline-none focus:border-[#00AA13] focus:ring-4 focus:ring-[#00AA13]/5 text-gray-700 font-medium transition-all';
+  const inputCls = 'w-full bg-white border border-gray-100 rounded-2xl px-14 py-5 focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/5 text-gray-700 font-medium transition-all';
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4 md:p-8">
@@ -106,10 +106,10 @@ export default function SellerRegisterPage() {
           <div className="mb-10 flex flex-col items-center lg:items-start w-full">
             <div className="mb-4 flex items-center gap-2">
               <Image src="/images/logo.jpg" alt="Logo" width={50} height={50} priority className="h-10 w-auto" />
-              <span className="text-2xl font-black text-[#00AA13]">Segar<span className="text-[#FF9F1C]">Tani</span></span>
+              <span className="text-2xl font-black text-primary">Segar<span className="text-secondary">Tani</span></span>
             </div>
             <div className="w-full text-left">
-              <Link href="/login" className="flex items-center gap-2 text-sm font-bold text-[#00AA13] hover:opacity-80 transition-opacity">
+              <Link href="/login" className="flex items-center gap-2 text-sm font-bold text-primary hover:opacity-80 transition-opacity">
                 <ArrowRight size={16} className="rotate-180" /> Sudah punya akun? Login
               </Link>
             </div>
@@ -122,10 +122,10 @@ export default function SellerRegisterPage() {
                 {[1, 2].map((s) => (
                   <React.Fragment key={s}>
                     <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-black transition-all
-                      ${step >= s ? 'bg-[#00AA13] text-white' : 'bg-gray-100 text-gray-400'}`}>
+                      ${step >= s ? 'bg-primary text-white' : 'bg-gray-100 text-gray-400'}`}>
                       {s}
                     </div>
-                    {s < 2 && <div className={`flex-1 h-1 rounded-full transition-all ${step > s ? 'bg-[#00AA13]' : 'bg-gray-100'}`} />}
+                    {s < 2 && <div className={`flex-1 h-1 rounded-full transition-all ${step > s ? 'bg-primary' : 'bg-gray-100'}`} />}
                   </React.Fragment>
                 ))}
               </div>
@@ -227,7 +227,7 @@ export default function SellerRegisterPage() {
                   </button>
                 )}
                 <button type="submit" disabled={loading || success}
-                  className="flex-1 bg-[#00AA13] hover:bg-[#008810] disabled:bg-gray-300 text-white font-black py-5 rounded-2xl transition-all shadow-xl shadow-[#00AA13]/20 flex items-center justify-center gap-2 group text-base">
+                  className="flex-1 bg-primary hover:bg-[#008810] disabled:bg-gray-300 text-white font-black py-5 rounded-2xl transition-all shadow-xl shadow-primary/20 flex items-center justify-center gap-2 group text-base">
                   {loading ? (
                     <><Loader2 size={22} className="animate-spin" /> Memproses...</>
                   ) : session ? (
@@ -243,13 +243,13 @@ export default function SellerRegisterPage() {
 
             <p className="mt-8 text-center text-sm font-medium text-gray-400">
               Mau belanja aja?{' '}
-              <Link href="/register" className="text-[#00AA13] font-black hover:underline">Daftar Akun Pembeli</Link>
+              <Link href="/register" className="text-primary font-black hover:underline">Daftar Akun Pembeli</Link>
             </p>
           </div>
         </div>
 
         {/* Right: Visual */}
-        <div className="hidden lg:flex flex-1 bg-gradient-to-br from-[#00AA13] to-emerald-700 p-16 flex-col justify-center relative overflow-hidden">
+        <div className="hidden lg:flex flex-1 bg-linear-to-br from-primary to-emerald-700 p-16 flex-col justify-center relative overflow-hidden">
           <div className="absolute top-20 right-20 w-64 h-64 bg-white/5 rounded-full blur-3xl" />
           <div className="absolute -bottom-20 -left-20 w-96 h-96 bg-white/10 rounded-full blur-2xl" />
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-white/5 rounded-full" />

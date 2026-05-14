@@ -2,11 +2,8 @@
 
 import React, { useState } from "react";
 import {
-	Search,
 	MapPin,
 	Phone,
-	Clock,
-	Navigation,
 	ArrowLeft,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -62,8 +59,9 @@ export default function LocationPage() {
 			<section className="pt-16 pb-12 px-6 bg-[#f8fcf9]">
 				<div className="container mx-auto max-w-4xl" data-aos="fade-down">
 					<button
+						type="button"
 						onClick={() => router.back()}
-						className="flex items-center gap-2 text-gray-500 font-bold hover:text-[#00AA13] transition-colors mb-8 group"
+						className="flex items-center gap-2 text-gray-500 font-bold hover:text-primary transition-colors mb-8 group"
 					>
 						<ArrowLeft
 							size={18}
@@ -74,8 +72,8 @@ export default function LocationPage() {
 
 					<div className="text-center" data-aos="fade-up">
 						<h1 className="text-4xl md:text-6xl font-black text-gray-900 mb-6 tracking-tight">
-							Cari Lokasi <span className="text-[#00AA13]">Segar</span>
-							<span className="text-[#FF9F1C]">Tani</span>
+							Cari Lokasi <span className="text-primary">Segar</span>
+							<span className="text-secondary">Tani</span>
 						</h1>
 						<p className="text-lg md:text-xl text-gray-600 mb-12 max-w-2xl mx-auto">
 							Cek apakah area Anda sudah masuk dalam jangkauan layanan
@@ -87,7 +85,7 @@ export default function LocationPage() {
 							onSubmit={(e) => { e.preventDefault(); setMapQuery(searchQuery.trim() || "Bandung"); }}
 							className="relative max-w-2xl mx-auto bg-white rounded-full shadow-2xl shadow-gray-200/50 p-2 flex items-center border border-gray-100"
 						>
-							<div className="flex-grow flex items-center px-4">
+							<div className="grow flex items-center px-4">
 								<MapPin className="text-gray-400 mr-3" size={20} />
 								<input
 									type="text"
@@ -97,7 +95,7 @@ export default function LocationPage() {
 									className="w-full py-3 focus:outline-none text-gray-700 font-medium"
 								/>
 							</div>
-							<button type="submit" className="bg-[#00AA13] text-white px-8 py-3.5 rounded-full font-bold hover:bg-[#00880F] transition-all shadow-lg active:scale-95">
+							<button type="submit" className="bg-primary text-white px-8 py-3.5 rounded-full font-bold hover:bg-[#008810] transition-all shadow-lg active:scale-95">
 								Cek Lokasi
 							</button>
 						</form>
@@ -121,9 +119,9 @@ export default function LocationPage() {
 							{locations.map((loc) => (
 								<div
 									key={loc.id}
-									className={`p-6 rounded-[1.5rem] border transition-all duration-300 hover:shadow-lg ${
+									className={`p-6 rounded-3xl border transition-all duration-300 hover:shadow-lg ${
 										loc.isPusat
-											? "bg-[#e8f5e9]/40 border-[#00AA13]/10"
+											? "bg-primary/10 border-primary/10"
 											: "bg-white border-gray-100"
 									}`}
 									data-aos="fade-right"
@@ -134,14 +132,14 @@ export default function LocationPage() {
 											{loc.name}
 										</h3>
 										{loc.isPusat && (
-											<span className="bg-[#00AA13] text-white text-[9px] font-black px-2 py-0.5 rounded-full">
+											<span className="bg-primary text-white text-[9px] font-black px-2 py-0.5 rounded-full">
 												PUSAT
 											</span>
 										)}
 									</div>
 
 									<p
-										className={`text-sm font-bold mb-4 ${loc.isPusat ? "text-[#00AA13]" : "text-[#FF9F1C]"}`}
+										className={`text-sm font-bold mb-4 ${loc.isPusat ? "text-primary" : "text-secondary"}`}
 									>
 										{loc.status}
 									</p>

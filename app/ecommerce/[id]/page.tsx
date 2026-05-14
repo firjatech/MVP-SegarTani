@@ -18,7 +18,6 @@ import {
 	MessageSquare,
 	Send,
 } from "lucide-react";
-import { motion } from "framer-motion";
 import Image from "next/image";
 import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
@@ -98,7 +97,7 @@ export default function ProductDetailPage() {
 		}
 
 		async function fetchReviews() {
-			const { data, error } = await supabase
+			const { data } = await supabase
 				.from("reviews")
 				.select("*")
 				.eq("product_id", id)
@@ -149,7 +148,7 @@ export default function ProductDetailPage() {
 	if (loading) {
 		return (
 			<div className="min-h-screen flex flex-col items-center justify-center bg-gray-50">
-				<Loader2 className="w-12 h-12 text-[#00AA13] animate-spin mb-4" />
+				<Loader2 className="w-12 h-12 text-primary animate-spin mb-4" />
 				<p className="text-gray-500 font-bold">Mengambil detail produk...</p>
 			</div>
 		);
@@ -163,7 +162,7 @@ export default function ProductDetailPage() {
 				</h2>
 				<button
 					onClick={() => router.back()}
-					className="flex items-center gap-2 text-[#00AA13] font-bold hover:underline"
+					className="flex items-center gap-2 text-primary font-bold hover:underline"
 				>
 					<ArrowLeft size={18} /> Kembali
 				</button>
@@ -180,9 +179,9 @@ export default function ProductDetailPage() {
 			<div className="container mx-auto px-6 max-w-7xl">
 				<button
 					onClick={() => router.back()}
-					className="flex items-center gap-2 text-gray-500 font-bold hover:text-[#00AA13] transition-colors mb-2 group"
+					className="flex items-center gap-2 text-gray-500 font-bold hover:text-primary transition-colors mb-2 group"
 				>
-					<div className="p-2 bg-white rounded-full shadow-sm group-hover:bg-[#00AA13]/10">
+					<div className="p-2 bg-white rounded-full shadow-sm group-hover:bg-primary/10">
 						<ArrowLeft size={20} />
 					</div>
 					Kembali ke Katalog
@@ -202,7 +201,7 @@ export default function ProductDetailPage() {
 								)}
 
 								{isOutOfStock && (
-									<div className="absolute inset-0 bg-white/60 backdrop-blur-[2px] z-20 flex items-center justify-center rounded-[2rem]">
+									<div className="absolute inset-0 bg-white/60 backdrop-blur-[2px] z-20 flex items-center justify-center rounded-4xl">
 										<span className="bg-red-500 text-white text-lg font-black px-8 py-3 rounded-full shadow-2xl transform -rotate-12 border-4 border-white">
 											STOK HABIS
 										</span>
@@ -221,7 +220,7 @@ export default function ProductDetailPage() {
 						{/* Right: Info */}
 						<div className="lg:w-1/2 p-8 md:p-16">
 							<div className="mb-6 flex items-center gap-3">
-								<span className="bg-[#00AA13]/10 text-[#00AA13] text-xs font-black px-4 py-1.5 rounded-full uppercase tracking-wider">
+								<span className="bg-primary/10 text-primary text-xs font-black px-4 py-1.5 rounded-full uppercase tracking-wider">
 									{product.category}
 								</span>
 								<div className="flex items-center gap-1 text-yellow-400">
@@ -248,7 +247,7 @@ export default function ProductDetailPage() {
 											{formatIDR(product.price)}
 										</span>
 									)}
-									<span className="text-4xl font-black text-[#00AA13]">
+									<span className="text-4xl font-black text-primary">
 										{formatIDR(discountPrice)}
 									</span>
 								</div>
@@ -278,7 +277,7 @@ export default function ProductDetailPage() {
 										<div className="flex items-center bg-gray-100 rounded-2xl p-1">
 											<button
 												onClick={() => handleQuantity("minus")}
-												className="w-12 h-12 flex items-center justify-center bg-white rounded-xl shadow-sm hover:text-[#00AA13] transition-colors"
+												className="w-12 h-12 flex items-center justify-center bg-white rounded-xl shadow-sm hover:text-primary transition-colors"
 											>
 												<Minus size={20} />
 											</button>
@@ -287,7 +286,7 @@ export default function ProductDetailPage() {
 											</span>
 											<button
 												onClick={() => handleQuantity("plus")}
-												className="w-12 h-12 flex items-center justify-center bg-white rounded-xl shadow-sm hover:text-[#00AA13] transition-colors"
+												className="w-12 h-12 flex items-center justify-center bg-white rounded-xl shadow-sm hover:text-primary transition-colors"
 											>
 												<Plus size={20} />
 											</button>
@@ -315,7 +314,7 @@ export default function ProductDetailPage() {
 									className={`flex-1 font-black py-5 rounded-2xl transition-all shadow-xl flex items-center justify-center gap-3 text-lg active:scale-95 ${
 										isOutOfStock
 											? "bg-gray-200 text-gray-400 cursor-not-allowed shadow-none"
-											: "bg-[#00AA13] hover:bg-[#008810] text-white shadow-[#00AA13]/20"
+											: "bg-primary hover:bg-[#008810] text-white shadow-primary/20"
 									}`}
 								>
 									<ShoppingCart size={22} />
@@ -349,7 +348,7 @@ export default function ProductDetailPage() {
 							{/* Badges */}
 							<div className="mt-12 grid grid-cols-2 gap-4">
 								<div className="flex items-center gap-3 p-4 bg-gray-50 rounded-2xl border border-gray-100">
-									<ShieldCheck className="text-[#00AA13]" size={24} />
+									<ShieldCheck className="text-primary" size={24} />
 									<div>
 										<p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">
 											Kualitas
@@ -360,7 +359,7 @@ export default function ProductDetailPage() {
 									</div>
 								</div>
 								<div className="flex items-center gap-3 p-4 bg-gray-50 rounded-2xl border border-gray-100">
-									<Truck className="text-[#00AA13]" size={24} />
+									<Truck className="text-primary" size={24} />
 									<div>
 										<p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">
 											Pengiriman
@@ -395,7 +394,7 @@ export default function ProductDetailPage() {
 						{/* Review List */}
 						<div className="lg:col-span-2 space-y-8">
 							{reviews.length === 0 ? (
-								<div className="py-12 text-center bg-gray-50 rounded-[2rem] border border-dashed border-gray-200">
+								<div className="py-12 text-center bg-gray-50 rounded-4xl border border-dashed border-gray-200">
 									<p className="text-gray-400 font-bold">
 										Belum ada ulasan untuk produk ini.
 									</p>
@@ -408,7 +407,7 @@ export default function ProductDetailPage() {
 									>
 										<div className="flex justify-between items-start mb-4">
 											<div className="flex items-center gap-3">
-												<div className="w-10 h-10 bg-[#00AA13]/10 text-[#00AA13] rounded-full flex items-center justify-center font-black text-sm uppercase">
+												<div className="w-10 h-10 bg-primary/10 text-primary rounded-full flex items-center justify-center font-black text-sm uppercase">
 													{review.user_name.charAt(0)}
 												</div>
 												<div>
@@ -488,13 +487,13 @@ export default function ProductDetailPage() {
 												}
 												placeholder="Apa pendapat Anda tentang produk ini?"
 												rows={4}
-												className="w-full bg-white border-none rounded-2xl px-6 py-4 focus:ring-4 focus:ring-[#00AA13]/5 text-gray-700 font-medium transition-all"
+												className="w-full bg-white border-none rounded-2xl px-6 py-4 focus:ring-4 focus:ring-primary/5 text-gray-700 font-medium transition-all"
 											/>
 										</div>
 										<button
 											type="submit"
 											disabled={submittingReview}
-											className="w-full bg-[#00AA13] hover:bg-[#008810] disabled:bg-gray-300 text-white font-black py-4 rounded-2xl transition-all shadow-xl shadow-[#00AA13]/20 flex items-center justify-center gap-3 active:scale-95"
+											className="w-full bg-primary hover:bg-[#008810] disabled:bg-gray-300 text-white font-black py-4 rounded-2xl transition-all shadow-xl shadow-primary/20 flex items-center justify-center gap-3 active:scale-95"
 										>
 											{submittingReview ? (
 												<Loader2 size={20} className="animate-spin" />
@@ -512,7 +511,7 @@ export default function ProductDetailPage() {
 										</p>
 										<Link
 											href="/login"
-											className="inline-block bg-white text-gray-900 font-black px-8 py-3 rounded-xl border border-gray-100 hover:bg-[#00AA13] hover:text-white transition-all shadow-sm"
+											className="inline-block bg-white text-gray-900 font-black px-8 py-3 rounded-xl border border-gray-100 hover:bg-primary hover:text-white transition-all shadow-sm"
 										>
 											Login Sekarang
 										</Link>

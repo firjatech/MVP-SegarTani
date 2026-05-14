@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useId } from 'react';
 import { useCart } from '@/context/CartContext';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
@@ -19,7 +19,7 @@ const formatIDR = (amount: number) => {
 
 export default function CheckoutPage() {
   const { 
-    cart, totalPrice, totalSelectedItems, clearCart, 
+    cart, totalPrice, clearCart, 
     appliedVoucher, applyVoucher, removeVoucher, discountAmount 
   } = useCart();
   const router = useRouter();
@@ -43,6 +43,13 @@ export default function CheckoutPage() {
   const selectedItems = cart.filter(item => item.selected);
   const finalPrice = totalPrice - discountAmount;
 
+  const nameId = useId();
+  const phoneId = useId();
+  const addressId = useId();
+  const cityId = useId();
+  const provinceId = useId();
+  const postalCodeId = useId();
+
   useEffect(() => {
     async function loadProfile() {
       const { data: { user } } = await supabase.auth.getUser();
@@ -51,7 +58,7 @@ export default function CheckoutPage() {
         return;
       }
 
-      const { data, error } = await supabase
+      const { data } = await supabase
         .from('profiles')
         .select('*')
         .eq('id', user.id)
@@ -105,7 +112,7 @@ export default function CheckoutPage() {
 
       applyVoucher(data);
       setVoucherInput('');
-    } catch (err) {
+    } catch {
       setVoucherError('Terjadi kesalahan saat mengecek voucher.');
     } finally {
       setIsApplyingVoucher(false);
@@ -220,7 +227,7 @@ export default function CheckoutPage() {
         <motion.div 
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
-          className="w-24 h-24 bg-[#00AA13]/10 text-[#00AA13] rounded-full flex items-center justify-center mb-8"
+          className="w-24 h-24 bg-primary/10 text-primary rounded-full flex items-center justify-center mb-8"
         >
           <CheckCircle2 size={60} strokeWidth={2.5} />
         </motion.div>
@@ -229,8 +236,9 @@ export default function CheckoutPage() {
           Terima kasih telah berbelanja di SegarTani. Pesanan Anda sedang kami siapkan dan akan segera dikirim.
         </p>
         <button 
+          type="button"
           onClick={() => router.push('/ecommerce')}
-          className="bg-[#00AA13] text-white px-12 py-4 rounded-2xl font-black shadow-xl shadow-[#00AA13]/20 hover:scale-105 transition-transform"
+          className="bg-primary text-white px-12 py-4 rounded-2xl font-black shadow-xl shadow-primary/20 hover:scale-105 transition-transform"
         >
           Kembali ke Katalog
         </button>
@@ -241,7 +249,7 @@ export default function CheckoutPage() {
   if (fetchingProfile) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
-        <Loader2 className="animate-spin text-[#00AA13]" size={40} />
+        <Loader2 className="animate-spin text-primary" size={40} />
       </div>
     );
   }
@@ -250,8 +258,9 @@ export default function CheckoutPage() {
     <div className="bg-gray-50 min-h-screen pt-16 pb-20 font-sans">
       <div className="container mx-auto px-6 max-w-6xl">
         <button 
+          type="button"
           onClick={() => router.back()}
-          className="flex items-center gap-2 text-gray-500 font-bold hover:text-[#00AA13] transition-colors mb-2 group"
+          className="flex items-center gap-2 text-gray-500 font-bold hover:text-primary transition-colors mb-2 group"
         >
           <ArrowLeft size={20} className="group-hover:-translate-x-1 transition-transform" />
           Kembali
@@ -262,7 +271,7 @@ export default function CheckoutPage() {
           <div className="lg:w-2/3 w-full">
             <div className="bg-white rounded-[2.5rem] shadow-xl p-8 md:p-12 border border-gray-100">
               <div className="flex items-center gap-4 mb-10">
-                <div className="bg-[#00AA13] p-3 rounded-2xl text-white">
+                <div className="bg-primary p-3 rounded-2xl text-white">
                   <MapPin size={24} />
                 </div>
                 <div>
@@ -273,88 +282,94 @@ export default function CheckoutPage() {
 
               {fetchingProfile ? (
                 <div className="py-20 flex justify-center">
-                  <Loader2 className="animate-spin text-[#00AA13]" size={40} />
+                  <Loader2 className="animate-spin text-primary" size={40} />
                 </div>
               ) : (
                 <form onSubmit={handleSubmit} className="space-y-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                      <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3">NAMA PENERIMA</label>
+                      <label htmlFor={nameId} className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3">NAMA PENERIMA</label>
                       <div className="relative">
                         <User size={18} className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-300" />
                         <input 
+                          id={nameId}
                           type="text" 
                           required
                           value={formData.full_name}
                           onChange={(e) => setFormData({...formData, full_name: e.target.value})}
                           placeholder="Nama lengkap Anda" 
-                          className="w-full bg-gray-50 border-none rounded-2xl px-14 py-4 focus:ring-4 focus:ring-[#00AA13]/5 text-gray-700 font-medium transition-all" 
+                          className="w-full bg-gray-50 border-none rounded-2xl px-14 py-4 focus:ring-4 focus:ring-primary/5 text-gray-700 font-medium transition-all" 
                         />
                       </div>
                     </div>
                     <div>
-                      <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3">NOMOR TELEPON / WA</label>
+                      <label htmlFor={phoneId} className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3">NOMOR TELEPON / WA</label>
                       <div className="relative">
                         <Phone size={18} className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-300" />
                         <input 
+                          id={phoneId}
                           type="tel" 
                           required
                           value={formData.phone}
                           onChange={(e) => setFormData({...formData, phone: e.target.value.replace(/\D/g, '')})}
                           placeholder="0812xxxx" 
-                          className="w-full bg-gray-50 border-none rounded-2xl px-14 py-4 focus:ring-4 focus:ring-[#00AA13]/5 text-gray-700 font-medium transition-all" 
+                          className="w-full bg-gray-50 border-none rounded-2xl px-14 py-4 focus:ring-4 focus:ring-primary/5 text-gray-700 font-medium transition-all" 
                         />
                       </div>
                     </div>
                   </div>
 
                   <div>
-                    <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3">ALAMAT LENGKAP</label>
+                    <label htmlFor={addressId} className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3">ALAMAT LENGKAP</label>
                     <div className="relative">
                       <Home size={18} className="absolute left-5 top-6 text-gray-300" />
                       <textarea 
+                        id={addressId}
                         required
                         value={formData.address}
                         onChange={(e) => setFormData({...formData, address: e.target.value})}
                         placeholder="Nama jalan, nomor rumah, RT/RW, kelurahan..." 
                         rows={3}
-                        className="w-full bg-gray-50 border-none rounded-2xl px-14 py-4 focus:ring-4 focus:ring-[#00AA13]/5 text-gray-700 font-medium transition-all" 
+                        className="w-full bg-gray-50 border-none rounded-2xl px-14 py-4 focus:ring-4 focus:ring-primary/5 text-gray-700 font-medium transition-all" 
                       />
                     </div>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div>
-                      <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3">KOTA</label>
+                      <label htmlFor={cityId} className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3">KOTA</label>
                       <input 
+                        id={cityId}
                         type="text" 
                         required
                         value={formData.city}
                         onChange={(e) => setFormData({...formData, city: e.target.value})}
                         placeholder="Contoh: Batu" 
-                        className="w-full bg-gray-50 border-none rounded-2xl px-6 py-4 focus:ring-4 focus:ring-[#00AA13]/5 text-gray-700 font-medium transition-all" 
+                        className="w-full bg-gray-50 border-none rounded-2xl px-6 py-4 focus:ring-4 focus:ring-primary/5 text-gray-700 font-medium transition-all" 
                       />
                     </div>
                     <div>
-                      <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3">PROVINSI</label>
+                      <label htmlFor={provinceId} className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3">PROVINSI</label>
                       <input 
+                        id={provinceId}
                         type="text" 
                         required
                         value={formData.province}
                         onChange={(e) => setFormData({...formData, province: e.target.value})}
                         placeholder="Jawa Timur" 
-                        className="w-full bg-gray-50 border-none rounded-2xl px-6 py-4 focus:ring-4 focus:ring-[#00AA13]/5 text-gray-700 font-medium transition-all" 
+                        className="w-full bg-gray-50 border-none rounded-2xl px-6 py-4 focus:ring-4 focus:ring-primary/5 text-gray-700 font-medium transition-all" 
                       />
                     </div>
                     <div>
-                      <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3">KODE POS</label>
+                      <label htmlFor={postalCodeId} className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3">KODE POS</label>
                       <input 
+                        id={postalCodeId}
                         type="text" 
                         required
                         value={formData.postal_code}
                         onChange={(e) => setFormData({...formData, postal_code: e.target.value})}
                         placeholder="65311" 
-                        className="w-full bg-gray-50 border-none rounded-2xl px-6 py-4 focus:ring-4 focus:ring-[#00AA13]/5 text-gray-700 font-medium transition-all" 
+                        className="w-full bg-gray-50 border-none rounded-2xl px-6 py-4 focus:ring-4 focus:ring-primary/5 text-gray-700 font-medium transition-all" 
                       />
                     </div>
                   </div>
@@ -363,7 +378,7 @@ export default function CheckoutPage() {
                     <button 
                       type="submit"
                       disabled={loading}
-                      className="w-full bg-[#00AA13] hover:bg-[#008810] disabled:bg-gray-300 text-white font-black py-5 rounded-2xl transition-all shadow-xl shadow-[#00AA13]/20 flex items-center justify-center gap-3 text-lg"
+                      className="w-full bg-primary hover:bg-[#008810] disabled:bg-gray-300 text-white font-black py-5 rounded-2xl transition-all shadow-xl shadow-primary/20 flex items-center justify-center gap-3 text-lg"
                     >
                       {loading ? (
                         <>
@@ -386,17 +401,18 @@ export default function CheckoutPage() {
             {/* Voucher Section */}
             <div className="bg-white rounded-[2.5rem] shadow-xl p-8 border border-gray-100 mb-8">
               <div className="flex items-center gap-3 mb-6">
-                <CreditCard size={20} className="text-[#00AA13]" />
+                <CreditCard size={20} className="text-primary" />
                 <h3 className="text-xl font-black text-gray-900">Kode Promo</h3>
               </div>
               
               {appliedVoucher ? (
-                <div className="bg-[#00AA13]/10 p-4 rounded-2xl border border-[#00AA13]/20 flex justify-between items-center">
+                <div className="bg-primary/10 p-4 rounded-2xl border border-primary/20 flex justify-between items-center">
                   <div>
-                    <p className="text-[10px] font-black text-[#00AA13] uppercase tracking-widest">VOUCHER DIGUNAKAN</p>
+                    <p className="text-[10px] font-black text-primary uppercase tracking-widest">VOUCHER DIGUNAKAN</p>
                     <p className="text-sm font-black text-gray-900">{appliedVoucher.code}</p>
                   </div>
                   <button 
+                    type="button"
                     onClick={removeVoucher}
                     className="text-red-500 font-bold text-xs hover:underline"
                   >
@@ -411,12 +427,13 @@ export default function CheckoutPage() {
                       placeholder="Masukkan kode promo..." 
                       value={voucherInput}
                       onChange={(e) => setVoucherInput(e.target.value)}
-                      className="w-full bg-gray-50 border-none rounded-2xl px-6 py-4 focus:ring-4 focus:ring-[#00AA13]/5 text-sm font-bold uppercase transition-all"
+                      className="w-full bg-gray-50 border-none rounded-2xl px-6 py-4 focus:ring-4 focus:ring-primary/5 text-sm font-bold uppercase transition-all"
                     />
                     <button 
+                      type="button"
                       onClick={handleApplyVoucher}
                       disabled={isApplyingVoucher || !voucherInput}
-                      className="absolute right-2 top-2 bottom-2 bg-[#00AA13] text-white px-4 rounded-xl text-xs font-black hover:bg-[#008810] disabled:bg-gray-300 transition-all"
+                      className="absolute right-2 top-2 bottom-2 bg-primary text-white px-4 rounded-xl text-xs font-black hover:bg-[#008810] disabled:bg-gray-300 transition-all"
                     >
                       {isApplyingVoucher ? <Loader2 size={16} className="animate-spin" /> : 'PAKAI'}
                     </button>
@@ -425,7 +442,7 @@ export default function CheckoutPage() {
                     <p className="text-[10px] font-bold text-red-500 px-2">{voucherError}</p>
                   )}
                   <p className="text-[10px] font-bold text-gray-400 px-2 uppercase tracking-wider">
-                    Gunakan <span className="text-[#00AA13]">SEGAR10</span> untuk diskon 10%
+                    Gunakan <span className="text-primary">SEGAR10</span> untuk diskon 10%
                   </p>
                 </div>
               )}
@@ -433,20 +450,20 @@ export default function CheckoutPage() {
 
             <div className="bg-white rounded-[2.5rem] shadow-xl p-8 border border-gray-100">
               <div className="flex items-center gap-3 mb-8">
-                <ShoppingBag size={20} className="text-[#00AA13]" />
+                <ShoppingBag size={20} className="text-primary" />
                 <h3 className="text-xl font-black text-gray-900">Ringkasan Pesanan</h3>
               </div>
 
               <div className="space-y-6 mb-8 max-h-80 overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-100">
                 {selectedItems.map((item) => (
                   <div key={item.id} className="flex gap-4">
-                    <div className="w-16 h-16 bg-gray-50 rounded-xl overflow-hidden flex-shrink-0 border border-gray-100 relative">
+                    <div className="w-16 h-16 bg-gray-50 rounded-xl overflow-hidden shrink-0 border border-gray-100 relative">
                       <Image src={item.image} alt={item.name} fill className="object-cover" />
                     </div>
                     <div className="flex-1 min-w-0">
                       <h4 className="text-sm font-bold text-gray-900 truncate">{item.name}</h4>
                       <p className="text-xs font-bold text-gray-400 mb-1">{item.quantity} x {formatIDR(item.price)}</p>
-                      <p className="text-sm font-black text-[#00AA13]">{formatIDR(item.price * item.quantity)}</p>
+                      <p className="text-sm font-black text-primary">{formatIDR(item.price * item.quantity)}</p>
                     </div>
                   </div>
                 ))}
@@ -459,7 +476,7 @@ export default function CheckoutPage() {
                 </div>
                 <div className="flex justify-between items-center text-sm font-bold text-gray-400">
                   <span>Biaya Pengiriman</span>
-                  <span className="text-[#00AA13]">GRATIS</span>
+                  <span className="text-primary">GRATIS</span>
                 </div>
                 {discountAmount > 0 && (
                   <div className="flex justify-between items-center text-sm font-bold text-red-500">
@@ -469,12 +486,12 @@ export default function CheckoutPage() {
                 )}
                 <div className="flex justify-between items-center pt-4 text-gray-900">
                   <span className="text-base font-black">Total Pembayaran</span>
-                  <span className="text-2xl font-black text-[#00AA13]">{formatIDR(finalPrice)}</span>
+                  <span className="text-2xl font-black text-primary">{formatIDR(finalPrice)}</span>
                 </div>
               </div>
 
               <div className="mt-8 p-4 bg-yellow-50 rounded-2xl flex items-start gap-3 border border-yellow-100">
-                <CreditCard className="text-[#FF9F1C] flex-shrink-0" size={20} />
+                <CreditCard className="text-secondary shrink-0" size={20} />
                 <p className="text-[10px] font-bold text-yellow-800 leading-relaxed uppercase tracking-wider">
                   Metode pembayaran saat ini hanya tersedia via <span className="font-black underline">WhatsApp / COD</span>.
                 </p>

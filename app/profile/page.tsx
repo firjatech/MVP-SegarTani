@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useId } from "react";
 import { supabase } from "@/lib/supabase";
 import {
 	User,
@@ -35,6 +35,13 @@ export default function ProfilePage() {
 	});
 	const [userEmail, setUserEmail] = useState("");
 
+	const nameId = useId();
+	const phoneId = useId();
+	const addressId = useId();
+	const cityId = useId();
+	const provinceId = useId();
+	const postalCodeId = useId();
+
 	useEffect(() => {
 		async function loadProfile() {
 			const {
@@ -46,7 +53,7 @@ export default function ProfilePage() {
 			}
 			setUserEmail(user.email || "");
 
-			const { data, error } = await supabase
+			const { data } = await supabase
 				.from("profiles")
 				.select("*")
 				.eq("id", user.id)
@@ -100,7 +107,7 @@ export default function ProfilePage() {
 	if (loading) {
 		return (
 			<div className="min-h-screen flex items-center justify-center bg-gray-50">
-				<Loader2 className="animate-spin text-[#00AA13]" size={40} />
+				<Loader2 className="animate-spin text-primary" size={40} />
 			</div>
 		);
 	}
@@ -112,7 +119,7 @@ export default function ProfilePage() {
 					<div>
 						<Link
 							href="/ecommerce"
-							className="flex items-center gap-2 text-gray-500 font-bold hover:text-[#00AA13] transition-colors mb-4 group"
+							className="flex items-center gap-2 text-gray-500 font-bold hover:text-primary transition-colors mb-4 group"
 						>
 							<ArrowLeft
 								size={18}
@@ -130,14 +137,17 @@ export default function ProfilePage() {
 				<div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
 					{/* Left: Avatar & Quick Links */}
 					<div className="lg:col-span-1 space-y-6">
-						<div className="bg-white rounded-[2.5rem] shadow-xl p-8 text-center border border-gray-100">
+						<div className="bg-white rounded-4xl shadow-xl p-8 text-center border border-gray-100">
 							<div className="relative inline-block mb-6">
-								<div className="w-32 h-32 bg-[#00AA13]/10 rounded-full flex items-center justify-center text-[#00AA13] font-black text-4xl border-4 border-white shadow-inner">
+								<div className="w-32 h-32 bg-primary/10 rounded-full flex items-center justify-center text-primary font-black text-4xl border-4 border-white shadow-inner">
 									{profile.full_name
 										? profile.full_name.charAt(0).toUpperCase()
 										: userEmail.charAt(0).toUpperCase()}
 								</div>
-								<button className="absolute bottom-0 right-0 p-2 bg-white rounded-full shadow-lg border border-gray-100 text-gray-400 hover:text-[#00AA13] transition-colors">
+								<button 
+									type="button"
+									className="absolute bottom-0 right-0 p-2 bg-white rounded-full shadow-lg border border-gray-100 text-gray-400 hover:text-primary transition-colors"
+								>
 									<Camera size={18} />
 								</button>
 							</div>
@@ -151,30 +161,30 @@ export default function ProfilePage() {
 							<div className="space-y-3">
 								<Link
 									href="/orders"
-									className="w-full flex items-center justify-between p-4 bg-gray-50 rounded-2xl hover:bg-[#00AA13]/5 transition-colors group"
+									className="w-full flex items-center justify-between p-4 bg-gray-50 rounded-2xl hover:bg-primary/5 transition-colors group"
 								>
 									<div className="flex items-center gap-3">
 										<ShoppingBag
 											size={18}
-											className="text-gray-400 group-hover:text-[#00AA13]"
+											className="text-gray-400 group-hover:text-primary"
 										/>
-										<span className="text-sm font-black text-gray-700 group-hover:text-[#00AA13]">
+										<span className="text-sm font-black text-gray-700 group-hover:text-primary">
 											Pesanan Saya
 										</span>
 									</div>
-									<ChevronRight size={16} className="text-gray-300 group-hover:text-[#00AA13]" />
+									<ChevronRight size={16} className="text-gray-300 group-hover:text-primary" />
 								</Link>
 
 								<Link
 									href={profile.is_seller ? "/admin/store-profile" : "/daftar-penjual"}
-									className="w-full flex items-center justify-between p-4 bg-gradient-to-r from-[#00AA13]/5 to-emerald-50 rounded-2xl hover:from-[#00AA13]/10 hover:to-emerald-100 transition-all group border border-[#00AA13]/10"
+									className="w-full flex items-center justify-between p-4 bg-linear-to-r from-primary/5 to-emerald-50 rounded-2xl hover:from-primary/10 hover:to-emerald-100 transition-all group border border-primary/10"
 								>
 									<div className="flex items-center gap-3">
-										<div className="w-8 h-8 rounded-xl bg-[#00AA13]/10 flex items-center justify-center">
-											<Store size={16} className="text-[#00AA13]" />
+										<div className="w-8 h-8 rounded-xl bg-primary/10 flex items-center justify-center">
+											<Store size={16} className="text-primary" />
 										</div>
 										<div className="text-left">
-											<span className="text-sm font-black text-gray-700 group-hover:text-[#00AA13] block">
+											<span className="text-sm font-black text-gray-700 group-hover:text-primary block">
 												{profile.is_seller ? "Profil Penjual" : "Daftar Akun Penjual"}
 											</span>
 											<span className="text-[9px] font-bold text-gray-400">
@@ -182,7 +192,7 @@ export default function ProfilePage() {
 											</span>
 										</div>
 									</div>
-									<ChevronRight size={16} className="text-[#00AA13]/40 group-hover:text-[#00AA13] group-hover:translate-x-0.5 transition-all" />
+									<ChevronRight size={16} className="text-primary/40 group-hover:text-primary group-hover:translate-x-0.5 transition-all" />
 								</Link>
 							</div>
 						</div>
@@ -190,11 +200,11 @@ export default function ProfilePage() {
 
 					{/* Right: Form */}
 					<div className="lg:col-span-2">
-						<div className="bg-white rounded-[2.5rem] shadow-xl p-8 md:p-12 border border-gray-100">
+						<div className="bg-white rounded-4xl shadow-xl p-8 md:p-12 border border-gray-100">
 							<form onSubmit={handleSave} className="space-y-8">
 								<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 									<div>
-										<label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3">
+										<label htmlFor={nameId} className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3">
 											NAMA LENGKAP
 										</label>
 										<div className="relative">
@@ -203,18 +213,19 @@ export default function ProfilePage() {
 												className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-300"
 											/>
 											<input
+												id={nameId}
 												type="text"
 												value={profile.full_name}
 												onChange={(e) =>
 													setProfile({ ...profile, full_name: e.target.value })
 												}
 												placeholder="Nama Anda"
-												className="w-full bg-gray-50 border-none rounded-2xl px-14 py-4 focus:ring-4 focus:ring-[#00AA13]/5 text-gray-700 font-bold transition-all"
+												className="w-full bg-gray-50 border-none rounded-2xl px-14 py-4 focus:ring-4 focus:ring-primary/5 text-gray-700 font-bold transition-all"
 											/>
 										</div>
 									</div>
 									<div>
-										<label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3">
+										<label htmlFor={phoneId} className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3">
 											NOMOR TELEPON
 										</label>
 										<div className="relative">
@@ -223,20 +234,21 @@ export default function ProfilePage() {
 												className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-300"
 											/>
 											<input
+												id={phoneId}
 												type="tel"
 												value={profile.phone}
 												onChange={(e) =>
 													setProfile({ ...profile, phone: e.target.value })
 												}
 												placeholder="0812xxxx"
-												className="w-full bg-gray-50 border-none rounded-2xl px-14 py-4 focus:ring-4 focus:ring-[#00AA13]/5 text-gray-700 font-bold transition-all"
+												className="w-full bg-gray-50 border-none rounded-2xl px-14 py-4 focus:ring-4 focus:ring-primary/5 text-gray-700 font-bold transition-all"
 											/>
 										</div>
 									</div>
 								</div>
 
 								<div>
-									<label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3">
+									<label htmlFor={addressId} className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3">
 										ALAMAT LENGKAP
 									</label>
 									<div className="relative">
@@ -245,58 +257,62 @@ export default function ProfilePage() {
 											className="absolute left-5 top-6 text-gray-300"
 										/>
 										<textarea
+											id={addressId}
 											value={profile.address}
 											onChange={(e) =>
 												setProfile({ ...profile, address: e.target.value })
 											}
 											placeholder="Nama jalan, nomor rumah, RT/RW..."
 											rows={3}
-											className="w-full bg-gray-50 border-none rounded-2xl px-14 py-4 focus:ring-4 focus:ring-[#00AA13]/5 text-gray-700 font-bold transition-all"
+											className="w-full bg-gray-50 border-none rounded-2xl px-14 py-4 focus:ring-4 focus:ring-primary/5 text-gray-700 font-bold transition-all"
 										/>
 									</div>
 								</div>
 
 								<div className="grid grid-cols-1 md:grid-cols-3 gap-6">
 									<div>
-										<label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3">
+										<label htmlFor={cityId} className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3">
 											KOTA
 										</label>
 										<input
+											id={cityId}
 											type="text"
 											value={profile.city}
 											onChange={(e) =>
 												setProfile({ ...profile, city: e.target.value })
 											}
 											placeholder="Batu"
-											className="w-full bg-gray-50 border-none rounded-2xl px-6 py-4 focus:ring-4 focus:ring-[#00AA13]/5 text-gray-700 font-bold transition-all"
+											className="w-full bg-gray-50 border-none rounded-2xl px-6 py-4 focus:ring-4 focus:ring-primary/5 text-gray-700 font-bold transition-all"
 										/>
 									</div>
 									<div>
-										<label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3">
+										<label htmlFor={provinceId} className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3">
 											PROVINSI
 										</label>
 										<input
+											id={provinceId}
 											type="text"
 											value={profile.province}
 											onChange={(e) =>
 												setProfile({ ...profile, province: e.target.value })
 											}
 											placeholder="Jawa Timur"
-											className="w-full bg-gray-50 border-none rounded-2xl px-6 py-4 focus:ring-4 focus:ring-[#00AA13]/5 text-gray-700 font-bold transition-all"
+											className="w-full bg-gray-50 border-none rounded-2xl px-6 py-4 focus:ring-4 focus:ring-primary/5 text-gray-700 font-bold transition-all"
 										/>
 									</div>
 									<div>
-										<label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3">
+										<label htmlFor={postalCodeId} className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3">
 											KODE POS
 										</label>
 										<input
+											id={postalCodeId}
 											type="text"
 											value={profile.postal_code}
 											onChange={(e) =>
 												setProfile({ ...profile, postal_code: e.target.value })
 											}
 											placeholder="65311"
-											className="w-full bg-gray-50 border-none rounded-2xl px-6 py-4 focus:ring-4 focus:ring-[#00AA13]/5 text-gray-700 font-bold transition-all"
+											className="w-full bg-gray-50 border-none rounded-2xl px-6 py-4 focus:ring-4 focus:ring-primary/5 text-gray-700 font-bold transition-all"
 										/>
 									</div>
 								</div>
@@ -305,7 +321,7 @@ export default function ProfilePage() {
 									<button
 										type="submit"
 										disabled={saving}
-										className="flex-1 bg-[#00AA13] hover:bg-[#008810] disabled:bg-gray-300 text-white font-black py-5 rounded-2xl transition-all shadow-xl shadow-[#00AA13]/20 flex items-center justify-center gap-3 text-lg"
+										className="flex-1 bg-primary hover:bg-[#008810] disabled:bg-gray-300 text-white font-black py-5 rounded-2xl transition-all shadow-xl shadow-primary/20 flex items-center justify-center gap-3 text-lg"
 									>
 										{saving ? (
 											<Loader2 size={24} className="animate-spin" />
@@ -317,7 +333,7 @@ export default function ProfilePage() {
 										<motion.div
 											initial={{ scale: 0, opacity: 0 }}
 											animate={{ scale: 1, opacity: 1 }}
-											className="flex items-center gap-2 text-[#00AA13] font-black uppercase tracking-widest text-[10px]"
+											className="flex items-center gap-2 text-primary font-black uppercase tracking-widest text-[10px]"
 										>
 											<CheckCircle2 size={20} /> Berhasil!
 										</motion.div>

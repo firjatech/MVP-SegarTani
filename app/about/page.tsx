@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { Leaf, Target, History, Users } from "lucide-react";
+import { Leaf, Target, History } from "lucide-react";
 
 export default function AboutPage() {
 	return (
@@ -8,8 +8,8 @@ export default function AboutPage() {
 			<section className="bg-white py-20 border-b border-gray-50">
 				<div className="container mx-auto px-6 text-center" data-aos="fade-up">
 					<h1 className="text-4xl md:text-5xl font-black text-gray-900 mb-6">
-						Tentang <span className="text-[#00AA13]">Segar</span>
-						<span className="text-[#FF9F1C]">Tani</span>
+						Tentang <span className="text-primary">Segar</span>
+						<span className="text-secondary">Tani</span>
 					</h1>
 					<p className="text-lg text-gray-600 max-w-2xl mx-auto">
 						Lahir dari sebuah proyek pembelajaran di Bandung, kami membawa
@@ -45,8 +45,8 @@ export default function AboutPage() {
 								Dimulai dari Kecintaan pada Alam
 							</h2>
 							<p className="text-gray-600 leading-relaxed mb-6">
-								<span className="text-[#00AA13]">Segar</span>
-								<span className="text-[#FF9F1C]">Tani</span> didirikan pada
+								<span className="text-primary">Segar</span>
+								<span className="text-secondary">Tani</span> didirikan pada
 								tahun 2018 di kota Batu, Jawa Timur. Berawal dari sebidang tanah
 								kecil dan keinginan untuk mengonsumsi makanan yang lebih sehat
 								tanpa bahan kimia, kami mulai menanam sayuran organik untuk
@@ -55,8 +55,8 @@ export default function AboutPage() {
 							<p className="text-gray-600 leading-relaxed">
 								Antusiasme yang tinggi dari komunitas sekitar mendorong kami
 								untuk mengembangkan lahan dan merangkul petani lokal lainnya.
-								Saat ini, <span className="text-[#00AA13]">Segar</span>
-								<span className="text-[#FF9F1C]">Tani</span> telah menjadi mitra
+								Saat ini, <span className="text-primary">Segar</span>
+								<span className="text-secondary">Tani</span> telah menjadi mitra
 								bagi puluhan petani lokal dalam mendistribusikan hasil bumi
 								organik yang jujur dan segar.
 							</p>
@@ -94,21 +94,21 @@ export default function AboutPage() {
 						<h3 className="text-2xl font-bold text-gray-900 mb-4">Misi Kami</h3>
 						<ul className="space-y-4 text-gray-600">
 							<li className="flex items-start space-x-3">
-								<div className="h-1.5 w-1.5 rounded-full bg-secondary mt-2 flex-shrink-0" />
+								<div className="h-1.5 w-1.5 rounded-full bg-secondary mt-2 shrink-0" />
 								<span>
 									Menjamin kualitas dan kesegaran produk organik di setiap tahap
 									distribusi.
 								</span>
 							</li>
 							<li className="flex items-start space-x-3">
-								<div className="h-1.5 w-1.5 rounded-full bg-secondary mt-2 flex-shrink-0" />
+								<div className="h-1.5 w-1.5 rounded-full bg-secondary mt-2 shrink-0" />
 								<span>
 									Memberdayakan petani lokal melalui pelatihan metode pertanian
 									organik modern.
 								</span>
 							</li>
 							<li className="flex items-start space-x-3">
-								<div className="h-1.5 w-1.5 rounded-full bg-secondary mt-2 flex-shrink-0" />
+								<div className="h-1.5 w-1.5 rounded-full bg-secondary mt-2 shrink-0" />
 								<span>
 									Mengedukasi masyarakat tentang pentingnya pola makan sehat
 									berbasis organik.

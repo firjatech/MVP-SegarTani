@@ -86,14 +86,14 @@ function ProductContent() {
       {/* Header Section - Clean White with Green Accent */}
       <div className="bg-white pt-24 pb-12 px-6 text-center border-b border-gray-100 shadow-sm">
         <h1 className="text-4xl md:text-5xl font-black text-gray-900 mb-4">
-          Katalog Bahan Masakan <span className="text-[#00AA13]">Segar</span><span className="text-[#FF9F1C]">Tani</span>
+          Katalog Bahan Masakan <span className="text-primary">Segar</span><span className="text-secondary">Tani</span>
         </h1>
         <p className="text-gray-500 max-w-2xl mx-auto text-base md:text-lg mb-6">
           Kebutuhan dapur lengkap mulai dari sayuran, buah, hingga bumbu masak berkualitas.
         </p>
         <Link
           href="/ecommerce"
-          className="inline-flex items-center gap-2 bg-[#00AA13] text-white px-6 py-3 rounded-full font-bold hover:bg-[#008810] transition-all shadow-lg"
+          className="inline-flex items-center gap-2 bg-primary text-white px-6 py-3 rounded-full font-bold hover:bg-[#008810] transition-all shadow-lg"
         >
           Belanja Sekarang <ArrowRight size={18} />
         </Link>
@@ -102,10 +102,10 @@ function ProductContent() {
       <div className="container mx-auto px-6 max-w-7xl">
         {/* Combined Filter Bar */}
         <div className="max-w-6xl mx-auto py-12 px-0 md:px-6">
-          <div className="flex flex-col sm:flex-row items-center bg-white border border-gray-200 rounded-3xl overflow-hidden shadow-md focus-within:border-[#2E7D32] focus-within:ring-4 focus-within:ring-[#2E7D32]/10 transition-all duration-300">
+          <div className="flex flex-col sm:flex-row items-center bg-white border border-gray-200 rounded-3xl overflow-hidden shadow-md focus-within:border-primary focus-within:ring-4 focus-within:ring-primary/10 transition-all duration-300">
 
             {/* Search Input Part */}
-            <div className="relative flex-grow w-full border-b sm:border-b-0 sm:border-r border-gray-100">
+            <div className="relative grow w-full border-b sm:border-b-0 sm:border-r border-gray-100">
               <input
                 type="text"
                 placeholder="Cari bahan masakan..."
@@ -113,7 +113,7 @@ function ProductContent() {
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full pl-14 pr-6 py-4 md:py-5 focus:outline-none bg-transparent text-gray-800 placeholder-gray-400 font-bold"
               />
-              <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-[#2E7D32] h-6 w-6" />
+              <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-primary h-6 w-6" />
             </div>
 
             {/* Category Dropdown Part */}
@@ -129,7 +129,7 @@ function ProductContent() {
                   </option>
                 ))}
               </select>
-              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-5 text-[#2E7D32]">
+              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-5 text-primary">
                 <ChevronDown size={20} strokeWidth={3} />
               </div>
             </div>
@@ -143,7 +143,7 @@ function ProductContent() {
               const discountPrice = product.price - (product.price * product.discount / 100);
 
               return (
-                <div key={product.id} className="group flex flex-col h-full bg-white rounded-[2rem] border border-gray-100 hover:border-[#2E7D32] transition-all duration-500 overflow-hidden hover:shadow-2xl">
+                <div key={product.id} className="group flex flex-col h-full bg-white rounded-4xl border border-gray-100 hover:border-primary transition-all duration-500 overflow-hidden hover:shadow-2xl">
                   {/* Image Container */}
                   <div className="relative aspect-square w-full bg-white flex justify-center items-center overflow-hidden">
                     {product.discount > 0 && (
@@ -160,20 +160,20 @@ function ProductContent() {
                       className="object-cover group-hover:scale-110 transition-transform duration-700 ease-in-out"
                     />
                     <div className="absolute top-5 right-5">
-                      <span className="bg-white/90 backdrop-blur-sm text-[#2E7D32] text-[10px] font-black px-3 py-1 rounded-lg border border-[#2E7D32]/20">
+                      <span className="bg-white/90 backdrop-blur-sm text-primary text-[10px] font-black px-3 py-1 rounded-lg border border-primary/20">
                         {product.category}
                       </span>
                     </div>
                   </div>
 
                   {/* Details Container */}
-                  <div className="p-6 flex flex-col flex-grow">
+                  <div className="p-6 flex flex-col grow">
                     <div className="flex items-center gap-1 text-yellow-400 mb-2">
                       <Star size={14} className="fill-current" />
                       <span className="text-xs font-bold text-gray-400 ml-1">{product.rating.toFixed(1)}</span>
                     </div>
 
-                    <h3 className="text-lg font-bold text-gray-900 leading-tight mb-4 group-hover:text-[#2E7D32] transition-colors line-clamp-2">
+                    <h3 className="text-lg font-bold text-gray-900 leading-tight mb-4 group-hover:text-primary transition-colors line-clamp-2">
                       {product.name}
                     </h3>
 
@@ -184,13 +184,13 @@ function ProductContent() {
                             {formatIDR(product.price)}
                           </span>
                         )}
-                        <span className="text-xl font-black text-[#2E7D32]">
+                        <span className="text-xl font-black text-primary">
                           {formatIDR(discountPrice)}
                         </span>
                       </div>
                       <Link 
                         href="/ecommerce"
-                        className="p-3.5 rounded-2xl bg-white border border-gray-100 text-gray-900 hover:bg-[#2E7D32] hover:text-white transition-all shadow-sm"
+                        className="p-3.5 rounded-2xl bg-white border border-gray-100 text-gray-900 hover:bg-primary hover:text-white transition-all shadow-sm"
                       >
                         <ShoppingCart size={20} />
                       </Link>
@@ -200,14 +200,15 @@ function ProductContent() {
               );
             })
           ) : (
-            <div className="col-span-full text-center py-32 bg-white rounded-[3rem] border border-dashed border-gray-200">
+            <div className="col-span-full text-center py-32 bg-white rounded-5xl border border-dashed border-gray-200">
               <h3 className="text-2xl font-black text-gray-900 mb-2">Produk Tidak Ditemukan</h3>
               <p className="text-gray-400 max-w-sm mx-auto mb-10">
                 Maaf, bahan masakan yang Anda cari tidak tersedia dalam kategori ini.
               </p>
               <button
+                type="button"
                 onClick={() => { setSearchQuery(''); setActiveCategory('Semua'); }}
-                className="bg-[#2E7D32] text-white px-10 py-4 rounded-full font-bold shadow-xl hover:shadow-[#2E7D32]/30 active:scale-95 transition-all"
+                className="bg-primary text-white px-10 py-4 rounded-full font-bold shadow-xl hover:shadow-primary/30 active:scale-95 transition-all"
               >
                 Reset Pencarian
               </button>

@@ -72,8 +72,8 @@ const getStatusConfig = (status: string) => {
       };
     case 'completed':
       return {
-        color: 'text-[#00AA13] bg-[#00AA13]/10 border-[#00AA13]/30',
-        iconColor: 'text-[#00AA13]',
+        color: 'text-primary bg-primary/10 border-primary/30',
+        iconColor: 'text-primary',
         icon: CheckCircle2,
         label: 'Selesai',
         description: 'Pesanan telah selesai. Terima kasih telah berbelanja!'
@@ -145,7 +145,7 @@ export default function OrderDetailPage() {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <Loader2 className="animate-spin text-[#00AA13]" size={48} />
+        <Loader2 className="animate-spin text-primary" size={48} />
       </div>
     );
   }
@@ -158,7 +158,7 @@ export default function OrderDetailPage() {
         </div>
         <h2 className="text-2xl font-black text-gray-900 mb-2">Pesanan Tidak Ditemukan</h2>
         <p className="text-gray-400 mb-8 font-medium">Pesanan ini tidak ada atau bukan milik Anda.</p>
-        <Link href="/orders" className="bg-[#00AA13] text-white px-10 py-4 rounded-2xl font-black shadow-xl shadow-[#00AA13]/20">
+        <Link href="/orders" className="bg-primary text-white px-10 py-4 rounded-2xl font-black shadow-xl shadow-primary/20">
           Kembali ke Daftar Pesanan
         </Link>
       </div>
@@ -188,7 +188,7 @@ export default function OrderDetailPage() {
         {/* Back Button */}
         <Link
           href="/orders"
-          className="flex items-center gap-2 text-gray-500 font-bold hover:text-[#00AA13] transition-colors mb-8 group inline-flex"
+          className="items-center gap-2 text-gray-500 font-bold hover:text-primary transition-colors mb-8 group inline-flex"
         >
           <ArrowLeft size={20} className="group-hover:-translate-x-1 transition-transform" />
           Kembali ke Pesanan Saya
@@ -196,7 +196,7 @@ export default function OrderDetailPage() {
 
         {/* Header */}
         <div className="flex items-center gap-4 mb-10">
-          <div className="bg-[#00AA13] p-3 rounded-2xl text-white shadow-lg shadow-[#00AA13]/20">
+          <div className="bg-primary p-3 rounded-2xl text-white shadow-lg shadow-primary/20">
             <Receipt size={28} />
           </div>
           <div>
@@ -208,7 +208,7 @@ export default function OrderDetailPage() {
         </div>
 
         {/* Status Banner */}
-        <div className={`mb-8 p-6 rounded-[2rem] border ${config.color} flex items-center gap-5`}>
+        <div className={`mb-8 p-6 rounded-4xl border ${config.color} flex items-center gap-5`}>
           <div className="p-3 rounded-2xl bg-white/60">
             <StatusIcon size={28} className={config.iconColor} />
           </div>
@@ -221,14 +221,14 @@ export default function OrderDetailPage() {
 
         {/* Progress Tracker */}
         {!isCancelled && (
-          <div className="bg-white rounded-[2rem] shadow-lg border border-gray-100 p-8 mb-8">
+          <div className="bg-white rounded-4xl shadow-lg border border-gray-100 p-8 mb-8">
             <h3 className="text-sm font-black text-gray-400 uppercase tracking-widest mb-8">Progress Pesanan</h3>
             <div className="flex items-center justify-between relative">
               {/* Line background */}
               <div className="absolute top-5 left-0 right-0 h-1 bg-gray-100 z-0 mx-8"></div>
               {/* Line progress */}
               <div
-                className="absolute top-5 left-0 h-1 bg-[#00AA13] z-0 transition-all duration-700 mx-8"
+                className="absolute top-5 left-0 h-1 bg-primary z-0 transition-all duration-700 mx-8"
                 style={{ width: `${(activeStep / (steps.length - 1)) * 100}%` }}
               ></div>
 
@@ -237,12 +237,12 @@ export default function OrderDetailPage() {
                 return (
                   <div key={step.key} className="flex flex-col items-center gap-3 z-10">
                     <div className={`w-10 h-10 rounded-full flex items-center justify-center font-black text-sm border-2 transition-all ${isCompleted
-                      ? 'bg-[#00AA13] border-[#00AA13] text-white shadow-lg shadow-[#00AA13]/30'
+                      ? 'bg-primary border-primary text-white shadow-lg shadow-primary/30'
                       : 'bg-white border-gray-200 text-gray-300'
                       }`}>
                       {isCompleted ? <CheckCircle2 size={18} /> : idx + 1}
                     </div>
-                    <span className={`text-[10px] font-black uppercase tracking-wider text-center ${isCompleted ? 'text-[#00AA13]' : 'text-gray-300'
+                    <span className={`text-[10px] font-black uppercase tracking-wider text-center ${isCompleted ? 'text-primary' : 'text-gray-300'
                       }`}>
                       {step.label}
                     </span>
@@ -262,24 +262,24 @@ export default function OrderDetailPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
-              className="bg-white rounded-[2rem] shadow-lg border border-gray-100 p-8"
+              className="bg-white rounded-4xl shadow-lg border border-gray-100 p-8"
             >
               <div className="flex items-center gap-3 mb-8">
-                <ShoppingBag size={20} className="text-[#00AA13]" />
+                <ShoppingBag size={20} className="text-primary" />
                 <h3 className="text-xl font-black text-gray-900">Produk yang Dipesan</h3>
               </div>
 
               <div className="space-y-6">
                 {order.order_items.map((item, idx) => (
                   <div key={idx} className="flex items-center gap-5 pb-6 border-b border-gray-50 last:border-0 last:pb-0">
-                    <div className="w-20 h-20 bg-gray-50 rounded-2xl overflow-hidden flex-shrink-0 border border-gray-100 shadow-sm relative">
+                    <div className="w-20 h-20 bg-gray-50 rounded-2xl overflow-hidden shrink-0 border border-gray-100 shadow-sm relative">
                       <Image src={item.image_url} alt={item.product_name} fill className="object-cover" />
                     </div>
                     <div className="flex-1 min-w-0">
                       <h4 className="text-sm font-black text-gray-900 mb-1">{item.product_name}</h4>
                       <p className="text-xs font-bold text-gray-400">{item.quantity} x {formatIDR(item.price_at_purchase)}</p>
                     </div>
-                    <p className="text-base font-black text-[#00AA13] flex-shrink-0">
+                    <p className="text-base font-black text-primary shrink-0">
                       {formatIDR(item.quantity * item.price_at_purchase)}
                     </p>
                   </div>
@@ -292,15 +292,15 @@ export default function OrderDetailPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3 }}
-              className="bg-white rounded-[2rem] shadow-lg border border-gray-100 p-8"
+              className="bg-white rounded-4xl shadow-lg border border-gray-100 p-8"
             >
               <div className="flex items-center gap-3 mb-8">
-                <MapPin size={20} className="text-[#00AA13]" />
+                <MapPin size={20} className="text-primary" />
                 <h3 className="text-xl font-black text-gray-900">Alamat Pengiriman</h3>
               </div>
               <div className="space-y-5">
                 <div className="flex items-start gap-4">
-                  <div className="bg-gray-50 p-2.5 rounded-xl flex-shrink-0">
+                  <div className="bg-gray-50 p-2.5 rounded-xl shrink-0">
                     <User size={16} className="text-gray-400" />
                   </div>
                   <div>
@@ -309,7 +309,7 @@ export default function OrderDetailPage() {
                   </div>
                 </div>
                 <div className="flex items-start gap-4">
-                  <div className="bg-gray-50 p-2.5 rounded-xl flex-shrink-0">
+                  <div className="bg-gray-50 p-2.5 rounded-xl shrink-0">
                     <Phone size={16} className="text-gray-400" />
                   </div>
                   <div>
@@ -318,7 +318,7 @@ export default function OrderDetailPage() {
                   </div>
                 </div>
                 <div className="flex items-start gap-4">
-                  <div className="bg-gray-50 p-2.5 rounded-xl flex-shrink-0">
+                  <div className="bg-gray-50 p-2.5 rounded-xl shrink-0">
                     <MapPin size={16} className="text-gray-400" />
                   </div>
                   <div>
@@ -338,7 +338,7 @@ export default function OrderDetailPage() {
                     href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${order.address}, ${order.city}, ${order.province} ${order.postal_code}`)}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-[10px] font-black text-[#00AA13] hover:underline uppercase tracking-widest flex items-center gap-1"
+                    className="text-[10px] font-black text-primary hover:underline uppercase tracking-widest flex items-center gap-1"
                   >
                     Buka di Google Maps ↗
                   </a>
@@ -361,9 +361,9 @@ export default function OrderDetailPage() {
           {/* Right Column: Payment Summary (Sticky Sidebar) */}
           <div className="lg:w-1/3 w-full">
             <div style={{ position: 'sticky', top: '100px', zIndex: 40 }} className="space-y-8">
-              <div className="bg-white rounded-[2rem] shadow-lg border border-gray-100 p-8">
+              <div className="bg-white rounded-4xl shadow-lg border border-gray-100 p-8">
                 <div className="flex items-center gap-3 mb-8">
-                  <Tag size={20} className="text-[#00AA13]" />
+                  <Tag size={20} className="text-primary" />
                   <h3 className="text-xl font-black text-gray-900">Ringkasan Bayar</h3>
                 </div>
 
@@ -374,18 +374,18 @@ export default function OrderDetailPage() {
                   </div>
                   <div className="flex justify-between text-sm">
                     <span className="font-bold text-gray-400">Biaya Pengiriman</span>
-                    <span className="font-black text-[#00AA13]">GRATIS</span>
+                    <span className="font-black text-primary">GRATIS</span>
                   </div>
                   {order.voucher_code && (
                     <div className="flex justify-between text-sm">
-                      <span className="font-bold text-gray-400">Voucher <span className="text-[#00AA13]">{order.voucher_code}</span></span>
+                      <span className="font-bold text-gray-400">Voucher <span className="text-primary">{order.voucher_code}</span></span>
                       <span className="font-black text-red-500">-{formatIDR(order.discount_amount || 0)}</span>
                     </div>
                   )}
                   <div className="h-px bg-gray-100 my-2"></div>
                   <div className="flex justify-between items-center">
                     <span className="text-base font-black text-gray-900">Total</span>
-                    <span className="text-2xl font-black text-[#00AA13]">{formatIDR(order.total_price)}</span>
+                    <span className="text-2xl font-black text-primary">{formatIDR(order.total_price)}</span>
                   </div>
                 </div>
 

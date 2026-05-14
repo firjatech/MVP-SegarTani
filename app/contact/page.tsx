@@ -1,21 +1,23 @@
 "use client";
 
-import React, { useState } from "react";
+import { useId, useState, type FormEvent } from "react";
 import {
 	Mail,
-	Phone,
 	MapPin,
 	MessageCircle,
-	Send,
 	Navigation,
+	Send,
 } from "lucide-react";
 
 export default function ContactPage() {
+	const nameId = useId();
+	const emailId = useId();
+	const messageId = useId();
 	const [name, setName] = useState("");
 	const [email, setEmail] = useState("");
 	const [message, setMessage] = useState("");
 
-	const handleSubmit = (e: React.FormEvent) => {
+	const handleSubmit = (e: FormEvent) => {
 		e.preventDefault();
 		const text = `Halo SegarTani, saya ingin menghubungi Anda.%0A%0A*Nama:* ${name}%0A*Email:* ${email}%0A*Pesan:*%0A${message}`;
 		window.open(`https://wa.me/6287789727616?text=${text}`, '_blank');
@@ -31,7 +33,7 @@ export default function ContactPage() {
 					data-aos-delay="100"
 				>
 					<h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 mb-6">
-						Hubungi <span className="text-[#00AA13]">Kami</span>
+						Hubungi <span className="text-primary">Kami</span>
 					</h1>
 					<p className="text-lg text-gray-600 max-w-3xl mx-auto leading-relaxed">
 						Kami siap membantu Anda. Silakan hubungi kami melalui informasi di
@@ -51,7 +53,7 @@ export default function ContactPage() {
 							</h2>
 							<div className="space-y-8">
 								<div className="flex items-start space-x-4 p-6 bg-natural rounded-2xl">
-									<div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center flex-shrink-0 shadow-sm">
+									<div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center shrink-0 shadow-sm">
 										<MapPin className="text-primary" />
 									</div>
 									<div>
@@ -65,7 +67,7 @@ export default function ContactPage() {
 								</div>
 
 								<div className="flex items-start space-x-4 p-6 bg-natural rounded-2xl">
-									<div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center flex-shrink-0 shadow-sm">
+									<div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center shrink-0 shadow-sm">
 										<MessageCircle className="text-secondary" />
 									</div>
 									<div>
@@ -75,7 +77,7 @@ export default function ContactPage() {
 								</div>
 
 								<div className="flex items-start space-x-4 p-6 bg-natural rounded-2xl">
-									<div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center flex-shrink-0 shadow-sm">
+									<div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center shrink-0 shadow-sm">
 										<Mail className="text-primary" />
 									</div>
 									<div>
@@ -99,7 +101,7 @@ export default function ContactPage() {
 								</p>
 								<a
 									href="/location"
-									className="text-[#2E7D32] font-black flex items-center gap-2 hover:translate-x-2 transition-transform"
+									className="text-primary font-black flex items-center gap-2 hover:translate-x-2 transition-transform"
 								>
 									Buka Halaman Lokasi <Navigation size={16} />
 								</a>
@@ -117,10 +119,11 @@ export default function ContactPage() {
 							</h3>
 							<form onSubmit={handleSubmit} className="space-y-6">
 								<div>
-									<label className="block text-sm font-bold text-gray-700 mb-2">
+									<label htmlFor={nameId} className="block text-sm font-bold text-gray-700 mb-2">
 										Nama Lengkap
 									</label>
 									<input
+										id={nameId}
 										type="text"
 										required
 										value={name}
@@ -130,10 +133,11 @@ export default function ContactPage() {
 									/>
 								</div>
 								<div>
-									<label className="block text-sm font-bold text-gray-700 mb-2">
+									<label htmlFor={emailId} className="block text-sm font-bold text-gray-700 mb-2">
 										Alamat Email
 									</label>
 									<input
+										id={emailId}
 										type="email"
 										required
 										value={email}
@@ -143,10 +147,11 @@ export default function ContactPage() {
 									/>
 								</div>
 								<div>
-									<label className="block text-sm font-bold text-gray-700 mb-2">
+									<label htmlFor={messageId} className="block text-sm font-bold text-gray-700 mb-2">
 										Pesan Anda
 									</label>
 									<textarea
+										id={messageId}
 										rows={4}
 										required
 										value={message}
