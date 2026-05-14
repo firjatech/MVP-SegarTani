@@ -1,13 +1,12 @@
 'use client';
 
 import React, { useState, useEffect, useMemo } from 'react';
-import { Search, Star, ShoppingCart, ChevronDown, Heart } from 'lucide-react';
+import { Search, Star, ShoppingCart, ChevronDown } from 'lucide-react';
 import Image from 'next/image';
 import { supabase } from '@/lib/supabase';
 import Link from 'next/link';
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import { useCart } from '@/context/CartContext';
-import { useWishlist } from '@/context/WishlistContext';
 import WishlistButton from '@/components/WishlistButton';
 
 interface Product {
@@ -31,11 +30,11 @@ const formatIDR = (amount: number) => {
 };
 
 const ProductSkeleton = () => (
-  <div className="bg-white rounded-[2rem] border border-gray-100 overflow-hidden shadow-sm h-full flex flex-col animate-pulse">
+  <div className="bg-white rounded-4xl border border-gray-100 overflow-hidden shadow-sm h-full flex flex-col animate-pulse">
     <div className="relative aspect-square w-full bg-gray-100 overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full animate-[shimmer_2s_infinite]"></div>
+      <div className="absolute inset-0 bg-linear-to-r from-transparent via-white/20 to-transparent -translate-x-full animate-[shimmer_2s_infinite]"></div>
     </div>
-    <div className="p-6 flex flex-col flex-grow">
+    <div className="p-6 flex flex-col grow">
       <div className="flex items-center gap-2 mb-2">
         <div className="h-4 bg-gray-100 rounded-lg w-12"></div>
         <div className="h-4 bg-gray-100 rounded-lg w-16"></div>
@@ -121,10 +120,10 @@ function EcommerceContent() {
       <div className="container mx-auto px-6 max-w-7xl">
         {/* Combined Filter Bar */}
         <div className="max-w-6xl mx-auto py-12 px-0 md:px-6">
-          <div className="flex flex-col sm:flex-row items-center bg-white border border-gray-200 rounded-3xl overflow-hidden shadow-md focus-within:border-[#2E7D32] focus-within:ring-4 focus-within:ring-[#2E7D32]/10 transition-all duration-300">
+          <div className="flex flex-col sm:flex-row items-center bg-white border border-gray-200 rounded-3xl overflow-hidden shadow-md focus-within:border-primary focus-within:ring-4 focus-within:ring-primary/10 transition-all duration-300">
 
             {/* Search Input Part */}
-            <div className="relative flex-grow w-full border-b sm:border-b-0 sm:border-r border-gray-100">
+            <div className="relative grow w-full border-b sm:border-b-0 sm:border-r border-gray-100">
               <input
                 type="text"
                 placeholder="Cari bahan masakan..."
@@ -132,7 +131,7 @@ function EcommerceContent() {
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full pl-14 pr-6 py-4 md:py-5 focus:outline-none bg-transparent text-gray-800 placeholder-gray-400 font-bold"
               />
-              <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-[#2E7D32] h-6 w-6" />
+              <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-primary h-6 w-6" />
             </div>
 
             {/* Category Dropdown Part */}
@@ -148,7 +147,7 @@ function EcommerceContent() {
                   </option>
                 ))}
               </select>
-              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-5 text-[#2E7D32]">
+              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-5 text-primary">
                 <ChevronDown size={20} strokeWidth={3} />
               </div>
             </div>
@@ -174,7 +173,7 @@ function EcommerceContent() {
                 >
                   <Link 
                     href={isOutOfStock ? '#' : `/ecommerce/${product.id}`}
-                    className={`group flex flex-col h-full bg-white rounded-[2rem] border border-gray-100 hover:border-[#2E7D32] transition-all duration-500 overflow-hidden hover:shadow-2xl ${isOutOfStock ? 'cursor-not-allowed opacity-75' : 'cursor-pointer'}`}
+                    className={`group flex flex-col h-full bg-white rounded-4xl border border-gray-100 hover:border-primary transition-all duration-500 overflow-hidden hover:shadow-2xl ${isOutOfStock ? 'cursor-not-allowed opacity-75' : 'cursor-pointer'}`}
                   >
                     {/* Image Container */}
                     <div className="relative aspect-square w-full bg-white flex justify-center items-center overflow-hidden">
@@ -201,7 +200,7 @@ function EcommerceContent() {
                         className={`object-cover transition-transform duration-700 ease-in-out ${isOutOfStock ? '' : 'group-hover:scale-110'}`}
                       />
                       <div className="absolute top-5 right-5 flex flex-col items-end gap-2 z-10">
-                        <span className="bg-white/90 backdrop-blur-sm text-[#2E7D32] text-[10px] font-black px-3 py-1 rounded-lg border border-[#2E7D32]/20">
+                        <span className="bg-white/90 backdrop-blur-sm text-primary text-[10px] font-black px-3 py-1 rounded-lg border border-primary/20">
                           {product.category}
                         </span>
                         <WishlistButton 
@@ -217,7 +216,7 @@ function EcommerceContent() {
                     </div>
 
                     {/* Details Container */}
-                    <div className="p-6 flex flex-col flex-grow">
+                    <div className="p-6 flex flex-col grow">
                       <div className="flex items-center gap-1 text-yellow-400 mb-2">
                         <Star size={14} className="fill-current" />
                         <span className="text-xs font-bold text-gray-400 ml-1">{Number(product.rating || 0).toFixed(1)}</span>
@@ -226,7 +225,7 @@ function EcommerceContent() {
                         </span>
                       </div>
 
-                      <h3 className="text-lg font-bold text-gray-900 leading-tight mb-4 group-hover:text-[#2E7D32] transition-colors line-clamp-2">
+                      <h3 className="text-lg font-bold text-gray-900 leading-tight mb-4 group-hover:text-primary transition-colors line-clamp-2">
                         {product.name}
                       </h3>
 
@@ -237,11 +236,12 @@ function EcommerceContent() {
                               {formatIDR(product.price)}
                             </span>
                           )}
-                          <span className="text-xl font-black text-[#2E7D32]">
+                          <span className="text-xl font-black text-primary">
                             {formatIDR(discountPrice)}
                           </span>
                         </div>
                         <button 
+                          type="button"
                           disabled={isOutOfStock}
                           onClick={(e) => {
                             e.preventDefault();
@@ -258,7 +258,7 @@ function EcommerceContent() {
                           className={`p-3.5 rounded-2xl transition-all shadow-sm ${
                             isOutOfStock 
                               ? 'bg-gray-100 text-gray-300 cursor-not-allowed' 
-                              : 'bg-white border border-gray-100 text-gray-900 hover:bg-[#2E7D32] hover:text-white'
+                              : 'bg-white border border-gray-100 text-gray-900 hover:bg-primary hover:text-white'
                           }`}
                         >
                           <ShoppingCart size={20} />
@@ -270,14 +270,15 @@ function EcommerceContent() {
               );
             })
           ) : (
-            <div className="col-span-full text-center py-32 bg-white rounded-[3rem] border border-dashed border-gray-200">
+            <div className="col-span-full text-center py-32 bg-white rounded-5xl border border-dashed border-gray-200">
               <h3 className="text-2xl font-black text-gray-900 mb-2">Produk Tidak Ditemukan</h3>
               <p className="text-gray-400 max-w-sm mx-auto mb-10">
                 Maaf, bahan masakan yang Anda cari tidak tersedia.
               </p>
               <button
+                type="button"
                 onClick={() => { setSearchQuery(''); setActiveCategory('Semua'); }}
-                className="bg-[#2E7D32] text-white px-10 py-4 rounded-full font-bold shadow-xl hover:shadow-[#2E7D32]/30 active:scale-95 transition-all"
+                className="bg-primary text-white px-10 py-4 rounded-full font-bold shadow-xl hover:shadow-primary/30 active:scale-95 transition-all"
               >
                 Reset Pencarian
               </button>
@@ -299,7 +300,7 @@ export default function EcommercePage() {
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
             {[...Array(8)].map((_, i) => (
-              <div key={i} className="bg-white rounded-[2rem] border border-gray-100 overflow-hidden shadow-sm h-[400px] animate-pulse">
+              <div key={i} className="bg-white rounded-4xl border border-gray-100 overflow-hidden shadow-sm h-[400px] animate-pulse">
                 <div className="aspect-square bg-gray-100"></div>
                 <div className="p-6 space-y-4">
                   <div className="h-4 bg-gray-100 rounded w-1/4"></div>

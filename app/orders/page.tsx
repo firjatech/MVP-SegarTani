@@ -40,7 +40,7 @@ const getStatusConfig = (status: string) => {
     case 'shipped':
       return { color: 'text-purple-600 bg-purple-50', icon: Truck, label: 'Dalam Pengiriman' };
     case 'completed':
-      return { color: 'text-[#00AA13] bg-[#00AA13]/10', icon: CheckCircle2, label: 'Selesai' };
+      return { color: 'text-primary bg-primary/10', icon: CheckCircle2, label: 'Selesai' };
     case 'cancelled':
       return { color: 'text-red-600 bg-red-50', icon: AlertCircle, label: 'Dibatalkan' };
     default:
@@ -83,7 +83,7 @@ export default function OrdersPage() {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#00AA13]"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
       </div>
     );
   }
@@ -94,13 +94,13 @@ export default function OrdersPage() {
         <header className="mb-12">
           <Link 
             href="/ecommerce"
-            className="flex items-center gap-2 text-gray-500 font-bold hover:text-[#00AA13] transition-colors mb-6 group inline-flex"
+            className="items-center gap-2 text-gray-500 font-bold hover:text-primary transition-colors mb-6 group inline-flex"
           >
             <ArrowLeft size={20} className="group-hover:-translate-x-1 transition-transform" />
             Kembali ke Katalog
           </Link>
           <div className="flex items-center gap-4">
-            <div className="bg-[#00AA13] p-3 rounded-2xl text-white shadow-lg shadow-[#00AA13]/20">
+            <div className="bg-primary p-3 rounded-2xl text-white shadow-lg shadow-primary/20">
               <ShoppingBag size={28} />
             </div>
             <div>
@@ -113,7 +113,7 @@ export default function OrdersPage() {
         </header>
 
         {orders.length === 0 ? (
-          <div className="bg-white rounded-[3rem] p-16 text-center shadow-xl border border-gray-100 flex flex-col items-center">
+          <div className="bg-white rounded-5xl p-16 text-center shadow-xl border border-gray-100 flex flex-col items-center">
             <div className="w-24 h-24 bg-gray-50 rounded-full flex items-center justify-center text-gray-300 mb-8">
               <ShoppingBag size={48} />
             </div>
@@ -123,7 +123,7 @@ export default function OrdersPage() {
             </p>
             <Link 
               href="/ecommerce"
-              className="bg-[#00AA13] text-white px-12 py-4 rounded-2xl font-black shadow-xl shadow-[#00AA13]/20 hover:scale-105 transition-transform"
+              className="bg-primary text-white px-12 py-4 rounded-2xl font-black shadow-xl shadow-primary/20 hover:scale-105 transition-transform"
             >
               Mulai Belanja
             </Link>
@@ -143,7 +143,7 @@ export default function OrdersPage() {
                   key={order.id}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="bg-white rounded-[2.5rem] shadow-lg border border-gray-100 overflow-hidden group hover:shadow-2xl transition-all duration-500"
+                  className="bg-white rounded-4xl shadow-lg border border-gray-100 overflow-hidden group hover:shadow-2xl transition-all duration-500"
                 >
                   <div className="p-8">
                     <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
@@ -165,7 +165,7 @@ export default function OrdersPage() {
                     <div className="space-y-6 mb-8 bg-gray-50/50 rounded-3xl p-6 border border-gray-50">
                       {order.order_items.map((item, idx) => (
                         <div key={idx} className="flex items-center gap-4">
-                          <div className="w-16 h-16 bg-white rounded-xl overflow-hidden shadow-sm flex-shrink-0 border border-gray-100 relative">
+                          <div className="w-16 h-16 bg-white rounded-xl overflow-hidden shadow-sm shrink-0 border border-gray-100 relative">
                             <Image src={item.image_url} alt={item.product_name} fill className="object-cover" />
                           </div>
                           <div className="flex-1 min-w-0">
@@ -173,7 +173,7 @@ export default function OrdersPage() {
                             <p className="text-xs font-bold text-gray-400">{item.quantity} x {formatIDR(item.price_at_purchase)}</p>
                           </div>
                           <div className="text-right">
-                            <p className="text-sm font-black text-[#00AA13]">{formatIDR(item.quantity * item.price_at_purchase)}</p>
+                            <p className="text-sm font-black text-primary">{formatIDR(item.quantity * item.price_at_purchase)}</p>
                           </div>
                         </div>
                       ))}
@@ -182,7 +182,7 @@ export default function OrdersPage() {
                     <div className="flex flex-col md:flex-row justify-between items-center pt-8 border-t border-gray-100 gap-6">
                       <div className="flex flex-col">
                         <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">TOTAL PEMBAYARAN</p>
-                        <p className="text-3xl font-black text-[#00AA13]">{formatIDR(order.total_price)}</p>
+                        <p className="text-3xl font-black text-primary">{formatIDR(order.total_price)}</p>
                       </div>
                       <Link 
                         href={`/orders/${order.id}`}

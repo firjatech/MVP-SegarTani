@@ -7,7 +7,7 @@ import { supabase } from '@/lib/supabase';
 import {
   Store, ArrowLeft, Loader2, CheckCircle2, AlertCircle,
   Camera, ImageIcon, FileText, MapPin, Building2, Upload,
-  Globe, Phone, ChevronRight,
+  Globe,
 } from 'lucide-react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -150,12 +150,12 @@ export default function StoreProfilePage() {
     { id: 'location', label: 'Lokasi & Peta', icon: <MapPin size={16} /> },
   ] as const;
 
-  const inputCls = 'w-full bg-gray-50 border-none rounded-2xl px-5 py-4 focus:ring-4 focus:ring-[#00AA13]/10 text-gray-700 font-bold transition-all text-sm';
+  const inputCls = 'w-full bg-gray-50 border-none rounded-2xl px-5 py-4 focus:ring-4 focus:ring-primary/10 text-gray-700 font-bold transition-all text-sm';
   const labelCls = 'block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2';
 
   if (loading) return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <Loader2 className="animate-spin text-[#00AA13]" size={40} />
+      <Loader2 className="animate-spin text-primary" size={40} />
     </div>
   );
 
@@ -164,7 +164,7 @@ export default function StoreProfilePage() {
       <AlertCircle size={60} className="text-red-500 mb-4" />
       <h1 className="text-2xl font-black text-gray-900 mb-2">Akses Ditolak</h1>
       <p className="text-gray-500">Halaman ini hanya untuk Penjual SegarTani.</p>
-      <Link href="/profile" className="mt-6 inline-flex items-center gap-2 px-6 py-3 bg-[#00AA13] text-white font-black rounded-2xl hover:bg-[#008810] transition-colors">
+      <Link href="/profile" className="mt-6 inline-flex items-center gap-2 px-6 py-3 bg-primary text-white font-black rounded-2xl hover:bg-[#008810] transition-colors">
         <ArrowLeft size={18} /> Kembali ke Profil
       </Link>
     </div>
@@ -176,12 +176,12 @@ export default function StoreProfilePage() {
 
         {/* Header */}
         <header className="mb-8">
-          <Link href="/profile" className="flex items-center gap-2 text-gray-500 font-bold hover:text-[#00AA13] transition-colors mb-5 group w-fit">
+          <Link href="/profile" className="flex items-center gap-2 text-gray-500 font-bold hover:text-primary transition-colors mb-5 group w-fit">
             <ArrowLeft size={18} className="group-hover:-translate-x-1 transition-transform" />
             Kembali ke Profil
           </Link>
           <div className="flex items-center gap-4">
-            <div className="bg-gradient-to-br from-[#00AA13] to-emerald-600 p-3.5 rounded-2xl text-white shadow-lg shadow-[#00AA13]/30">
+            <div className="bg-linear-to-br from-primary to-emerald-600 p-3.5 rounded-2xl text-white shadow-lg shadow-primary/30">
               <Store size={26} />
             </div>
             <div>
@@ -194,21 +194,21 @@ export default function StoreProfilePage() {
         </header>
 
         {/* Banner Preview */}
-        <div className="relative w-full h-44 rounded-[2rem] overflow-hidden mb-6 bg-gradient-to-br from-[#00AA13]/20 to-emerald-100 shadow-xl">
+        <div className="relative w-full h-44 rounded-4xl overflow-hidden mb-6 bg-linear-to-br from-primary/20 to-emerald-100 shadow-xl">
           {bannerPreview ? (
             <Image src={bannerPreview} alt="Banner Toko" fill className="object-cover" />
           ) : (
-            <div className="w-full h-full flex items-center justify-center gap-3 text-[#00AA13]/40">
+            <div className="w-full h-full flex items-center justify-center gap-3 text-primary/40">
               <ImageIcon size={32} />
               <span className="font-black text-sm">Banner Toko Belum Diatur</span>
             </div>
           )}
           {/* Logo overlay */}
-          <div className="absolute -bottom-6 left-8 w-20 h-20 rounded-2xl border-4 border-white shadow-xl overflow-hidden bg-white relative">
+          <div className="absolute -bottom-6 left-8 w-20 h-20 rounded-2xl border-4 border-white shadow-xl overflow-hidden bg-white">
             {logoPreview ? (
               <Image src={logoPreview} alt="Logo Toko" fill className="object-cover" />
             ) : (
-              <div className="w-full h-full bg-[#00AA13]/10 flex items-center justify-center text-[#00AA13]">
+              <div className="w-full h-full bg-primary/10 flex items-center justify-center text-primary">
                 <Store size={28} />
               </div>
             )}
@@ -234,7 +234,7 @@ export default function StoreProfilePage() {
               onClick={() => setActiveTab(t.id)}
               className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl font-black text-sm transition-all
                 ${activeTab === t.id
-                  ? 'bg-[#00AA13] text-white shadow-lg shadow-[#00AA13]/25'
+                  ? 'bg-primary text-white shadow-lg shadow-primary/25'
                   : 'text-gray-400 hover:text-gray-700'}`}
             >
               {t.icon} <span className="hidden sm:inline">{t.label}</span>
@@ -305,7 +305,7 @@ export default function StoreProfilePage() {
                           }} />
                         <button type="button" onClick={() => logoRef.current?.click()}
                           disabled={logoUploading}
-                          className="flex items-center gap-2 px-5 py-3 bg-[#00AA13]/10 text-[#00AA13] font-black text-sm rounded-2xl hover:bg-[#00AA13]/20 transition-all disabled:opacity-50">
+                          className="flex items-center gap-2 px-5 py-3 bg-primary/10 text-primary font-black text-sm rounded-2xl hover:bg-primary/20 transition-all disabled:opacity-50">
                           {logoUploading ? <Loader2 size={16} className="animate-spin" /> : <Upload size={16} />}
                           {logoUploading ? 'Mengupload...' : 'Upload dari Perangkat'}
                         </button>
@@ -341,7 +341,7 @@ export default function StoreProfilePage() {
                         }} />
                       <button type="button" onClick={() => bannerRef.current?.click()}
                         disabled={bannerUploading}
-                        className="flex items-center gap-2 px-5 py-3 bg-[#00AA13]/10 text-[#00AA13] font-black text-sm rounded-2xl hover:bg-[#00AA13]/20 transition-all disabled:opacity-50">
+                        className="flex items-center gap-2 px-5 py-3 bg-primary/10 text-primary font-black text-sm rounded-2xl hover:bg-primary/20 transition-all disabled:opacity-50">
                         {bannerUploading ? <Loader2 size={16} className="animate-spin" /> : <Upload size={16} />}
                         {bannerUploading ? 'Mengupload...' : 'Upload dari Perangkat'}
                       </button>
@@ -402,7 +402,7 @@ export default function StoreProfilePage() {
                 {embedUrl ? (
                   <div className="rounded-2xl overflow-hidden border border-gray-100 shadow-inner">
                     <div className="bg-gray-50 px-5 py-3 flex items-center gap-2 border-b border-gray-100">
-                      <MapPin size={14} className="text-[#00AA13]" />
+                      <MapPin size={14} className="text-primary" />
                       <span className="text-xs font-black text-gray-500 uppercase tracking-widest">Pratinjau Peta</span>
                     </div>
                     <iframe
@@ -427,7 +427,7 @@ export default function StoreProfilePage() {
           {/* Save Bar */}
           <div className="mt-6 flex items-center gap-4">
             <button type="submit" disabled={saving}
-              className="flex-1 md:flex-none md:px-12 bg-[#00AA13] hover:bg-[#008810] disabled:bg-gray-300 text-white font-black py-5 rounded-2xl transition-all shadow-xl shadow-[#00AA13]/20 flex items-center justify-center gap-3 text-base">
+              className="flex-1 md:flex-none md:px-12 bg-primary hover:bg-[#008810] disabled:bg-gray-300 text-white font-black py-5 rounded-2xl transition-all shadow-xl shadow-primary/20 flex items-center justify-center gap-3 text-base">
               {saving ? <Loader2 size={22} className="animate-spin" /> : 'Simpan Profil Toko'}
             </button>
 
@@ -435,7 +435,7 @@ export default function StoreProfilePage() {
               {success && (
                 <motion.div
                   initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }}
-                  className="flex items-center gap-2 text-[#00AA13] font-black text-sm">
+                  className="flex items-center gap-2 text-primary font-black text-sm">
                   <CheckCircle2 size={20} /> Tersimpan!
                 </motion.div>
               )}

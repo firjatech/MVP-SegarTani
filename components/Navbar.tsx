@@ -1,15 +1,28 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import Link from 'next/link';
+import { AnimatePresence, motion } from 'framer-motion';
+import {
+  Heart,
+  LogOut,
+  MapPin,
+  Menu,
+  Package,
+  PackageSearch,
+  ShoppingBag,
+  ShoppingCart,
+  Store,
+  User as UserIcon,
+  X,
+} from 'lucide-react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { Menu, X, MapPin, ShoppingCart, LogOut, Heart, ShoppingBag, Package, User as UserIcon, Store, PackageSearch } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useEffect, useState } from 'react';
+
 import { useCart } from '@/context/CartContext';
 import { useWishlist } from '@/context/WishlistContext';
 import { supabase } from '@/lib/supabase';
-import { User } from '@supabase/supabase-js';
+import type { User } from '@supabase/supabase-js';
 
 const navLinks = [
   { name: 'Beranda', href: '/' },
@@ -19,9 +32,7 @@ const navLinks = [
 ];
 
 export default function Navbar() {
-  const [isOpen, setIsOpen] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
   const [user, setUser] = useState<User | null>(null);
   const [isSeller, setIsSeller] = useState(false);
   const pathname = usePathname();
@@ -30,10 +41,6 @@ export default function Navbar() {
   const { totalWishlistItems } = useWishlist();
 
   useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 20);
-    };
-    window.addEventListener('scroll', handleScroll);
 
     async function checkAdmin(userId: string) {
       const { data } = await supabase
@@ -60,7 +67,6 @@ export default function Navbar() {
     });
 
     return () => {
-      window.removeEventListener('scroll', handleScroll);
       subscription.unsubscribe();
     };
   }, []);
@@ -82,6 +88,7 @@ export default function Navbar() {
         <div className="flex items-center gap-4">
           {/* Hamburger Icon - Show on all pages */}
           <button
+            type="button"
             onClick={() => setIsSidebarOpen(true)}
             className="p-2 hover:bg-gray-50 rounded-lg text-gray-700 transition-colors"
           >
@@ -170,12 +177,13 @@ export default function Navbar() {
             {/* Cart Button - Only show on ecommerce */}
             {pathname.startsWith('/ecommerce') && (
               <button
+                type="button"
                 onClick={() => setIsCartOpen(true)}
-                className="relative p-2 text-gray-700 hover:text-[#00AA13] transition-colors bg-gray-50 rounded-full"
+                className="relative p-2 text-gray-700 hover:text-primary transition-colors bg-gray-50 rounded-full"
               >
                 <ShoppingCart size={22} />
                 {totalItems > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-[#FF9F1C] text-white text-[10px] font-black w-5 h-5 flex items-center justify-center rounded-full shadow-sm border-2 border-white">
+                  <span className="absolute -top-1 -right-1 bg-secondary text-white text-[10px] font-black w-5 h-5 flex items-center justify-center rounded-full shadow-sm border-2 border-white">
                     {totalItems}
                   </span>
                 )}
@@ -184,8 +192,9 @@ export default function Navbar() {
 
             {user ? (
               <button
+                type="button"
                 onClick={handleLogout}
-                className="bg-[#00AA13] text-white px-6 py-2 rounded-full text-sm font-bold hover:bg-[#008810] transition-all flex items-center gap-2 shadow-lg shadow-[#00AA13]/10"
+                className="bg-primary text-white px-6 py-2 rounded-full text-sm font-bold hover:bg-[#008810] transition-all flex items-center gap-2 shadow-lg shadow-primary/10"
               >
                 <LogOut size={16} /> Logout
               </button>
@@ -214,20 +223,21 @@ export default function Navbar() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setIsSidebarOpen(false)}
-              className="fixed inset-0 bg-black/20 backdrop-blur-sm z-[60]"
+              className="fixed inset-0 bg-black/20 backdrop-blur-sm z-60"
             />
             <motion.div
               initial={{ x: '-100%' }}
               animate={{ x: 0 }}
               exit={{ x: '-100%' }}
               transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-              className="fixed left-0 top-0 h-full w-64 bg-[#00AA13] shadow-2xl z-[70] p-6"
+              className="fixed left-0 top-0 h-full w-64 bg-primary shadow-2xl z-70 p-6"
             >
               <div className="flex justify-between items-center mb-8">
                 <div className="flex items-center gap-2">
                   <span className="text-white font-black text-lg">Pengaturan</span>
                 </div>
                 <button
+                  type="button"
                   onClick={() => setIsSidebarOpen(false)}
                   className="text-white/80 hover:text-white bg-white/10 p-2 rounded-xl transition-all"
                 >
@@ -243,7 +253,7 @@ export default function Navbar() {
                     href={link.href}
                     onClick={() => setIsSidebarOpen(false)}
                     className={`flex items-center gap-3 p-3 rounded-xl transition-all font-bold text-sm ${pathname === link.href
-                      ? 'bg-white text-[#00AA13] shadow-lg'
+                      ? 'bg-white text-primary shadow-lg'
                       : 'text-white/90 hover:text-white hover:bg-white/10'
                       }`}
                   >
@@ -262,7 +272,7 @@ export default function Navbar() {
                   href="/ecommerce"
                   onClick={() => setIsSidebarOpen(false)}
                   className={`flex items-center gap-3 p-3 rounded-xl transition-all font-bold text-sm ${pathname.startsWith('/ecommerce')
-                    ? 'bg-white text-[#00AA13] shadow-lg'
+                    ? 'bg-white text-primary shadow-lg'
                     : 'text-white/90 hover:text-white hover:bg-white/10'
                     }`}
                 >
@@ -272,7 +282,7 @@ export default function Navbar() {
                   href="/location"
                   onClick={() => setIsSidebarOpen(false)}
                   className={`flex items-center gap-3 p-3 rounded-xl transition-all font-bold text-sm ${pathname === '/location'
-                    ? 'bg-white text-[#00AA13] shadow-lg'
+                    ? 'bg-white text-primary shadow-lg'
                     : 'text-white/90 hover:text-white hover:bg-white/10'
                     }`}
                 >
@@ -285,7 +295,7 @@ export default function Navbar() {
                       href="/wishlist"
                       onClick={() => setIsSidebarOpen(false)}
                       className={`flex items-center gap-3 p-3 rounded-xl transition-all font-bold text-sm ${pathname === '/wishlist'
-                        ? 'bg-white text-[#00AA13] shadow-lg'
+                        ? 'bg-white text-primary shadow-lg'
                         : 'text-white/90 hover:text-white hover:bg-white/10'
                         }`}
                     >
@@ -295,7 +305,7 @@ export default function Navbar() {
                       href="/orders"
                       onClick={() => setIsSidebarOpen(false)}
                       className={`flex items-center gap-3 p-3 rounded-xl transition-all font-bold text-sm ${pathname === '/orders'
-                        ? 'bg-white text-[#00AA13] shadow-lg'
+                        ? 'bg-white text-primary shadow-lg'
                         : 'text-white/90 hover:text-white hover:bg-white/10'
                         }`}
                     >
@@ -313,7 +323,7 @@ export default function Navbar() {
                       href="/profile"
                       onClick={() => setIsSidebarOpen(false)}
                       className={`flex items-center gap-3 p-3 rounded-xl transition-all font-bold text-sm ${pathname === '/profile'
-                        ? 'bg-white text-[#00AA13] shadow-lg'
+                        ? 'bg-white text-primary shadow-lg'
                         : 'text-white/90 hover:text-white hover:bg-white/10'
                         }`}
                     >
@@ -324,7 +334,7 @@ export default function Navbar() {
                         href="/admin/products"
                         onClick={() => setIsSidebarOpen(false)}
                         className={`flex items-center gap-3 p-3 rounded-xl transition-all font-bold text-sm ${pathname.startsWith('/admin')
-                          ? 'bg-white text-[#00AA13] shadow-lg'
+                          ? 'bg-white text-primary shadow-lg'
                           : 'text-white/90 hover:text-white hover:bg-white/10'
                           }`}
                       >

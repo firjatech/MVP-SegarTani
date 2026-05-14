@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useId } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Mail, Lock, ArrowRight, Loader2, AlertCircle } from 'lucide-react';
@@ -14,6 +14,9 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const emailId = useId();
+  const passwordId = useId();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -46,10 +49,10 @@ export default function LoginPage() {
           <div className="mb-12 flex flex-col items-center lg:items-start w-full">
              <div className="mb-4 flex items-center gap-2">
                 <Image src="/images/logo.jpg" alt="Logo" width={50} height={50} priority className="h-10 w-auto" />
-                <span className="text-2xl font-black text-[#00AA13]">Segar<span className="text-[#FF9F1C]">Tani</span></span>
+                <span className="text-2xl font-black text-primary">Segar<span className="text-secondary">Tani</span></span>
              </div>
              <div className="w-full text-left">
-                <Link href="/" className="flex items-center gap-2 text-sm font-bold text-[#00AA13] hover:opacity-80 transition-opacity">
+                <Link href="/" className="flex items-center gap-2 text-sm font-bold text-primary hover:opacity-80 transition-opacity">
                   <ArrowRight size={16} className="rotate-180" /> Kembali ke Beranda
                 </Link>
              </div>
@@ -72,34 +75,36 @@ export default function LoginPage() {
 
             <form onSubmit={handleLogin} className="space-y-6 text-left">
               <div>
-                <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3">EMAIL</label>
+                <label htmlFor={emailId} className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3">EMAIL</label>
                 <div className="relative">
                   <Mail size={18} className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-300" />
                   <input 
+                    id={emailId}
                     type="email" 
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="Masukkan email kamu" 
-                    className="w-full bg-white border border-gray-100 rounded-2xl px-14 py-5 focus:outline-none focus:border-[#00AA13] focus:ring-4 focus:ring-[#00AA13]/5 text-gray-700 font-medium transition-all" 
+                    className="w-full bg-white border border-gray-100 rounded-2xl px-14 py-5 focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/5 text-gray-700 font-medium transition-all" 
                   />
                 </div>
               </div>
 
               <div>
                 <div className="flex justify-between items-center mb-3">
-                  <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">PASSWORD</label>
-                  <Link href="#" className="text-[10px] font-black text-[#00AA13] hover:underline uppercase tracking-widest">Lupa Password?</Link>
+                  <label htmlFor={passwordId} className="text-[10px] font-black text-gray-400 uppercase tracking-widest">PASSWORD</label>
+                  <Link href="#" className="text-[10px] font-black text-primary hover:underline uppercase tracking-widest">Lupa Password?</Link>
                 </div>
                 <div className="relative">
                   <Lock size={18} className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-300" />
                   <input 
+                    id={passwordId}
                     type="password" 
                     required
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="........." 
-                    className="w-full bg-white border border-gray-100 rounded-2xl px-14 py-5 focus:outline-none focus:border-[#00AA13] focus:ring-4 focus:ring-[#00AA13]/5 text-gray-700 font-medium transition-all" 
+                    className="w-full bg-white border border-gray-100 rounded-2xl px-14 py-5 focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/5 text-gray-700 font-medium transition-all" 
                   />
                 </div>
               </div>
@@ -107,7 +112,7 @@ export default function LoginPage() {
               <button 
                 type="submit" 
                 disabled={loading}
-                className="w-full bg-[#00AA13] hover:bg-[#008810] disabled:bg-gray-300 text-white font-black py-5 rounded-2xl transition-all shadow-xl shadow-[#00AA13]/20 flex items-center justify-center gap-2 group text-lg"
+                className="w-full bg-primary hover:bg-[#008810] disabled:bg-gray-300 text-white font-black py-5 rounded-2xl transition-all shadow-xl shadow-primary/20 flex items-center justify-center gap-2 group text-lg"
               >
                 {loading ? (
                   <>
@@ -124,13 +129,13 @@ export default function LoginPage() {
 
 
             <p className="mt-12 text-center text-sm font-medium text-gray-400">
-              Belum punya akun? <Link href="/register" className="text-[#00AA13] font-black hover:underline">Daftar Gratis</Link>
+              Belum punya akun? <Link href="/register" className="text-primary font-black hover:underline">Daftar Gratis</Link>
             </p>
           </div>
         </div>
 
         {/* Right Side: Welcome */}
-        <div className="hidden lg:flex flex-1 bg-[#00AA13] p-16 flex-col justify-start pt-32 relative overflow-hidden">
+        <div className="hidden lg:flex flex-1 bg-primary p-16 flex-col justify-start pt-32 relative overflow-hidden">
           {/* Decorative Elements */}
           <div className="absolute top-20 right-20 w-64 h-64 bg-white/5 rounded-full blur-3xl"></div>
           <div className="absolute -bottom-20 -left-20 w-96 h-96 bg-white/10 rounded-full blur-2xl"></div>

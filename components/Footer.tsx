@@ -2,8 +2,6 @@
 
 import React from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
-import { Apple, PlayCircle } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 
 export default function Footer() {
@@ -89,7 +87,7 @@ function FooterLink({ href, children }: { href: string; children: React.ReactNod
     <li>
       <Link
         href={href}
-        className="hover:text-[#00AA13] transition-colors duration-200 block w-fit"
+        className="hover:text-primary transition-colors duration-200 block w-fit"
       >
         {children}
       </Link>
@@ -101,7 +99,7 @@ function SocialIcon({ icon }: { icon: string }) {
   return (
     <a
       href="#"
-      className="w-10 h-10 rounded-full bg-zinc-800/50 flex items-center justify-center hover:bg-[#00AA13] text-white transition-all duration-300 hover:-translate-y-1"
+      className="w-10 h-10 rounded-full bg-zinc-800/50 flex items-center justify-center hover:bg-primary text-white transition-all duration-300 hover:-translate-y-1"
     >
       <IconMapper name={icon} />
     </a>

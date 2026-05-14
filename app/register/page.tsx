@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useId } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Mail, Lock, User, ArrowRight, Loader2, AlertCircle, CheckCircle2 } from 'lucide-react';
@@ -17,6 +17,10 @@ export default function RegisterPage() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
 
+  const nameId = useId();
+  const emailId = useId();
+  const passwordId = useId();
+
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -24,12 +28,11 @@ export default function RegisterPage() {
     setSuccess(false);
 
     try {
-      // 1. Sign Up User
+      // 1. Sign Up User (tanpa verifikasi email)
       const { data, error: signUpError } = await supabase.auth.signUp({
         email,
         password,
         options: {
-          emailRedirectTo: `${window.location.origin}/auth/callback`,
           data: {
             full_name: fullName,
           },
@@ -38,12 +41,18 @@ export default function RegisterPage() {
 
       if (signUpError) throw signUpError;
 
-      if (data.user) {
-        // Data profil sekarang dibuat otomatis oleh TRIGGER di database.
+      if (data.session) {
+        // Langsung login, redirect ke halaman utama
+        setSuccess(true);
+        setTimeout(() => {
+          router.push('/ecommerce');
+        }, 1500);
+      } else if (data.user) {
+        // Fallback jika session belum tersedia
         setSuccess(true);
         setTimeout(() => {
           router.push('/login');
-        }, 4000);
+        }, 1500);
       }
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Gagal mendaftar. Silakan coba lagi.');
@@ -60,10 +69,10 @@ export default function RegisterPage() {
           <div className="mb-12 flex flex-col items-center lg:items-start w-full">
              <div className="mb-4 flex items-center gap-2">
                 <Image src="/images/logo.jpg" alt="Logo" width={50} height={50} priority className="h-10 w-auto" />
-                <span className="text-2xl font-black text-[#00AA13]">Segar<span className="text-[#FF9F1C]">Tani</span></span>
+                <span className="text-2xl font-black text-primary">Segar<span className="text-secondary">Tani</span></span>
              </div>
              <div className="w-full text-left">
-                <Link href="/login" className="flex items-center gap-2 text-sm font-bold text-[#00AA13] hover:opacity-80 transition-opacity">
+                <Link href="/login" className="flex items-center gap-2 text-sm font-bold text-primary hover:opacity-80 transition-opacity">
                   <ArrowRight size={16} className="rotate-180" /> Kembali ke Login
                 </Link>
              </div>
@@ -91,53 +100,56 @@ export default function RegisterPage() {
                 className="mb-6 p-4 bg-green-50 border border-green-100 rounded-2xl flex items-center gap-3 text-green-700 text-sm font-bold text-left"
               >
                 <CheckCircle2 size={18} className="shrink-0" />
-                <span>Pendaftaran berhasil! Silakan cek email Anda untuk konfirmasi (jika diperlukan). Mengalihkan ke halaman login...</span>
+                <span>Pendaftaran berhasil! Mengalihkan ke halaman utama...</span>
               </motion.div>
             )}
 
             <form onSubmit={handleRegister} className="space-y-6 text-left">
               <div>
-                <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3">NAMA LENGKAP</label>
+                <label htmlFor={nameId} className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3">NAMA LENGKAP</label>
                 <div className="relative">
                   <User size={18} className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-300" />
                   <input 
+                    id={nameId}
                     type="text" 
                     required
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
                     placeholder="Masukkan nama lengkap kamu" 
-                    className="w-full bg-white border border-gray-100 rounded-2xl px-14 py-5 focus:outline-none focus:border-[#00AA13] focus:ring-4 focus:ring-[#00AA13]/5 text-gray-700 font-medium transition-all" 
+                    className="w-full bg-white border border-gray-100 rounded-2xl px-14 py-5 focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/5 text-gray-700 font-medium transition-all" 
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3">EMAIL</label>
+                <label htmlFor={emailId} className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3">EMAIL</label>
                 <div className="relative">
                   <Mail size={18} className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-300" />
                   <input 
+                    id={emailId}
                     type="email" 
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="Masukkan email kamu" 
-                    className="w-full bg-white border border-gray-100 rounded-2xl px-14 py-5 focus:outline-none focus:border-[#00AA13] focus:ring-4 focus:ring-[#00AA13]/5 text-gray-700 font-medium transition-all" 
+                    className="w-full bg-white border border-gray-100 rounded-2xl px-14 py-5 focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/5 text-gray-700 font-medium transition-all" 
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3">PASSWORD</label>
+                <label htmlFor={passwordId} className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3">PASSWORD</label>
                 <div className="relative">
                   <Lock size={18} className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-300" />
                   <input 
+                    id={passwordId}
                     type="password" 
                     required
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="Minimal 6 karakter" 
                     minLength={6}
-                    className="w-full bg-white border border-gray-100 rounded-2xl px-14 py-5 focus:outline-none focus:border-[#00AA13] focus:ring-4 focus:ring-[#00AA13]/5 text-gray-700 font-medium transition-all" 
+                    className="w-full bg-white border border-gray-100 rounded-2xl px-14 py-5 focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/5 text-gray-700 font-medium transition-all" 
                   />
                 </div>
               </div>
@@ -145,7 +157,7 @@ export default function RegisterPage() {
               <button 
                 type="submit" 
                 disabled={loading || success}
-                className="w-full bg-[#00AA13] hover:bg-[#008810] disabled:bg-gray-300 text-white font-black py-5 rounded-2xl transition-all shadow-xl shadow-[#00AA13]/20 flex items-center justify-center gap-2 group text-lg"
+                className="w-full bg-primary hover:bg-[#008810] disabled:bg-gray-300 text-white font-black py-5 rounded-2xl transition-all shadow-xl shadow-primary/20 flex items-center justify-center gap-2 group text-lg"
               >
                 {loading ? (
                   <>
@@ -160,13 +172,13 @@ export default function RegisterPage() {
             </form>
 
             <p className="mt-12 text-center text-sm font-medium text-gray-400">
-              Sudah punya akun? <Link href="/login" className="text-[#00AA13] font-black hover:underline">Masuk di Sini</Link>
+              Sudah punya akun? <Link href="/login" className="text-primary font-black hover:underline">Masuk di Sini</Link>
             </p>
           </div>
         </div>
 
         {/* Right Side: Welcome */}
-        <div className="hidden lg:flex flex-1 bg-[#00AA13] p-16 flex-col justify-start pt-32 relative overflow-hidden">
+        <div className="hidden lg:flex flex-1 bg-primary p-16 flex-col justify-start pt-32 relative overflow-hidden">
           {/* Decorative Elements */}
           <div className="absolute top-20 right-20 w-64 h-64 bg-white/5 rounded-full blur-3xl"></div>
           <div className="absolute -bottom-20 -left-20 w-96 h-96 bg-white/10 rounded-full blur-2xl"></div>
