@@ -146,11 +146,11 @@ function AdminOrdersContent() {
       <div className="container mx-auto px-6 max-w-7xl">
         <header className="mb-12">
           <Link
-            href="/ecommerce"
+            href="/admin/dashboard"
             className="flex items-center gap-2 text-gray-500 font-bold hover:text-primary transition-colors mb-6 group"
           >
             <ArrowLeft size={20} className="group-hover:-translate-x-1 transition-transform" />
-            Kembali ke Katalog
+            Kembali ke Dashboard Toko
           </Link>
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
             <div className="flex items-center gap-4">

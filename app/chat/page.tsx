@@ -98,11 +98,18 @@ const formatIDR = (amount: number) => {
   }).format(amount).replace(/\s/g, '');
 };
 
-const QUICK_TEMPLATES = [
+const BUYER_QUICK_TEMPLATES = [
   'Halo, apakah produk ini masih tersedia?',
   'Kapan pesanan saya bisa dikirim?',
   'Apakah bisa bayar COD di tempat?',
   'Sayur dan buahnya segar hari ini?',
+];
+
+const SELLER_QUICK_TEMPLATES = [
+  'Halo, produk ready stok dan siap dikirim hari ini ya.',
+  'Pesanan Anda sedang kami siapkan dan segera dikirim.',
+  'Bisa bayar COD saat kurir tiba di lokasi.',
+  'Produk kami dijamin 100% segar dan baru dipanen.',
 ];
 
 function ChatPageContent() {
@@ -189,20 +196,27 @@ function ChatPageContent() {
       setCurrentUserId(user.id);
 
       try {
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('is_seller, is_admin')
-          .eq('id', user.id)
-          .maybeSingle();
-
-        const { data: storeProfile } = await supabase
-          .from('store_profiles')
-          .select('id')
-          .eq('id', user.id)
-          .maybeSingle();
-
-        if (profile?.is_seller || profile?.is_admin || storeProfile) {
+        const storedRole = localStorage.getItem('segar-tani-role');
+        if (storedRole === 'seller') {
           setIsCurrentUserSeller(true);
+        } else if (storedRole === 'buyer') {
+          setIsCurrentUserSeller(false);
+        } else {
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('is_seller, is_admin')
+            .eq('id', user.id)
+            .maybeSingle();
+
+          const { data: storeProfile } = await supabase
+            .from('store_profiles')
+            .select('id')
+            .eq('id', user.id)
+            .maybeSingle();
+
+          if (profile?.is_seller || profile?.is_admin || storeProfile) {
+            setIsCurrentUserSeller(true);
+          }
         }
       } catch (err) {
         console.error('Error checking seller role:', err);
@@ -735,9 +749,10 @@ function ChatPageContent() {
     );
   }
 
-  const backTarget = isCurrentUserSeller ? '/admin/orders' : '/ecommerce';
-  const backLabel = isCurrentUserSeller ? 'Kembali ke Pesanan' : 'Kembali ke Katalog Produk';
-  const backTooltip = isCurrentUserSeller ? 'Kembali ke Halaman Pesanan Penjual' : 'Kembali ke Halaman Katalog Produk';
+  const backTarget = isCurrentUserSeller ? '/admin/dashboard' : '/ecommerce';
+  const backLabel = isCurrentUserSeller ? 'Kembali ke Dashboard Toko' : 'Kembali ke Katalog Belanja';
+  const backTooltip = isCurrentUserSeller ? 'Kembali ke Dashboard Toko Penjual' : 'Kembali ke Halaman Katalog Belanja';
+  const activeTemplates = isCurrentUserSeller ? SELLER_QUICK_TEMPLATES : BUYER_QUICK_TEMPLATES;
 
   return (
     <div className="bg-[#f8fafc] min-h-screen pt-20 pb-8 font-sans text-gray-900">
@@ -1102,7 +1117,7 @@ function ChatPageContent() {
                   <span className="text-[10px] font-black text-gray-400 uppercase tracking-wider shrink-0 flex items-center gap-1">
                     <Sparkles size={12} className="text-amber-500" /> Balas Cepat:
                   </span>
-                  {QUICK_TEMPLATES.map((tmpl, i) => (
+                  {activeTemplates.map((tmpl, i) => (
                     <button
                       key={i}
                       type="button"

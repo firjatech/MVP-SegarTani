@@ -87,9 +87,9 @@ function AdminSellersContent() {
       <AlertCircle size={60} className="text-red-500 mb-4" />
       <h1 className="text-2xl font-black text-gray-900 mb-2">Akses Ditolak</h1>
       <p className="text-gray-500">Halaman ini hanya untuk Administrator SegarTani.</p>
-      <Link href="/ecommerce"
+      <Link href="/admin/dashboard"
         className="mt-6 inline-flex items-center gap-2 px-6 py-3 bg-[#00AA13] text-white font-black rounded-2xl hover:bg-[#008810] transition-colors">
-        <ArrowLeft size={18} /> Kembali ke Ecommerce
+        <ArrowLeft size={18} /> Kembali ke Dashboard
       </Link>
     </div>
   );
@@ -100,10 +100,10 @@ function AdminSellersContent() {
 
         {/* Header */}
         <header className="mb-10">
-          <Link href="/ecommerce"
+          <Link href="/admin/dashboard"
             className="flex items-center gap-2 text-gray-500 font-bold hover:text-[#00AA13] transition-colors mb-6 group w-fit">
             <ArrowLeft size={20} className="group-hover:-translate-x-1 transition-transform" />
-            Kembali ke Ecommerce
+            Kembali ke Dashboard
           </Link>
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
             <div className="flex items-center gap-4">

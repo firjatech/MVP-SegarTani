@@ -116,10 +116,10 @@ function EcommerceContent() {
   }, [searchQuery, activeCategory, pathname, router, searchParams]);
 
   return (
-    <div className="bg-white min-h-screen pb-20 font-sans pt-10">
+    <div className="bg-white min-h-screen pb-20 font-sans pt-4">
       <div className="container mx-auto px-6 max-w-7xl">
         {/* Combined Filter Bar */}
-        <div className="max-w-6xl mx-auto py-12 px-0 md:px-6">
+        <div className="max-w-6xl mx-auto pt-3 pb-8 px-0 md:px-6">
           <div className="flex flex-col sm:flex-row items-center bg-white border border-gray-200 rounded-3xl overflow-hidden shadow-md focus-within:border-primary focus-within:ring-4 focus-within:ring-primary/10 transition-all duration-300">
 
             {/* Search Input Part */}

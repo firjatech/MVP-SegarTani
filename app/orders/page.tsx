@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
-import { ShoppingBag, ChevronRight, Package, Clock, CheckCircle2, Truck, AlertCircle, ArrowLeft } from 'lucide-react';
+import { ShoppingBag, ChevronRight, Package, Clock, CheckCircle2, Truck, AlertCircle, ArrowLeft, Star } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
@@ -184,12 +184,23 @@ export default function OrdersPage() {
                         <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">TOTAL PEMBAYARAN</p>
                         <p className="text-3xl font-black text-primary">{formatIDR(order.total_price)}</p>
                       </div>
-                      <Link 
-                        href={`/orders/${order.id}`}
-                        className="flex items-center gap-2 bg-gray-50 hover:bg-gray-100 text-gray-900 font-black px-8 py-4 rounded-2xl transition-colors group"
-                      >
-                        Lihat Detail <ChevronRight size={18} className="group-hover:translate-x-1 transition-transform" />
-                      </Link>
+                      <div className="flex items-center gap-3 w-full md:w-auto">
+                        {order.status.toLowerCase() === 'completed' && (
+                          <Link
+                            href="/reviews"
+                            className="flex-1 md:flex-none flex items-center justify-center gap-2 bg-amber-50 hover:bg-amber-100 text-amber-700 font-black px-6 py-4 rounded-2xl transition-colors text-sm border border-amber-200"
+                          >
+                            <Star size={16} className="fill-amber-400 text-amber-400" />
+                            Beri Ulasan
+                          </Link>
+                        )}
+                        <Link 
+                          href={`/orders/${order.id}`}
+                          className="flex-1 md:flex-none flex items-center justify-center gap-2 bg-gray-50 hover:bg-gray-100 text-gray-900 font-black px-8 py-4 rounded-2xl transition-colors group"
+                        >
+                          Lihat Detail <ChevronRight size={18} className="group-hover:translate-x-1 transition-transform" />
+                        </Link>
+                      </div>
                     </div>
                   </div>
                 </motion.div>

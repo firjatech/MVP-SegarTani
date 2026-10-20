@@ -3,18 +3,15 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { useRouter, usePathname } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import {
-  LayoutDashboard, Package, ShoppingBag, MessageSquare, Star,
-  BarChart3, Wallet, Tag, Store, Bell, User, LogOut, Plus,
-  TrendingUp, ArrowUpRight, Clock, AlertCircle, CheckCircle2, ChevronRight
+  Package, ShoppingBag, Store, Plus,
+  TrendingUp, Clock, ChevronRight, MessageSquare
 } from 'lucide-react';
-import { motion } from 'framer-motion';
 
 export default function SellerDashboardPage() {
   const router = useRouter();
-  const pathname = usePathname();
   const [loading, setLoading] = useState(true);
   const [storeName, setStoreName] = useState('Toko Saya');
   const [logoUrl, setLogoUrl] = useState('');
@@ -91,23 +88,6 @@ export default function SellerDashboardPage() {
     loadDashboardData();
   }, [router]);
 
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
-    router.push('/');
-  };
-
-  const sidebarNav = [
-    { name: 'Dashboard', href: '/admin/dashboard', icon: LayoutDashboard },
-    { name: 'Produk', href: '/admin/products', icon: Package },
-    { name: 'Pesanan', href: '/admin/orders', icon: ShoppingBag },
-    { name: 'Chat', href: '/chat', icon: MessageSquare },
-    { name: 'Ulasan', href: '#', icon: Star, badge: 'Segera' },
-    { name: 'Laporan', href: '#', icon: BarChart3, badge: 'Segera' },
-    { name: 'Saldo', href: '#', icon: Wallet, badge: 'Segera' },
-    { name: 'Promo', href: '#', icon: Tag, badge: 'Segera' },
-    { name: 'Profil Toko', href: '/admin/store-profile', icon: Store },
-  ];
-
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -138,33 +118,6 @@ export default function SellerDashboardPage() {
                 ● Toko Aktif (Mode Penjual)
               </span>
             </div>
-          </div>
-
-          <div className="flex items-center gap-3">
-            <Link
-              href="/ecommerce"
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 rounded-xl text-xs font-bold transition-all border border-emerald-200"
-              title="Beralih ke halaman katalog belanja"
-            >
-              <ShoppingBag size={15} />
-              <span className="hidden sm:inline">Katalog Belanja</span>
-            </Link>
-            <button type="button" className="relative p-2.5 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-xl transition-all">
-              <Bell size={20} />
-              <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full"></span>
-            </button>
-            <Link href="/admin/store-profile" className="flex items-center gap-2 p-2 text-gray-700 hover:bg-gray-100 rounded-xl text-sm font-bold transition-all">
-              <User size={20} className="text-gray-500" />
-              <span className="hidden sm:inline">Profil Toko</span>
-            </Link>
-            <button
-              type="button"
-              onClick={handleLogout}
-              className="flex items-center gap-2 px-4 py-2 bg-red-50 hover:bg-red-100 text-red-600 rounded-xl text-sm font-bold transition-all cursor-pointer"
-            >
-              <LogOut size={18} />
-              <span className="hidden sm:inline">Keluar</span>
-            </button>
           </div>
         </div>
       </header>

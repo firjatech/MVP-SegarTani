@@ -64,6 +64,8 @@ export default function SellerRegisterPage() {
         if (storeError) throw storeError;
 
         setSuccess(true);
+        localStorage.setItem('segar-tani-role', 'seller');
+        window.dispatchEvent(new Event('roleChange'));
         setTimeout(() => router.push('/admin/dashboard'), 1500);
       } else {
         // 1. Sign Up user baru (tanpa verifikasi email)
@@ -85,6 +87,8 @@ export default function SellerRegisterPage() {
         if (data.session) {
           // Langsung login, redirect ke dashboard penjual
           setSuccess(true);
+          localStorage.setItem('segar-tani-role', 'seller');
+          window.dispatchEvent(new Event('roleChange'));
           setTimeout(() => router.push('/admin/dashboard'), 1500);
         } else if (data.user) {
           // Fallback

@@ -23,6 +23,7 @@ export default function ProfilePage() {
 	const [loading, setLoading] = useState(true);
 	const [saving, setSaving] = useState(false);
 	const [success, setSuccess] = useState(false);
+	const [currentRole, setCurrentRole] = useState<'buyer' | 'seller'>('buyer');
 	const [profile, setProfile] = useState({
 		full_name: "",
 		phone: "",
@@ -34,6 +35,26 @@ export default function ProfilePage() {
 		is_seller: false,
 	});
 	const [userEmail, setUserEmail] = useState("");
+
+	useEffect(() => {
+		const syncRole = () => {
+			const stored = localStorage.getItem('segar-tani-role');
+			if (stored === 'seller') {
+				setCurrentRole('seller');
+			} else {
+				setCurrentRole('buyer');
+			}
+		};
+		syncRole();
+		window.addEventListener('roleChange', syncRole);
+		window.addEventListener('storage', syncRole);
+		return () => {
+			window.removeEventListener('roleChange', syncRole);
+			window.removeEventListener('storage', syncRole);
+		};
+	}, []);
+
+	const isSeller = currentRole === 'seller';
 
 	const nameId = useId();
 	const phoneId = useId();
@@ -117,19 +138,34 @@ export default function ProfilePage() {
 			<div className="container mx-auto px-6 max-w-4xl" data-aos="fade-up">
 				<header className="mb-8 flex justify-between items-end">
 					<div>
-						<Link
-							href="/ecommerce"
-							className="flex items-center gap-2 text-gray-500 font-bold hover:text-primary transition-colors mb-4 group"
-						>
-							<ArrowLeft
-								size={18}
-								className="group-hover:-translate-x-1 transition-transform"
-							/>
-							Kembali Belanja
-						</Link>
+						{isSeller ? (
+							<Link
+								href="/admin/dashboard"
+								className="flex items-center gap-2 text-gray-500 font-bold hover:text-primary transition-colors mb-4 group"
+							>
+								<ArrowLeft
+									size={18}
+									className="group-hover:-translate-x-1 transition-transform"
+								/>
+								Kembali ke Dashboard Toko
+							</Link>
+						) : (
+							<Link
+								href="/ecommerce"
+								className="flex items-center gap-2 text-gray-500 font-bold hover:text-primary transition-colors mb-4 group"
+							>
+								<ArrowLeft
+									size={18}
+									className="group-hover:-translate-x-1 transition-transform"
+								/>
+								Kembali Belanja
+							</Link>
+						)}
 						<h1 className="text-4xl font-black text-gray-900">Profil Saya</h1>
 						<p className="text-gray-400 font-bold uppercase tracking-widest text-[10px] mt-1">
-							KELOLA INFORMASI PRIBADI DAN ALAMAT ANDA
+							{isSeller
+								? "KELOLA INFORMASI PRIBADI AKUN PENJUAL"
+								: "KELOLA INFORMASI PRIBADI DAN ALAMAT ANDA"}
 						</p>
 					</div>
 				</header>
@@ -144,7 +180,7 @@ export default function ProfilePage() {
 										? profile.full_name.charAt(0).toUpperCase()
 										: userEmail.charAt(0).toUpperCase()}
 								</div>
-								<button 
+								<button
 									type="button"
 									className="absolute bottom-0 right-0 p-2 bg-white rounded-full shadow-lg border border-gray-100 text-gray-400 hover:text-primary transition-colors"
 								>
@@ -159,41 +195,69 @@ export default function ProfilePage() {
 							</p>
 
 							<div className="space-y-3">
-								<Link
-									href="/ecommerce"
-									className="w-full flex items-center justify-between p-4 bg-gray-50 rounded-2xl hover:bg-primary/5 transition-colors group"
-								>
-									<div className="flex items-center gap-3">
-										<ShoppingBag
-											size={18}
-											className="text-gray-400 group-hover:text-primary"
-										/>
-										<span className="text-sm font-black text-gray-700 group-hover:text-primary">
-											Mulai Belanja
-										</span>
-									</div>
-									<ChevronRight size={16} className="text-gray-300 group-hover:text-primary" />
-								</Link>
-
-								<Link
-									href={profile.is_seller ? "/admin/dashboard" : "/daftar-penjual"}
-									className="w-full flex items-center justify-between p-4 bg-linear-to-r from-primary/5 to-emerald-50 rounded-2xl hover:from-primary/10 hover:to-emerald-100 transition-all group border border-primary/10"
-								>
-									<div className="flex items-center gap-3">
-										<div className="w-8 h-8 rounded-xl bg-primary/10 flex items-center justify-center">
-											<Store size={16} className="text-primary" />
-										</div>
-										<div className="text-left">
-											<span className="text-sm font-black text-gray-700 group-hover:text-primary block">
-												{profile.is_seller ? "Mulai Jualan" : "Daftar Akun Penjual"}
-											</span>
-											<span className="text-[9px] font-bold text-gray-400">
-												{profile.is_seller ? "Kelola toko, pesanan dan produk Anda" : "Mulai jualan di SegarTani"}
-											</span>
-										</div>
-									</div>
-									<ChevronRight size={16} className="text-primary/40 group-hover:text-primary group-hover:translate-x-0.5 transition-all" />
-								</Link>
+								{isSeller ? (
+									<>
+										{/* Jembatan ke Mode Pembeli */}
+										<button
+											type="button"
+											onClick={() => {
+												localStorage.setItem('segar-tani-role', 'buyer');
+												window.dispatchEvent(new Event('roleChange'));
+												router.push('/ecommerce');
+											}}
+											className="w-full flex items-center justify-between p-4 bg-emerald-50 rounded-2xl hover:bg-emerald-100 transition-colors group border border-emerald-200 cursor-pointer"
+										>
+											<div className="flex items-center gap-3">
+												<ShoppingBag
+													size={18}
+													className="text-emerald-700"
+												/>
+												<div className="text-left">
+													<span className="text-sm font-black text-emerald-900 block">
+														Mulai Belanja
+													</span>
+													<span className="text-[10px] font-bold text-emerald-600">
+														Beralih ke mode pembeli
+													</span>
+												</div>
+											</div>
+											<ChevronRight size={16} className="text-emerald-500 group-hover:text-emerald-700" />
+										</button>
+									</>
+								) : (
+									<>
+										{/* Jembatan ke Mode Penjual */}
+										<button
+											type="button"
+											onClick={() => {
+												if (profile.is_seller || profile.is_admin) {
+													localStorage.setItem('segar-tani-role', 'seller');
+													window.dispatchEvent(new Event('roleChange'));
+													router.push('/admin/dashboard');
+												} else {
+													router.push('/daftar-penjual');
+												}
+											}}
+											className="w-full flex items-center justify-between p-4 bg-amber-50 rounded-2xl hover:bg-amber-100 transition-colors group border border-amber-200 cursor-pointer"
+										>
+											<div className="flex items-center gap-3">
+												<Store
+													size={18}
+													className="text-amber-600"
+												/>
+												<div className="text-left">
+													<span className="text-sm font-black text-amber-900 block">
+														{profile.is_seller || profile.is_admin ? 'Toko Saya (Mode Penjual)' : 'Mulai Jualan'}
+													</span>
+													<span className="text-[10px] font-bold text-amber-600">
+														{profile.is_seller || profile.is_admin ? 'Kelola toko & produk Anda' : 'Buka toko gratis di SegarTani'}
+													</span>
+												</div>
+											</div>
+											<ChevronRight size={16} className="text-amber-500 group-hover:text-amber-700" />
+										</button>
+									</>
+								)}
 							</div>
 						</div>
 					</div>

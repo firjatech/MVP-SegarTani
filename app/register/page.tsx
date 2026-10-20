@@ -45,12 +45,16 @@ export default function RegisterPage() {
       if (data.session) {
         // Langsung login, redirect ke halaman utama
         setSuccess(true);
+        localStorage.setItem('segar-tani-role', 'buyer');
+        window.dispatchEvent(new Event('roleChange'));
         setTimeout(() => {
           router.push('/ecommerce');
         }, 1500);
       } else if (data.user) {
         // Fallback jika session belum tersedia
         setSuccess(true);
+        localStorage.setItem('segar-tani-role', 'buyer');
+        window.dispatchEvent(new Event('roleChange'));
         setTimeout(() => {
           router.push('/login');
         }, 1500);

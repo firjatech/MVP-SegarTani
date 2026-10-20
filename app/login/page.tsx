@@ -79,6 +79,9 @@ function LoginForm() {
             return;
           }
 
+          localStorage.setItem('segar-tani-role', 'seller');
+          window.dispatchEvent(new Event('roleChange'));
+
           const storeName = storeProfile?.store_name ? ` (${storeProfile.store_name})` : '';
           setSuccessInfo({
             message: `Berhasil masuk sebagai Penjual${storeName}! Mengalihkan ke Dashboard Toko...`,
@@ -89,6 +92,9 @@ function LoginForm() {
           }, 800);
         } else {
           // USER MEMILIH LOGIN SEBAGAI PEMBELI
+          localStorage.setItem('segar-tani-role', 'buyer');
+          window.dispatchEvent(new Event('roleChange'));
+
           setSuccessInfo({
             message: 'Berhasil masuk sebagai Pembeli! Mengalihkan ke Katalog Belanja...',
             role: 'buyer',
@@ -111,7 +117,7 @@ function LoginForm() {
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4 md:p-8">
       <div className="bg-white w-full max-w-6xl rounded-[3rem] shadow-2xl overflow-hidden flex flex-col lg:flex-row min-h-[720px]">
-        
+
         {/* Left Side: Form */}
         <div className="flex-1 p-8 md:p-14 flex flex-col justify-center relative bg-white">
           <div className="mb-6 flex flex-col items-center lg:items-start w-full">
@@ -140,11 +146,10 @@ function LoginForm() {
                     setError(null);
                     setNotSellerPrompt(false);
                   }}
-                  className={`flex-1 py-3 px-3 rounded-xl font-black text-xs sm:text-sm flex items-center justify-center gap-2 transition-all cursor-pointer ${
-                    selectedRole === 'buyer'
+                  className={`flex-1 py-3 px-3 rounded-xl font-black text-xs sm:text-sm flex items-center justify-center gap-2 transition-all cursor-pointer ${selectedRole === 'buyer'
                       ? 'bg-primary text-white shadow-md shadow-primary/25 scale-[1.02]'
                       : 'text-gray-600 hover:text-gray-900 hover:bg-gray-200/60'
-                  }`}
+                    }`}
                 >
                   <ShoppingBag size={18} />
                   <span>Sebagai Pembeli</span>
@@ -157,11 +162,10 @@ function LoginForm() {
                     setError(null);
                     setNotSellerPrompt(false);
                   }}
-                  className={`flex-1 py-3 px-3 rounded-xl font-black text-xs sm:text-sm flex items-center justify-center gap-2 transition-all cursor-pointer ${
-                    selectedRole === 'seller'
+                  className={`flex-1 py-3 px-3 rounded-xl font-black text-xs sm:text-sm flex items-center justify-center gap-2 transition-all cursor-pointer ${selectedRole === 'seller'
                       ? 'bg-amber-600 text-white shadow-md shadow-amber-600/25 scale-[1.02]'
                       : 'text-gray-600 hover:text-gray-900 hover:bg-gray-200/60'
-                  }`}
+                    }`}
                 >
                   <Store size={18} />
                   <span>Sebagai Penjual</span>
@@ -199,7 +203,7 @@ function LoginForm() {
 
             {/* Error Message */}
             {error && (
-              <motion.div 
+              <motion.div
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
                 className="mb-5 p-4 bg-red-50 border border-red-200 rounded-2xl flex flex-col gap-2 text-red-700 text-xs sm:text-sm font-bold"
@@ -235,14 +239,13 @@ function LoginForm() {
 
             {/* Success Message */}
             {successInfo && (
-              <motion.div 
+              <motion.div
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className={`mb-5 p-4 rounded-2xl flex items-center gap-3 text-sm font-bold ${
-                  successInfo.role === 'seller' 
-                    ? 'bg-amber-50 border border-amber-200 text-amber-900' 
+                className={`mb-5 p-4 rounded-2xl flex items-center gap-3 text-sm font-bold ${successInfo.role === 'seller'
+                    ? 'bg-amber-50 border border-amber-200 text-amber-900'
                     : 'bg-emerald-50 border border-emerald-200 text-emerald-800'
-                }`}
+                  }`}
               >
                 {successInfo.role === 'seller' ? (
                   <Store size={20} className="text-amber-700 shrink-0" />
@@ -260,14 +263,14 @@ function LoginForm() {
                 </label>
                 <div className="relative">
                   <Mail size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
-                  <input 
+                  <input
                     id={emailId}
-                    type="email" 
+                    type="email"
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    placeholder="nama@email.com" 
-                    className="w-full bg-white border border-gray-200 rounded-2xl pl-12 pr-4 py-3.5 focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 text-gray-800 font-medium text-sm transition-all" 
+                    placeholder="nama@email.com"
+                    className="w-full bg-white border border-gray-200 rounded-2xl pl-12 pr-4 py-3.5 focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 text-gray-800 font-medium text-sm transition-all"
                   />
                 </div>
               </div>
@@ -283,14 +286,14 @@ function LoginForm() {
                 </div>
                 <div className="relative">
                   <Lock size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
-                  <input 
+                  <input
                     id={passwordId}
-                    type={showPassword ? 'text' : 'password'} 
+                    type={showPassword ? 'text' : 'password'}
                     required
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    placeholder="••••••••" 
-                    className="w-full bg-white border border-gray-200 rounded-2xl pl-12 pr-12 py-3.5 focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 text-gray-800 font-medium text-sm transition-all" 
+                    placeholder="••••••••"
+                    className="w-full bg-white border border-gray-200 rounded-2xl pl-12 pr-12 py-3.5 focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 text-gray-800 font-medium text-sm transition-all"
                   />
                   <button
                     type="button"
@@ -303,14 +306,13 @@ function LoginForm() {
                 </div>
               </div>
 
-              <button 
-                type="submit" 
+              <button
+                type="submit"
                 disabled={loading || Boolean(successInfo)}
-                className={`w-full text-white font-black py-4 rounded-2xl transition-all shadow-lg flex items-center justify-center gap-2 group text-base cursor-pointer disabled:cursor-not-allowed ${
-                  selectedRole === 'seller'
+                className={`w-full text-white font-black py-4 rounded-2xl transition-all shadow-lg flex items-center justify-center gap-2 group text-base cursor-pointer disabled:cursor-not-allowed ${selectedRole === 'seller'
                     ? 'bg-amber-600 hover:bg-amber-700 shadow-amber-600/20 disabled:bg-gray-300'
                     : 'bg-primary hover:bg-[#008810] shadow-primary/20 disabled:bg-gray-300'
-                }`}
+                  }`}
               >
                 {loading ? (
                   <>
@@ -318,7 +320,7 @@ function LoginForm() {
                   </>
                 ) : (
                   <>
-                    <span>{selectedRole === 'seller' ? 'Masuk ke Dashboard Toko' : 'Masuk ke Katalog Belanja'}</span>
+                    <span>Masuk</span>
                     <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
                   </>
                 )}
@@ -326,54 +328,27 @@ function LoginForm() {
             </form>
 
             {/* Footer Links */}
-            <div className="mt-8 pt-5 border-t border-gray-100 text-center space-y-1.5">
-              {selectedRole === 'buyer' ? (
-                <>
-                  <p className="text-xs font-medium text-gray-500">
-                    Belum punya akun?{' '}
-                    <Link href="/register" className="text-primary font-black hover:underline">
-                      Daftar Pembeli Gratis
-                    </Link>
-                  </p>
-                  <p className="text-xs text-gray-400">
-                    Punya hasil panen sayur & buah?{' '}
-                    <Link href="/daftar-penjual" className="text-amber-700 font-bold hover:underline">
-                      Daftar Jadi Penjual 🏪
-                    </Link>
-                  </p>
-                </>
-              ) : (
-                <>
-                  <p className="text-xs font-medium text-gray-500">
-                    Belum punya toko di SegarTani?{' '}
-                    <Link href="/daftar-penjual" className="text-amber-700 font-black hover:underline">
-                      Buka Toko Penjual Sekarang
-                    </Link>
-                  </p>
-                  <p className="text-xs text-gray-400">
-                    Hanya ingin belanja?{' '}
-                    <button
-                      type="button"
-                      onClick={() => setSelectedRole('buyer')}
-                      className="text-primary font-bold hover:underline cursor-pointer"
-                    >
-                      Beralih ke Akun Pembeli 🛒
-                    </button>
-                  </p>
-                </>
-              )}
+            <div className="mt-8 pt-5 border-t border-gray-100 text-center">
+              <p className="text-xs font-medium text-gray-500">
+                Belum punya akun?{' '}
+                <Link
+                  href={selectedRole === 'seller' ? '/daftar-penjual' : '/register'}
+                  className={`font-black hover:underline ${selectedRole === 'seller' ? 'text-amber-700' : 'text-primary'}`}
+                >
+                  Daftar
+                </Link>
+              </p>
             </div>
           </div>
         </div>
 
         {/* Right Side: Visual Context per Role */}
-        <div className={`hidden lg:flex flex-1 p-14 flex-col justify-between relative overflow-hidden transition-all duration-500 ${
-          selectedRole === 'seller' ? 'bg-linear-to-br from-[#854d0e] to-[#713f12]' : 'bg-primary'
-        }`}>
+        <div className={`hidden lg:flex flex-1 p-14 flex-col justify-between relative overflow-hidden transition-all duration-500 ${selectedRole === 'seller' ? 'bg-linear-to-br from-[#854d0e] to-[#713f12]' : 'bg-primary'
+          }`}>
           {/* Decorative Elements */}
           <div className="absolute top-20 right-20 w-64 h-64 bg-white/5 rounded-full blur-3xl"></div>
           <div className="absolute -bottom-20 -left-20 w-96 h-96 bg-white/10 rounded-full blur-2xl"></div>
-          
+
           <div className="relative z-10">
             <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider bg-white/15 text-white backdrop-blur-xs mb-4">
               <Sparkles size={14} />
@@ -389,36 +364,6 @@ function LoginForm() {
                 ? 'Jangkau ribuan pembeli langsung tanpa perantara tengkulak. Pantau pesanan masuk secara real-time, atur stok produk, dan nikmati pencairan dana yang aman.'
                 : 'Penuhi kebutuhan nutrisi keluarga Anda dengan sayuran hijau, buah-buahan, dan umbi-umbian terbaik yang dipetik segar setiap hari dengan jaminan kualitas.'}
             </p>
-          </div>
-
-          <div className="relative z-10 grid grid-cols-2 gap-3 pt-6 border-t border-white/15 text-white">
-            {selectedRole === 'seller' ? (
-              <>
-                <div className="bg-white/10 p-3.5 rounded-2xl border border-white/10 backdrop-blur-xs">
-                  <p className="text-2xl font-black mb-0.5">📦</p>
-                  <h4 className="font-bold text-xs">Manajemen Stok</h4>
-                  <p className="text-[11px] text-white/70 mt-0.5">Tambah produk dan atur harga dengan fleksibel.</p>
-                </div>
-                <div className="bg-white/10 p-3.5 rounded-2xl border border-white/10 backdrop-blur-xs">
-                  <p className="text-2xl font-black mb-0.5">💬</p>
-                  <h4 className="font-bold text-xs">Chat Langsung</h4>
-                  <p className="text-[11px] text-white/70 mt-0.5">Terhubung langsung dengan pembeli Anda.</p>
-                </div>
-              </>
-            ) : (
-              <>
-                <div className="bg-white/10 p-3.5 rounded-2xl border border-white/10 backdrop-blur-xs">
-                  <p className="text-2xl font-black mb-0.5">🌱</p>
-                  <h4 className="font-bold text-xs">100% Organik</h4>
-                  <p className="text-[11px] text-white/70 mt-0.5">Bebas pestisida kimia berbahaya.</p>
-                </div>
-                <div className="bg-white/10 p-3.5 rounded-2xl border border-white/10 backdrop-blur-xs">
-                  <p className="text-2xl font-black mb-0.5">🚚</p>
-                  <h4 className="font-bold text-xs">Kirim Cepat</h4>
-                  <p className="text-[11px] text-white/70 mt-0.5">Sampai dalam kondisi tetap renyah dan segar.</p>
-                </div>
-              </>
-            )}
           </div>
         </div>
 

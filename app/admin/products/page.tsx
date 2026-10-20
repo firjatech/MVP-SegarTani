@@ -56,7 +56,7 @@ function AdminProductsContent() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchProducts = useCallback(async (_sellerId: string) => {
+  const fetchProducts = useCallback(async () => {
     setLoading(true);
     const { data, error } = await supabase
       .from('products')
@@ -85,7 +85,7 @@ function AdminProductsContent() {
     }
 
     setUserId(user.id);
-    fetchProducts(user.id);
+    fetchProducts();
   }, [router, fetchProducts]);
 
   useEffect(() => {

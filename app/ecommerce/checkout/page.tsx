@@ -7,7 +7,6 @@ import { supabase } from '@/lib/supabase';
 import {
   ArrowLeft,
   MapPin,
-  CreditCard,
   ShoppingBag,
   Loader2,
   CheckCircle2,
