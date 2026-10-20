@@ -100,7 +100,7 @@ export default function SellerDashboardPage() {
     { name: 'Dashboard', href: '/admin/dashboard', icon: LayoutDashboard },
     { name: 'Produk', href: '/admin/products', icon: Package },
     { name: 'Pesanan', href: '/admin/orders', icon: ShoppingBag },
-    { name: 'Chat', href: '#', icon: MessageSquare, badge: 'Segera' },
+    { name: 'Chat', href: '/chat', icon: MessageSquare },
     { name: 'Ulasan', href: '#', icon: Star, badge: 'Segera' },
     { name: 'Laporan', href: '#', icon: BarChart3, badge: 'Segera' },
     { name: 'Saldo', href: '#', icon: Wallet, badge: 'Segera' },
@@ -135,12 +135,20 @@ export default function SellerDashboardPage() {
             <div>
               <h1 className="text-lg font-black text-gray-900 leading-tight">{storeName}</h1>
               <span className="text-[11px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full inline-block">
-                ● Toko Aktif
+                ● Toko Aktif (Mode Penjual)
               </span>
             </div>
           </div>
 
           <div className="flex items-center gap-3">
+            <Link
+              href="/ecommerce"
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 rounded-xl text-xs font-bold transition-all border border-emerald-200"
+              title="Beralih ke halaman katalog belanja"
+            >
+              <ShoppingBag size={15} />
+              <span className="hidden sm:inline">Katalog Belanja</span>
+            </Link>
             <button type="button" className="relative p-2.5 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-xl transition-all">
               <Bell size={20} />
               <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full"></span>
@@ -152,7 +160,7 @@ export default function SellerDashboardPage() {
             <button
               type="button"
               onClick={handleLogout}
-              className="flex items-center gap-2 px-4 py-2 bg-red-50 hover:bg-red-100 text-red-600 rounded-xl text-sm font-bold transition-all"
+              className="flex items-center gap-2 px-4 py-2 bg-red-50 hover:bg-red-100 text-red-600 rounded-xl text-sm font-bold transition-all cursor-pointer"
             >
               <LogOut size={18} />
               <span className="hidden sm:inline">Keluar</span>

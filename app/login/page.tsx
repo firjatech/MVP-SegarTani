@@ -1,20 +1,22 @@
 'use client';
 
-import React, { useState, useId } from 'react';
+import React, { useState, useId, Suspense } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Mail, Lock, ArrowRight, Loader2, AlertCircle, Eye, EyeOff } from 'lucide-react';
+import { Mail, Lock, ArrowRight, Loader2, AlertCircle, Eye, EyeOff, CheckCircle2, Store, ShoppingBag } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 
-export default function LoginPage() {
+function LoginForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [successInfo, setSuccessInfo] = useState<{ message: string; role: 'seller' | 'buyer' } | null>(null);
 
   const emailId = useId();
   const passwordId = useId();
@@ -23,6 +25,7 @@ export default function LoginPage() {
     e.preventDefault();
     setLoading(true);
     setError(null);
+    setSuccessInfo(null);
 
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
@@ -33,15 +36,49 @@ export default function LoginPage() {
       if (error) throw error;
 
       if (data.user) {
-        router.push('/ecommerce');
-      }
-      } catch (err: unknown) {
-        if (err instanceof Error && (err.message.includes('Failed to fetch') || err.message.includes('fetch'))) {
-          setError('Gagal terhubung ke server Supabase. Pastikan koneksi internet aktif atau cek apakah status proyek Supabase di dashboard sedang Paused.');
+        // Cek apakah user adalah penjual atau pembeli
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('is_seller, is_admin')
+          .eq('id', data.user.id)
+          .maybeSingle();
+
+        const { data: storeProfile } = await supabase
+          .from('store_profiles')
+          .select('id, store_name')
+          .eq('id', data.user.id)
+          .maybeSingle();
+
+        const isSeller = Boolean(profile?.is_seller || profile?.is_admin || storeProfile);
+        const redirectParam = searchParams.get('redirect');
+
+        if (redirectParam) {
+          setSuccessInfo({
+            message: 'Berhasil masuk! Mengalihkan ke halaman tujuan...',
+            role: isSeller ? 'seller' : 'buyer',
+          });
+          setTimeout(() => router.push(redirectParam), 700);
+        } else if (isSeller) {
+          const storeLabel = storeProfile?.store_name ? ` (${storeProfile.store_name})` : '';
+          setSuccessInfo({
+            message: `Berhasil masuk sebagai Penjual${storeLabel}! Mengalihkan ke Dashboard Toko...`,
+            role: 'seller',
+          });
+          setTimeout(() => router.push('/admin/dashboard'), 800);
         } else {
-          setError(err instanceof Error ? err.message : 'Gagal masuk. Silakan periksa kembali email dan password Anda.');
+          setSuccessInfo({
+            message: 'Berhasil masuk sebagai Pembeli! Mengalihkan ke Katalog Produk...',
+            role: 'buyer',
+          });
+          setTimeout(() => router.push('/ecommerce'), 800);
         }
-      } finally {
+      }
+    } catch (err: unknown) {
+      if (err instanceof Error && (err.message.includes('Failed to fetch') || err.message.includes('fetch'))) {
+        setError('Gagal terhubung ke server Supabase. Pastikan koneksi internet aktif atau cek apakah status proyek Supabase di dashboard sedang Paused.');
+      } else {
+        setError(err instanceof Error ? err.message : 'Gagal masuk. Silakan periksa kembali email dan password Anda.');
+      }
       setLoading(false);
     }
   };
@@ -51,30 +88,51 @@ export default function LoginPage() {
       <div className="bg-white w-full max-w-6xl rounded-[3rem] shadow-2xl overflow-hidden flex flex-col lg:flex-row min-h-[700px]">
         {/* Left Side: Form */}
         <div className="flex-1 p-8 md:p-16 flex flex-col justify-center relative bg-white">
-          <div className="mb-12 flex flex-col items-center lg:items-start w-full">
-             <div className="mb-4 flex items-center gap-2">
-                <Image src="/images/logo.jpg" alt="Logo" width={50} height={50} priority className="h-10 w-auto" />
-                <span className="text-2xl font-black text-primary">Segar<span className="text-secondary">Tani</span></span>
-             </div>
-             <div className="w-full text-left">
-                <Link href="/" className="flex items-center gap-2 text-sm font-bold text-primary hover:opacity-80 transition-opacity">
-                  <ArrowRight size={16} className="rotate-180" /> Kembali ke Beranda
-                </Link>
-             </div>
+          <div className="mb-10 flex flex-col items-center lg:items-start w-full">
+            <div className="mb-4 flex items-center gap-2">
+              <Image src="/images/logo.jpg" alt="Logo" width={50} height={50} priority className="h-10 w-auto" />
+              <span className="text-2xl font-black text-primary">Segar<span className="text-secondary">Tani</span></span>
+            </div>
+            <div className="w-full text-left">
+              <Link href="/" className="flex items-center gap-2 text-sm font-bold text-primary hover:opacity-80 transition-opacity">
+                <ArrowRight size={16} className="rotate-180" /> Kembali ke Beranda
+              </Link>
+            </div>
           </div>
 
           <div className="max-w-md w-full mx-auto text-center">
             <h1 className="text-4xl font-black text-gray-900 mb-2">Masuk ke Akun</h1>
-            <p className="text-gray-400 font-medium mb-8 text-sm">Cari sayuran segar pilihan Anda di sini.</p>
+            <p className="text-gray-400 font-medium mb-6 text-sm">
+              Satu pintu masuk untuk Pembeli & Penjual SegarTani
+            </p>
 
             {error && (
               <motion.div 
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="mb-6 p-4 bg-red-50 border border-red-100 rounded-2xl flex items-center gap-3 text-red-600 text-sm font-bold"
+                className="mb-6 p-4 bg-red-50 border border-red-100 rounded-2xl flex items-center gap-3 text-red-600 text-sm font-bold text-left"
               >
-                <AlertCircle size={18} />
-                {error}
+                <AlertCircle size={18} className="shrink-0" />
+                <span>{error}</span>
+              </motion.div>
+            )}
+
+            {successInfo && (
+              <motion.div 
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className={`mb-6 p-4 rounded-2xl flex items-center gap-3 text-sm font-bold text-left ${
+                  successInfo.role === 'seller' 
+                    ? 'bg-amber-50 border border-amber-200 text-amber-900' 
+                    : 'bg-emerald-50 border border-emerald-200 text-emerald-800'
+                }`}
+              >
+                {successInfo.role === 'seller' ? (
+                  <Store size={20} className="text-amber-700 shrink-0" />
+                ) : (
+                  <CheckCircle2 size={20} className="text-emerald-600 shrink-0" />
+                )}
+                <span>{successInfo.message}</span>
               </motion.div>
             )}
 
@@ -114,7 +172,7 @@ export default function LoginPage() {
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                    className="absolute right-5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors cursor-pointer"
                     title={showPassword ? 'Sembunyikan password' : 'Tampilkan password'}
                   >
                     {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
@@ -124,12 +182,12 @@ export default function LoginPage() {
 
               <button 
                 type="submit" 
-                disabled={loading}
-                className="w-full bg-primary hover:bg-[#008810] disabled:bg-gray-300 text-white font-black py-5 rounded-2xl transition-all shadow-xl shadow-primary/20 flex items-center justify-center gap-2 group text-lg"
+                disabled={loading || Boolean(successInfo)}
+                className="w-full bg-primary hover:bg-[#008810] disabled:bg-gray-300 text-white font-black py-5 rounded-2xl transition-all shadow-xl shadow-primary/20 flex items-center justify-center gap-2 group text-lg cursor-pointer"
               >
                 {loading ? (
                   <>
-                    <Loader2 size={22} className="animate-spin" /> Sedang Masuk...
+                    <Loader2 size={22} className="animate-spin" /> Sedang Memeriksa Akun...
                   </>
                 ) : (
                   <>
@@ -139,11 +197,14 @@ export default function LoginPage() {
               </button>
             </form>
 
-
-
-            <p className="mt-12 text-center text-sm font-medium text-gray-400">
-              Belum punya akun? <Link href="/register" className="text-primary font-black hover:underline">Daftar Gratis</Link>
-            </p>
+            <div className="mt-10 pt-6 border-t border-gray-100 space-y-2">
+              <p className="text-center text-sm font-medium text-gray-500">
+                Belum punya akun? <Link href="/register" className="text-primary font-black hover:underline">Daftar Pembeli</Link>
+              </p>
+              <p className="text-center text-xs font-semibold text-gray-400">
+                Ingin berjualan sayur & buah? <Link href="/daftar-penjual" className="text-amber-700 font-bold hover:underline">Daftar Akun Penjual 🏪</Link>
+              </p>
+            </div>
           </div>
         </div>
 
@@ -160,7 +221,7 @@ export default function LoginPage() {
               animate={{ opacity: 1, y: 0 }}
               className="text-5xl font-black text-white mb-4 leading-tight"
             >
-              Selamat Datang!!
+              Selamat Datang!
             </motion.h2>
             <motion.p 
               initial={{ opacity: 0, y: 20 }}
@@ -174,13 +235,38 @@ export default function LoginPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
-              className="text-base text-white/80 leading-relaxed font-medium"
+              className="text-base text-white/80 leading-relaxed font-medium mb-8"
             >
-              Kami menghadirkan SegarTani untuk Anda. untuk menyambut kedatangan anda dengan suka cita.
+              Platform terintegrasi untuk pembeli mendapatkan sayuran organik segar langsung dari petani, dan bagi penjual untuk mengelola toko & transaksi dengan mudah.
             </motion.p>
+
+            <div className="grid grid-cols-2 gap-4 pt-4 border-t border-white/20">
+              <div className="bg-white/10 backdrop-blur-xs p-4 rounded-2xl border border-white/15 text-white">
+                <ShoppingBag size={22} className="mb-2 text-emerald-200" />
+                <h4 className="font-bold text-sm">Untuk Pembeli</h4>
+                <p className="text-xs text-white/70 mt-1">Belanja aneka sayur segar, chat penjual, dan lacak pesanan.</p>
+              </div>
+              <div className="bg-white/10 backdrop-blur-xs p-4 rounded-2xl border border-white/15 text-white">
+                <Store size={22} className="mb-2 text-amber-200" />
+                <h4 className="font-bold text-sm">Untuk Penjual</h4>
+                <p className="text-xs text-white/70 mt-1">Kelola stok produk, pantau pesanan masuk, dan terima pembayaran.</p>
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <Loader2 className="animate-spin text-primary" size={40} />
+      </div>
+    }>
+      <LoginForm />
+    </Suspense>
   );
 }

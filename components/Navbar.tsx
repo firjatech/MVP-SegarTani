@@ -89,8 +89,14 @@ export default function Navbar() {
         .eq('id', userId)
         .maybeSingle();
 
-      if (data) {
-        setIsSeller(data.is_seller || false);
+      const { data: storeData } = await supabase
+        .from('store_profiles')
+        .select('id, store_name')
+        .eq('id', userId)
+        .maybeSingle();
+
+      if (data?.is_seller || data?.is_admin || storeData) {
+        setIsSeller(true);
       }
     }
 
@@ -222,9 +228,56 @@ export default function Navbar() {
           </div>
         )}
 
-        {/* Desktop Button and Mobile Hamburger */}
-        <div className="flex items-center gap-4">
-          <div className="hidden md:flex items-center gap-4">
+        {/* Desktop Buttons and Quick Actions */}
+        <div className="flex items-center gap-3">
+          {/* Mobile Right Controls: Role Badge, Chat & Cart */}
+          <div className="flex md:hidden items-center gap-2">
+            {user && isSeller && (
+              <Link
+                href="/admin/dashboard"
+                className="flex items-center gap-1 bg-amber-100 text-amber-900 border border-amber-300 px-2.5 py-1 rounded-full text-[11px] font-black shadow-xs"
+                title="Buka Dashboard Toko"
+              >
+                <Store size={13} />
+                <span>Toko</span>
+              </Link>
+            )}
+
+            {user && (
+              <Link
+                href="/chat"
+                className={`relative p-2 text-gray-700 bg-gray-50 rounded-full ${
+                  pathname === '/chat' ? 'text-primary bg-primary/10' : ''
+                }`}
+                title="Pesan & Chat"
+              >
+                <MessageSquare size={18} />
+                {unreadChatCount > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[9px] font-black w-4 h-4 flex items-center justify-center rounded-full">
+                    {unreadChatCount > 9 ? '9+' : unreadChatCount}
+                  </span>
+                )}
+              </Link>
+            )}
+
+            {user && pathname.startsWith('/ecommerce') && (
+              <button
+                type="button"
+                onClick={() => setIsCartOpen(true)}
+                className="relative p-2 text-gray-700 bg-gray-50 rounded-full"
+              >
+                <ShoppingCart size={18} />
+                {totalItems > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-secondary text-white text-[9px] font-black w-4 h-4 flex items-center justify-center rounded-full">
+                    {totalItems}
+                  </span>
+                )}
+              </button>
+            )}
+          </div>
+
+          {/* Desktop Right Controls */}
+          <div className="hidden md:flex items-center gap-3">
             {/* Cari Lokasi - Only show on ecommerce */}
             {pathname.startsWith('/ecommerce') && (
               <Link
@@ -236,7 +289,50 @@ export default function Navbar() {
               </Link>
             )}
 
-            {/* Order History Button - Only show on ecommerce */}
+            {/* SELLER MODE: Shortcut to Store Dashboard on Desktop */}
+            {user && isSeller && (
+              <Link
+                href="/admin/dashboard"
+                className={`flex items-center gap-1.5 text-xs font-black px-3.5 py-2 rounded-full transition-all shadow-xs border ${
+                  pathname.startsWith('/admin')
+                    ? 'bg-amber-600 text-white border-amber-600 shadow-sm'
+                    : 'bg-amber-50 text-amber-900 border-amber-200 hover:bg-amber-100 hover:border-amber-300'
+                }`}
+                title="Buka Dashboard Toko Anda"
+              >
+                <Store size={15} className={pathname.startsWith('/admin') ? 'text-white' : 'text-amber-800'} />
+                <span>Toko Saya</span>
+                <span className={`text-[9px] font-black px-1.5 py-0.5 rounded-full uppercase tracking-wider ${
+                  pathname.startsWith('/admin') ? 'bg-white/20 text-white' : 'bg-amber-200 text-amber-950'
+                }`}>
+                  Penjual
+                </span>
+              </Link>
+            )}
+
+            {/* SELLER ON ADMIN PAGES: Shortcut to Buyer Catalog */}
+            {user && isSeller && pathname.startsWith('/admin') && (
+              <Link
+                href="/ecommerce"
+                className="flex items-center gap-1.5 text-xs font-bold text-emerald-800 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 px-3.5 py-2 rounded-full transition-all"
+                title="Lihat katalog produk dari sudut pandang pembeli"
+              >
+                <ShoppingBag size={15} className="text-emerald-700" />
+                <span>Katalog Belanja</span>
+              </Link>
+            )}
+
+            {/* BUYER MODE: Shortcut to Become Seller */}
+            {user && !isSeller && (
+              <Link
+                href="/daftar-penjual"
+                className="flex items-center gap-1.5 text-xs font-bold text-gray-700 hover:text-primary bg-gray-50 hover:bg-primary/5 px-3.5 py-2 rounded-full transition-all border border-gray-200"
+                title="Daftar Menjadi Penjual SegarTani"
+              >
+                <Store size={15} className="text-primary" />
+                <span>Buka Toko</span>
+              </Link>
+            )}
 
             {/* Chat Button */}
             {user && (
@@ -291,7 +387,7 @@ export default function Navbar() {
               <button
                 type="button"
                 onClick={handleLogout}
-                className="bg-primary text-white px-6 py-2 rounded-full text-sm font-bold hover:bg-[#008810] transition-all flex items-center gap-2 shadow-lg shadow-primary/10"
+                className="bg-primary text-white px-5 py-2 rounded-full text-sm font-bold hover:bg-[#008810] transition-all flex items-center gap-2 shadow-lg shadow-primary/10 cursor-pointer"
               >
                 <LogOut size={16} /> Logout
               </button>
@@ -312,8 +408,6 @@ export default function Navbar() {
               </div>
             )}
           </div>
-
-
         </div>
       </div>
 
@@ -338,9 +432,11 @@ export default function Navbar() {
               className="fixed left-0 top-0 h-full w-64 bg-primary shadow-2xl z-70 flex flex-col"
             >
               {/* Header - fixed */}
-              <div className="flex justify-between items-center px-6 pt-6 pb-4 shrink-0">
+              <div className="flex justify-between items-center px-6 pt-6 pb-4 shrink-0 border-b border-white/10">
                 <div className="flex items-center gap-2">
-                  <span className="text-white font-black text-lg">Pengaturan</span>
+                  <span className="text-white font-black text-lg">
+                    {isSeller ? '🏪 Panel Penjual' : '🛒 Akun Pembeli'}
+                  </span>
                 </div>
                 <button
                   type="button"
