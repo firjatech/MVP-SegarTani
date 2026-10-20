@@ -5,6 +5,7 @@ const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'http://localhost:54
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
 
 // Custom lock function untuk mencegah error Web Lock API di browser
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const dummyLock = async (_name: string, _acquireTimeout: number, fn: () => Promise<any>) => {
   return await fn();
 };

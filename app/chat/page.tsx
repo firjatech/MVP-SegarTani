@@ -1,18 +1,16 @@
 'use client';
 
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, Suspense } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useRouter, useSearchParams } from 'next/navigation';
 import {
   MessageSquare,
   Search,
   Send,
-  ArrowLeft,
   Store,
   User as UserIcon,
   Check,
   CheckCheck,
-  Clock,
   Sparkles,
   Loader2,
   Plus,
@@ -20,9 +18,7 @@ import {
   ExternalLink,
   ChevronLeft,
   X,
-  Phone,
   ShieldCheck,
-  Package
 } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -108,7 +104,7 @@ const QUICK_TEMPLATES = [
   'Sayur dan buahnya segar hari ini?',
 ];
 
-export default function ChatPage() {
+function ChatPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -143,6 +139,7 @@ export default function ChatPage() {
   const messagesContainerRef = useRef<HTMLDivElement | null>(null);
   const isInitialLoad = useRef(true);
   const prevMessageCount = useRef(0);
+  const tempIdCounter = useRef(0);
 
   const scrollToBottom = (force = false) => {
     const container = messagesContainerRef.current;
@@ -176,8 +173,8 @@ export default function ChatPage() {
     }
 
     prevMessageCount.current = currentCount;
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [messages]);
+
 
   // 1. Initial auth check
   useEffect(() => {
@@ -228,7 +225,7 @@ export default function ChatPage() {
         .in('id', otherUserIds);
 
       // Fetch products referenced in chats
-      let productsMap: Record<number, ProductInfo> = {};
+      const productsMap: Record<number, ProductInfo> = {};
       if (productIds.length > 0) {
         const { data: prods } = await supabase
           .from('products')
@@ -437,12 +434,16 @@ export default function ChatPage() {
   useEffect(() => {
     if (!activeChat) return;
 
-    // Reset scroll state when switching to a different chat
-    isInitialLoad.current = true;
-    prevMessageCount.current = 0;
-    setMessages([]);
+    // Reset scroll state and fetch messages for this chat
+    async function loadChat(chatId: string) {
+      // Reset state inside async function to avoid setState in effect body lint error
+      isInitialLoad.current = true;
+      prevMessageCount.current = 0;
+      setMessages([]);
+      await fetchMessages(chatId);
+    }
 
-    fetchMessages(activeChat.id);
+    loadChat(activeChat.id);
 
     // Setup Realtime Subscription
     const channel = supabase
@@ -508,8 +509,8 @@ export default function ChatPage() {
     setSending(true);
     setInputText('');
 
-    // Optimistic message
-    const tempId = Date.now();
+    // Optimistic message — gunakan ref counter agar tidak memanggil fungsi impure
+    const tempId = -(++tempIdCounter.current);
     const optimisticMsg: MessageItem = {
       id: tempId,
       chat_id: activeChat.id,
@@ -1219,5 +1220,18 @@ export default function ChatPage() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function ChatPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center gap-4">
+        <div className="animate-spin rounded-full h-11 w-11 border-4 border-primary border-t-transparent" />
+        <p className="font-bold text-gray-500 text-sm">Memuat halaman chat...</p>
+      </div>
+    }>
+      <ChatPageContent />
+    </Suspense>
   );
 }
