@@ -1,23 +1,32 @@
 'use client';
 
+import React from 'react';
+
 import { AnimatePresence, motion } from 'framer-motion';
 import {
+  BarChart3,
+  Gift,
   Heart,
+  KeyRound,
+  LayoutDashboard,
   LogOut,
   MapPin,
   Menu,
+  MessageSquare,
   Package,
-  PackageSearch,
   ShoppingBag,
   ShoppingCart,
+  Star,
   Store,
+  Tag,
   User as UserIcon,
+  Wallet,
   X,
 } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 
 import { useCart } from '@/context/CartContext';
 import { useWishlist } from '@/context/WishlistContext';
@@ -35,12 +44,43 @@ export default function Navbar() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [user, setUser] = useState<User | null>(null);
   const [isSeller, setIsSeller] = useState(false);
+  const [unreadChatCount, setUnreadChatCount] = useState(0);
   const pathname = usePathname();
   const router = useRouter();
   const { setIsCartOpen, totalItems } = useCart();
   const { totalWishlistItems } = useWishlist();
 
+  const fetchUnreadCount = useCallback(async (userId: string) => {
+    try {
+      // Get all chat rooms the user participates in
+      const { data: chatsData } = await supabase
+        .from('chats')
+        .select('id')
+        .or(`buyer_id.eq.${userId},seller_id.eq.${userId}`);
+
+      if (!chatsData || chatsData.length === 0) {
+        setUnreadChatCount(0);
+        return;
+      }
+
+      const chatIds = chatsData.map((c: { id: string }) => c.id);
+
+      // Count unread messages from others
+      const { count } = await supabase
+        .from('messages')
+        .select('*', { count: 'exact', head: true })
+        .in('chat_id', chatIds)
+        .eq('is_read', false)
+        .neq('sender_id', userId);
+
+      setUnreadChatCount(count || 0);
+    } catch {
+      // silently ignore errors
+    }
+  }, []);
+
   useEffect(() => {
+    let currentUserId: string | null = null;
 
     async function checkAdmin(userId: string) {
       const { data } = await supabase
@@ -57,23 +97,60 @@ export default function Navbar() {
     // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);
-      if (session?.user) checkAdmin(session.user.id);
+      if (session?.user) {
+        currentUserId = session.user.id;
+        checkAdmin(session.user.id);
+        fetchUnreadCount(session.user.id);
+      }
     });
 
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
-      if (session?.user) checkAdmin(session.user.id);
+      if (session?.user) {
+        currentUserId = session.user.id;
+        checkAdmin(session.user.id);
+        fetchUnreadCount(session.user.id);
+      } else {
+        currentUserId = null;
+        setUnreadChatCount(0);
+      }
     });
+
+    // Realtime subscription for new messages → update unread badge
+    const channel = supabase
+      .channel('navbar-unread-messages')
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'messages' },
+        () => {
+          if (currentUserId) fetchUnreadCount(currentUserId);
+        }
+      )
+      .on(
+        'postgres_changes',
+        { event: 'UPDATE', schema: 'public', table: 'messages' },
+        () => {
+          if (currentUserId) fetchUnreadCount(currentUserId);
+        }
+      )
+      .subscribe();
+
+    // Poll every 30s as fallback
+    const pollInterval = setInterval(() => {
+      if (currentUserId) fetchUnreadCount(currentUserId);
+    }, 30000);
 
     return () => {
       subscription.unsubscribe();
+      supabase.removeChannel(channel);
+      clearInterval(pollInterval);
     };
-  }, []);
+  }, [fetchUnreadCount]);
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
-    router.push('/');
+    router.push('/login');
   };
 
   if (pathname === '/login' || pathname === '/register' || pathname === '/daftar-penjual') {
@@ -86,14 +163,16 @@ export default function Navbar() {
     >
       <div className="container mx-auto px-6 flex justify-between items-center relative">
         <div className="flex items-center gap-4">
-          {/* Hamburger Icon - Show on all pages */}
-          <button
-            type="button"
-            onClick={() => setIsSidebarOpen(true)}
-            className="p-2 hover:bg-gray-50 rounded-lg text-gray-700 transition-colors"
-          >
-            <Menu size={24} />
-          </button>
+          {/* Hamburger Icon - Only show when user is logged in */}
+          {user && (
+            <button
+              type="button"
+              onClick={() => setIsSidebarOpen(true)}
+              className="p-2 hover:bg-gray-50 rounded-lg text-gray-700 transition-colors"
+            >
+              <Menu size={24} />
+            </button>
+          )}
 
           {/* Conditional Logo: Link if not on ecommerce, Static if on ecommerce */}
           {pathname.startsWith('/ecommerce') ? (
@@ -159,6 +238,24 @@ export default function Navbar() {
 
             {/* Order History Button - Only show on ecommerce */}
 
+            {/* Chat Button */}
+            {user && (
+              <Link
+                href="/chat"
+                className={`relative p-2 text-gray-700 hover:text-primary transition-colors bg-gray-50 rounded-full ${
+                  pathname === '/chat' ? 'text-primary bg-primary/10' : ''
+                }`}
+                title="Pesan & Chat"
+              >
+                <MessageSquare size={22} />
+                {unreadChatCount > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-black w-5 h-5 flex items-center justify-center rounded-full shadow-sm border-2 border-white animate-pulse">
+                    {unreadChatCount > 9 ? '9+' : unreadChatCount}
+                  </span>
+                )}
+              </Link>
+            )}
+
             {/* Wishlist Button - Only show on ecommerce */}
             {pathname.startsWith('/ecommerce') && (
               <Link
@@ -199,12 +296,20 @@ export default function Navbar() {
                 <LogOut size={16} /> Logout
               </button>
             ) : (
-              <Link
-                href="/register"
-                className="bg-primary text-white px-6 py-2 rounded-full text-sm font-semibold hover:bg-primary-dark transition-all transform hover:scale-105 inline-block"
-              >
-                Daftar
-              </Link>
+              <div className="flex items-center gap-2">
+                <Link
+                  href="/login"
+                  className="px-5 py-2 rounded-full text-sm font-bold text-primary border border-primary hover:bg-primary/5 transition-all"
+                >
+                  Masuk
+                </Link>
+                <Link
+                  href="/register"
+                  className="bg-primary text-white px-5 py-2 rounded-full text-sm font-semibold hover:bg-[#008810] transition-all inline-block"
+                >
+                  Daftar
+                </Link>
+              </div>
             )}
           </div>
 
@@ -230,9 +335,10 @@ export default function Navbar() {
               animate={{ x: 0 }}
               exit={{ x: '-100%' }}
               transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-              className="fixed left-0 top-0 h-full w-64 bg-primary shadow-2xl z-70 p-6"
+              className="fixed left-0 top-0 h-full w-64 bg-primary shadow-2xl z-70 flex flex-col"
             >
-              <div className="flex justify-between items-center mb-8">
+              {/* Header - fixed */}
+              <div className="flex justify-between items-center px-6 pt-6 pb-4 shrink-0">
                 <div className="flex items-center gap-2">
                   <span className="text-white font-black text-lg">Pengaturan</span>
                 </div>
@@ -244,110 +350,132 @@ export default function Navbar() {
                   <X size={20} />
                 </button>
               </div>
-              {/* Sidebar Menu Items */}
-              <div className="space-y-1.5">
-                {/* General Links for All */}
-                {navLinks.map((link) => (
-                  <Link
-                    key={link.name}
-                    href={link.href}
-                    onClick={() => setIsSidebarOpen(false)}
-                    className={`flex items-center gap-3 p-3 rounded-xl transition-all font-bold text-sm ${pathname === link.href
-                      ? 'bg-white text-primary shadow-lg'
-                      : 'text-white/90 hover:text-white hover:bg-white/10'
-                      }`}
-                  >
-                    {link.name === 'Beranda' && <Package size={20} />}
-                    {link.name === 'Tentang Kami' && <UserIcon size={20} />}
-                    {link.name === 'Layanan' && <Store size={20} />}
-                    {link.name === 'Kontak' && <MapPin size={20} />}
-                    {link.name}
-                  </Link>
-                ))}
-
-                <div className="h-px bg-white/10 my-4"></div>
-                <p className="text-[10px] font-black text-white/40 uppercase tracking-widest px-3 mb-2">E-Commerce</p>
-
-                <Link
-                  href="/ecommerce"
-                  onClick={() => setIsSidebarOpen(false)}
-                  className={`flex items-center gap-3 p-3 rounded-xl transition-all font-bold text-sm ${pathname.startsWith('/ecommerce')
-                    ? 'bg-white text-primary shadow-lg'
-                    : 'text-white/90 hover:text-white hover:bg-white/10'
-                    }`}
-                >
-                  <ShoppingBag size={20} /> Katalog Produk
-                </Link>
-                <Link
-                  href="/location"
-                  onClick={() => setIsSidebarOpen(false)}
-                  className={`flex items-center gap-3 p-3 rounded-xl transition-all font-bold text-sm ${pathname === '/location'
-                    ? 'bg-white text-primary shadow-lg'
-                    : 'text-white/90 hover:text-white hover:bg-white/10'
-                    }`}
-                >
-                  <MapPin size={20} /> Cari Lokasi
-                </Link>
-
-                {user && (
+              {/* Sidebar Menu Items - scrollable */}
+              <div
+                className="flex-1 overflow-y-auto no-scrollbar px-6 pb-6 space-y-1.5"
+                style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' } as React.CSSProperties}
+              >
+                {/* ===== BUYER MENU ===== */}
+                {!isSeller && user && (
                   <>
-                    <Link
-                      href="/wishlist"
-                      onClick={() => setIsSidebarOpen(false)}
-                      className={`flex items-center gap-3 p-3 rounded-xl transition-all font-bold text-sm ${pathname === '/wishlist'
-                        ? 'bg-white text-primary shadow-lg'
-                        : 'text-white/90 hover:text-white hover:bg-white/10'
-                        }`}
-                    >
-                      <Heart size={20} /> Wishlist Saya
+                    {/* Akun Saya */}
+                    <p className="text-[10px] font-black text-white/40 uppercase tracking-widest px-3 mb-2">👤 Akun Saya</p>
+                    {[
+                      { name: 'Profil Saya', href: '/profile', icon: UserIcon },
+                      { name: 'Alamat Pengiriman', href: '/profile/address', icon: MapPin },
+                      { name: 'Ubah Password', href: '/profile/password', icon: KeyRound },
+                    ].map(item => {
+                      const Icon = item.icon;
+                      const isActive = pathname === item.href;
+                      return (
+                        <Link key={item.name} href={item.href} onClick={() => setIsSidebarOpen(false)}
+                          className={`flex items-center gap-3 p-3 rounded-xl transition-all font-bold text-sm ${
+                            isActive ? 'bg-white text-primary shadow-lg' : 'text-white/90 hover:text-white hover:bg-white/10'
+                          }`}>
+                          <Icon size={18} /> {item.name}
+                        </Link>
+                      );
+                    })}
+
+                    <div className="h-px bg-white/10 my-3" />
+
+                    {/* Belanja Saya */}
+                    <p className="text-[10px] font-black text-white/40 uppercase tracking-widest px-3 mb-2">🛍️ Belanja Saya</p>
+                    {[
+                      { name: 'Pesanan Saya', href: '/orders', icon: ShoppingBag },
+                      { name: 'Keranjang', href: '/ecommerce', icon: ShoppingCart },
+                      { name: 'Wishlist', href: '/wishlist', icon: Heart },
+                      { name: 'Ulasan Saya', href: '/profile/reviews', icon: Star },
+                    ].map(item => {
+                      const Icon = item.icon;
+                      const isActive = pathname === item.href;
+                      return (
+                        <Link key={item.name} href={item.href} onClick={() => setIsSidebarOpen(false)}
+                          className={`flex items-center gap-3 p-3 rounded-xl transition-all font-bold text-sm ${
+                            isActive ? 'bg-white text-primary shadow-lg' : 'text-white/90 hover:text-white hover:bg-white/10'
+                          }`}>
+                          <Icon size={18} /> {item.name}
+                        </Link>
+                      );
+                    })}
+
+                    <div className="h-px bg-white/10 my-3" />
+
+                    {/* Promo & Voucher */}
+                    <Link href="/promo" onClick={() => setIsSidebarOpen(false)}
+                      className={`flex items-center gap-3 p-3 rounded-xl transition-all font-bold text-sm ${
+                        pathname === '/promo' ? 'bg-white text-primary shadow-lg' : 'text-white/90 hover:text-white hover:bg-white/10'
+                      }`}>
+                      <Gift size={18} /> 🎁 Promo & Voucher
                     </Link>
-                    <Link
-                      href="/orders"
-                      onClick={() => setIsSidebarOpen(false)}
-                      className={`flex items-center gap-3 p-3 rounded-xl transition-all font-bold text-sm ${pathname === '/orders'
-                        ? 'bg-white text-primary shadow-lg'
-                        : 'text-white/90 hover:text-white hover:bg-white/10'
-                        }`}
-                    >
-                      <ShoppingBag size={20} /> Pesanan Saya
+
+                    {/* Chat */}
+                    <Link href="/chat" onClick={() => setIsSidebarOpen(false)}
+                      className={`flex items-center justify-between p-3 rounded-xl transition-all font-bold text-sm ${
+                        pathname === '/chat' ? 'bg-white text-primary shadow-lg' : 'text-white/90 hover:text-white hover:bg-white/10'
+                      }`}>
+                      <span className="flex items-center gap-3"><MessageSquare size={18} /> 💬 Chat</span>
+                      {unreadChatCount > 0 && (
+                        <span className="bg-red-500 text-white text-[10px] font-black min-w-[20px] h-5 px-1 flex items-center justify-center rounded-full">
+                          {unreadChatCount > 9 ? '9+' : unreadChatCount}
+                        </span>
+                      )}
                     </Link>
+
                   </>
                 )}
 
-                <div className="h-px bg-white/10 my-4"></div>
-                <p className="text-[10px] font-black text-white/40 uppercase tracking-widest px-3 mb-2">Akun Saya</p>
-
-                {user ? (
+                {/* ===== SELLER MENU ===== */}
+                {isSeller && user && (
                   <>
-                    <Link
-                      href="/profile"
-                      onClick={() => setIsSidebarOpen(false)}
-                      className={`flex items-center gap-3 p-3 rounded-xl transition-all font-bold text-sm ${pathname === '/profile'
-                        ? 'bg-white text-primary shadow-lg'
-                        : 'text-white/90 hover:text-white hover:bg-white/10'
-                        }`}
-                    >
-                      <UserIcon size={20} /> Profil Saya
+                    <p className="text-[10px] font-black text-white/40 uppercase tracking-widest px-3 mb-2">Akun Saya</p>
+                    <Link href="/profile" onClick={() => setIsSidebarOpen(false)}
+                      className={`flex items-center gap-3 p-3 rounded-xl transition-all font-bold text-sm ${
+                        pathname === '/profile' ? 'bg-white text-primary shadow-lg' : 'text-white/90 hover:text-white hover:bg-white/10'
+                      }`}>
+                      <UserIcon size={18} /> Profil Saya
                     </Link>
-                    {isSeller && (
-                      <Link
-                        href="/admin/products"
-                        onClick={() => setIsSidebarOpen(false)}
-                        className={`flex items-center gap-3 p-3 rounded-xl transition-all font-bold text-sm ${pathname.startsWith('/admin')
-                          ? 'bg-white text-primary shadow-lg'
-                          : 'text-white/90 hover:text-white hover:bg-white/10'
-                          }`}
-                      >
-                        <PackageSearch size={20} /> Panel Penjual
-                      </Link>
-                    )}
+
+                    <div className="h-px bg-white/10 my-3" />
+                    <p className="text-[10px] font-black text-white/40 uppercase tracking-widest px-3 mb-2">Menu Penjual</p>
+                    {[
+                      { name: 'Profil Toko', href: '/admin/store-profile', icon: Store },
+                      { name: 'Dashboard', href: '/admin/dashboard', icon: LayoutDashboard },
+                      { name: 'Produk', href: '/admin/products', icon: Package },
+                      { name: 'Pesanan', href: '/admin/orders', icon: ShoppingBag },
+                      { name: 'Chat', href: '/chat', icon: MessageSquare },
+                      { name: 'Ulasan', href: '#', icon: Star, badge: 'Segera' },
+                      { name: 'Laporan', href: '#', icon: BarChart3, badge: 'Segera' },
+                      { name: 'Saldo', href: '#', icon: Wallet, badge: 'Segera' },
+                      { name: 'Promo', href: '#', icon: Tag, badge: 'Segera' },
+                    ].map((item) => {
+                      const Icon = item.icon;
+                      const isActive = pathname === item.href || (item.href !== '#' && pathname.startsWith(item.href));
+                      return (
+                        <Link key={item.name} href={item.href} onClick={() => setIsSidebarOpen(false)}
+                          className={`flex items-center justify-between p-3 rounded-xl transition-all font-bold text-sm ${
+                            isActive ? 'bg-white text-primary shadow-lg' : 'text-white/90 hover:text-white hover:bg-white/10'
+                          }`}>
+                          <span className="flex items-center gap-3"><Icon size={18} />{item.name}</span>
+                          {item.badge && (
+                            <span className="text-[9px] font-black bg-white/10 text-white/60 px-2 py-0.5 rounded-full">{item.badge}</span>
+                          )}
+                        </Link>
+                      );
+                    })}
+
+                    <div className="h-px bg-white/10 my-3" />
+                    <button type="button" onClick={handleLogout}
+                      className="w-full flex items-center gap-3 p-3 rounded-xl transition-all font-bold text-sm text-red-300 hover:text-red-200 hover:bg-white/10">
+                      <LogOut size={18} /> 🚪 Keluar
+                    </button>
                   </>
-                ) : (
-                  <Link
-                    href="/register"
-                    onClick={() => setIsSidebarOpen(false)}
-                    className="flex items-center gap-3 text-white/90 hover:text-white hover:bg-white/10 p-3 rounded-xl transition-all font-bold text-sm"
-                  >
+                )}
+
+                {/* NOT LOGGED IN */}
+                {!user && (
+                  <Link href="/register" onClick={() => setIsSidebarOpen(false)}
+                    className="flex items-center gap-3 text-white/90 hover:text-white hover:bg-white/10 p-3 rounded-xl transition-all font-bold text-sm">
                     <UserIcon size={20} /> Daftar Sekarang
                   </Link>
                 )}
