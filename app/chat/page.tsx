@@ -140,13 +140,43 @@ export default function ChatPage() {
   const [mobileViewChat, setMobileViewChat] = useState(false);
 
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
+  const messagesContainerRef = useRef<HTMLDivElement | null>(null);
+  const isInitialLoad = useRef(true);
+  const prevMessageCount = useRef(0);
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  const scrollToBottom = (force = false) => {
+    const container = messagesContainerRef.current;
+    if (!container) return;
+
+    if (force) {
+      // Force scroll: used when user sends a message
+      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+      return;
+    }
+
+    // Auto-scroll only if user is already near the bottom (within 150px)
+    const distanceFromBottom = container.scrollHeight - container.scrollTop - container.clientHeight;
+    if (distanceFromBottom < 150) {
+      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }
   };
 
   useEffect(() => {
-    scrollToBottom();
+    const currentCount = messages.length;
+
+    if (isInitialLoad.current) {
+      // On initial load: jump to bottom instantly without animation, no smooth scroll
+      if (messagesEndRef.current) {
+        messagesEndRef.current.scrollIntoView({ behavior: 'instant' });
+      }
+      isInitialLoad.current = false;
+    } else if (currentCount > prevMessageCount.current) {
+      // New message arrived: only scroll if near bottom
+      scrollToBottom();
+    }
+
+    prevMessageCount.current = currentCount;
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [messages]);
 
   // 1. Initial auth check
@@ -407,6 +437,11 @@ export default function ChatPage() {
   useEffect(() => {
     if (!activeChat) return;
 
+    // Reset scroll state when switching to a different chat
+    isInitialLoad.current = true;
+    prevMessageCount.current = 0;
+    setMessages([]);
+
     fetchMessages(activeChat.id);
 
     // Setup Realtime Subscription
@@ -485,6 +520,8 @@ export default function ChatPage() {
     };
 
     setMessages(prev => [...prev, optimisticMsg]);
+    // Force scroll to bottom when user sends a message
+    setTimeout(() => scrollToBottom(true), 50);
 
     try {
       const { error } = await supabase
@@ -942,7 +979,7 @@ export default function ChatPage() {
                 )}
 
                 {/* Messages Body Scroll Area */}
-                <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4">
+                <div ref={messagesContainerRef} className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4">
                   {/* Security / Encrypted Notice */}
                   <div className="flex justify-center mb-4">
                     <div className="inline-flex items-center gap-1.5 bg-gray-100/90 text-gray-500 text-[11px] font-medium px-3 py-1 rounded-full shadow-2xs">
