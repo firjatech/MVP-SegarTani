@@ -64,7 +64,7 @@ export default function SellerRegisterPage() {
         if (storeError) throw storeError;
 
         setSuccess(true);
-        setTimeout(() => router.push('/admin/store-profile'), 2000);
+        setTimeout(() => router.push('/admin/dashboard'), 1500);
       } else {
         // 1. Sign Up user baru (tanpa verifikasi email)
         const { data, error: signUpError } = await supabase.auth.signUp({
@@ -83,9 +83,9 @@ export default function SellerRegisterPage() {
         if (signUpError) throw signUpError;
 
         if (data.session) {
-          // Langsung login, redirect ke profil toko
+          // Langsung login, redirect ke dashboard penjual
           setSuccess(true);
-          setTimeout(() => router.push('/admin/store-profile'), 1500);
+          setTimeout(() => router.push('/admin/dashboard'), 1500);
         } else if (data.user) {
           // Fallback
           setSuccess(true);
@@ -113,8 +113,8 @@ export default function SellerRegisterPage() {
               <span className="text-2xl font-black text-primary">Segar<span className="text-secondary">Tani</span></span>
             </div>
             <div className="w-full text-left">
-              <Link href="/login" className="flex items-center gap-2 text-sm font-bold text-primary hover:opacity-80 transition-opacity">
-                <ArrowRight size={16} className="rotate-180" /> Sudah punya akun? Login
+              <Link href="/profile" className="flex items-center gap-2 text-sm font-bold text-primary hover:opacity-80 transition-opacity">
+                <ArrowRight size={16} className="rotate-180" /> Kembali ke Profil
               </Link>
             </div>
           </div>
@@ -224,12 +224,16 @@ export default function SellerRegisterPage() {
               </AnimatePresence>
 
               <div className="flex gap-3 pt-2">
-                {step === 2 && !session && (
+                {session ? (
+                  <Link href="/profile" className="flex-none px-6 py-5 rounded-2xl border border-gray-200 text-gray-500 font-black hover:bg-gray-50 transition-all flex items-center justify-center">
+                    Kembali
+                  </Link>
+                ) : step === 2 ? (
                   <button type="button" onClick={() => setStep(1)}
                     className="flex-none px-6 py-5 rounded-2xl border border-gray-200 text-gray-500 font-black hover:bg-gray-50 transition-all">
                     Kembali
                   </button>
-                )}
+                ) : null}
                 <button type="submit" disabled={loading || success}
                   className="flex-1 bg-primary hover:bg-[#008810] disabled:bg-gray-300 text-white font-black py-5 rounded-2xl transition-all shadow-xl shadow-primary/20 flex items-center justify-center gap-2 group text-base">
                   {loading ? (
@@ -244,11 +248,6 @@ export default function SellerRegisterPage() {
                 </button>
               </div>
             </form>
-
-            <p className="mt-8 text-center text-sm font-medium text-gray-400">
-              Mau belanja aja?{' '}
-              <Link href="/register" className="text-primary font-black hover:underline">Daftar Akun Pembeli</Link>
-            </p>
           </div>
         </div>
 

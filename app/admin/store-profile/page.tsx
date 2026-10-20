@@ -130,7 +130,7 @@ export default function StoreProfilePage() {
     } else {
       setSuccess(true);
       setTimeout(() => {
-        router.push('/ecommerce');
+        router.push('/admin/dashboard');
       }, 1500);
     }
     setSaving(false);
@@ -176,9 +176,9 @@ export default function StoreProfilePage() {
 
         {/* Header */}
         <header className="mb-8">
-          <Link href="/profile" className="flex items-center gap-2 text-gray-500 font-bold hover:text-primary transition-colors mb-5 group w-fit">
+          <Link href="/admin/dashboard" className="flex items-center gap-2 text-gray-500 font-bold hover:text-primary transition-colors mb-5 group w-fit">
             <ArrowLeft size={18} className="group-hover:-translate-x-1 transition-transform" />
-            Kembali ke Profil
+            Kembali ke Dashboard
           </Link>
           <div className="flex items-center gap-4">
             <div className="bg-linear-to-br from-primary to-emerald-600 p-3.5 rounded-2xl text-white shadow-lg shadow-primary/30">

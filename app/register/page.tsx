@@ -3,7 +3,7 @@
 import React, { useState, useId } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Mail, Lock, User, ArrowRight, Loader2, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { Mail, Lock, User, ArrowRight, Loader2, AlertCircle, CheckCircle2, Eye, EyeOff } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
@@ -13,6 +13,7 @@ export default function RegisterPage() {
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
@@ -55,7 +56,11 @@ export default function RegisterPage() {
         }, 1500);
       }
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Gagal mendaftar. Silakan coba lagi.');
+      if (err instanceof Error && (err.message.includes('Failed to fetch') || err.message.includes('fetch'))) {
+        setError('Gagal terhubung ke server Supabase. Pastikan koneksi internet aktif atau cek apakah status proyek Supabase di dashboard sedang Paused.');
+      } else {
+        setError(err instanceof Error ? err.message : 'Gagal mendaftar. Silakan coba lagi.');
+      }
     } finally {
       setLoading(false);
     }
@@ -143,14 +148,23 @@ export default function RegisterPage() {
                   <Lock size={18} className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-300" />
                   <input 
                     id={passwordId}
-                    type="password" 
+                    type={showPassword ? 'text' : 'password'} 
                     required
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="Minimal 6 karakter" 
                     minLength={6}
-                    className="w-full bg-white border border-gray-100 rounded-2xl px-14 py-5 focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/5 text-gray-700 font-medium transition-all" 
+                    autoComplete="new-password"
+                    className="w-full bg-white border border-gray-100 rounded-2xl pl-14 pr-14 py-5 focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/5 text-gray-700 font-medium transition-all" 
                   />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                    title={showPassword ? 'Sembunyikan password' : 'Tampilkan password'}
+                  >
+                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
                 </div>
               </div>
 

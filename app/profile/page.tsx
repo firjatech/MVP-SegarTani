@@ -160,7 +160,7 @@ export default function ProfilePage() {
 
 							<div className="space-y-3">
 								<Link
-									href="/orders"
+									href="/ecommerce"
 									className="w-full flex items-center justify-between p-4 bg-gray-50 rounded-2xl hover:bg-primary/5 transition-colors group"
 								>
 									<div className="flex items-center gap-3">
@@ -169,14 +169,14 @@ export default function ProfilePage() {
 											className="text-gray-400 group-hover:text-primary"
 										/>
 										<span className="text-sm font-black text-gray-700 group-hover:text-primary">
-											Pesanan Saya
+											Mulai Belanja
 										</span>
 									</div>
 									<ChevronRight size={16} className="text-gray-300 group-hover:text-primary" />
 								</Link>
 
 								<Link
-									href={profile.is_seller ? "/admin/store-profile" : "/daftar-penjual"}
+									href={profile.is_seller ? "/admin/dashboard" : "/daftar-penjual"}
 									className="w-full flex items-center justify-between p-4 bg-linear-to-r from-primary/5 to-emerald-50 rounded-2xl hover:from-primary/10 hover:to-emerald-100 transition-all group border border-primary/10"
 								>
 									<div className="flex items-center gap-3">
@@ -185,10 +185,10 @@ export default function ProfilePage() {
 										</div>
 										<div className="text-left">
 											<span className="text-sm font-black text-gray-700 group-hover:text-primary block">
-												{profile.is_seller ? "Profil Penjual" : "Daftar Akun Penjual"}
+												{profile.is_seller ? "Mulai Jualan" : "Daftar Akun Penjual"}
 											</span>
 											<span className="text-[9px] font-bold text-gray-400">
-												{profile.is_seller ? "Kelola toko dan produk Anda" : "Mulai jualan di SegarTani"}
+												{profile.is_seller ? "Kelola toko, pesanan dan produk Anda" : "Mulai jualan di SegarTani"}
 											</span>
 										</div>
 									</div>

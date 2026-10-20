@@ -145,6 +145,22 @@ export default function ProductDetailPage() {
 		else if (type === "minus" && quantity > 1) setQuantity((prev) => prev - 1);
 	};
 
+	const handleChatSeller = () => {
+		if (!user) {
+			router.push(`/login?redirect=/ecommerce/${id}`);
+			return;
+		}
+		if (product?.seller_id && product.seller_id === user.id) {
+			alert('Ini adalah produk dari toko Anda sendiri.');
+			return;
+		}
+		if (product?.seller_id) {
+			router.push(`/chat?userId=${product.seller_id}&productId=${product.id}`);
+		} else {
+			router.push(`/chat?productId=${product?.id}`);
+		}
+	};
+
 	if (loading) {
 		return (
 			<div className="min-h-screen flex flex-col items-center justify-center bg-gray-50">
@@ -342,6 +358,16 @@ export default function ProductDetailPage() {
 									/>
 								</button>
 							</div>
+
+							{/* Chat Penjual Button */}
+							<button
+								type="button"
+								onClick={handleChatSeller}
+								className="w-full bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 font-black py-4 px-6 rounded-2xl transition-all flex items-center justify-center gap-2.5 text-base shadow-xs active:scale-98 cursor-pointer mt-3"
+							>
+								<MessageSquare size={20} className="text-primary" />
+								<span>Chat Penjual Sekarang</span>
+							</button>
 
 
 

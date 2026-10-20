@@ -5,7 +5,7 @@ import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import {
   PackageSearch, Plus, Edit2, Trash2, Image as ImageIcon,
-  Loader2, AlertCircle, Search, X, Upload, ArrowLeft
+  Loader2, AlertCircle, Search, X, Upload, ArrowLeft, Star
 } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -56,12 +56,11 @@ function AdminProductsContent() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchProducts = useCallback(async (sellerId: string) => {
+  const fetchProducts = useCallback(async (_sellerId: string) => {
     setLoading(true);
     const { data, error } = await supabase
       .from('products')
       .select('*')
-      .eq('seller_id', sellerId)
       .order('created_at', { ascending: false });
 
     if (!error && data) {
@@ -251,50 +250,119 @@ function AdminProductsContent() {
             <p className="text-gray-400 font-medium max-w-md">Anda belum memiliki produk, atau produk yang dicari tidak ditemukan. Klik tombol Tambah Produk untuk memulai.</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             <AnimatePresence>
-              {filteredProducts.map(p => (
-                <motion.div key={p.id} initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }}
-                  className="bg-white rounded-4xl border border-gray-100 overflow-hidden shadow-sm hover:shadow-xl hover:border-primary/20 transition-all group flex flex-col">
-                  
-                  {/* Image */}
-                  <div className="relative h-48 bg-gray-100 overflow-hidden">
-                    {p.image ? (
-                      <Image src={p.image} alt={p.name} fill className="object-cover group-hover:scale-105 transition-transform duration-500" />
-                    ) : (
-                      <div className="w-full h-full flex flex-col items-center justify-center text-gray-300">
-                        <ImageIcon size={32} />
-                        <span className="text-xs font-bold mt-2">No Image</span>
+              {filteredProducts.map(p => {
+                const discountedPrice = p.discount > 0
+                  ? Math.round(p.price * (1 - p.discount / 100))
+                  : p.price;
+                return (
+                  <motion.div key={p.id}
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.95 }}
+                    className="bg-white rounded-4xl border border-gray-100 overflow-hidden shadow-sm hover:shadow-xl hover:border-primary/20 transition-all group flex flex-col"
+                  >
+                    {/* Image */}
+                    <div className="relative aspect-square w-full bg-gray-100 overflow-hidden">
+                      {p.image ? (
+                        <Image src={p.image} alt={p.name} fill className="object-cover group-hover:scale-105 transition-transform duration-500" />
+                      ) : (
+                        <div className="w-full h-full flex flex-col items-center justify-center text-gray-300">
+                          <ImageIcon size={32} />
+                          <span className="text-xs font-bold mt-2">No Image</span>
+                        </div>
+                      )}
+                      {/* Badges */}
+                      <div className="absolute top-3 left-3 flex flex-col gap-1">
+                        {p.discount > 0 && (
+                          <span className="bg-red-500 text-white text-[10px] font-black px-2 py-0.5 rounded-lg">
+                            -{p.discount}%
+                          </span>
+                        )}
+                        {p.stock <= 5 && (
+                          <span className="bg-orange-500 text-white text-[10px] font-black px-2 py-0.5 rounded-lg">
+                            Stok Menipis
+                          </span>
+                        )}
+                        {p.stock === 0 && (
+                          <span className="bg-gray-700 text-white text-[10px] font-black px-2 py-0.5 rounded-lg">
+                            Habis
+                          </span>
+                        )}
                       </div>
-                    )}
-                    {p.stock <= 5 && (
-                      <div className="absolute top-4 left-4 bg-red-500 text-white text-[10px] font-black px-2 py-1 rounded-lg">Stok Menipis</div>
-                    )}
-                  </div>
-
-                  {/* Content */}
-                  <div className="p-5 flex-1 flex flex-col">
-                    <div className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">{p.category}</div>
-                    <h3 className="text-lg font-black text-gray-900 line-clamp-1 mb-2">{p.name}</h3>
-                    <div className="flex items-center gap-2 mb-4">
-                      <span className="text-xl font-black text-primary">Rp {p.price.toLocaleString('id-ID')}</span>
-                      {p.discount > 0 && <span className="text-xs font-bold text-gray-400 line-through">Rp {(p.price + (p.price * p.discount / 100)).toLocaleString('id-ID')}</span>}
-                    </div>
-                    
-                    <div className="mt-auto pt-4 border-t border-gray-50 flex items-center justify-between">
-                      <div className="text-xs font-bold text-gray-500">Stok: <span className={p.stock > 10 ? 'text-gray-900' : 'text-red-500'}>{p.stock}</span></div>
-                      <div className="flex gap-2">
-                        <button onClick={() => openModalForEdit(p)} className="w-8 h-8 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center hover:bg-blue-100 transition-colors">
+                      {/* Action buttons overlay */}
+                      <div className="absolute top-3 right-3 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <button
+                          onClick={() => openModalForEdit(p)}
+                          className="w-8 h-8 rounded-full bg-white shadow-md text-blue-600 flex items-center justify-center hover:bg-blue-50 transition-colors"
+                        >
                           <Edit2 size={14} />
                         </button>
-                        <button onClick={() => handleDelete(p.id)} className="w-8 h-8 rounded-full bg-red-50 text-red-600 flex items-center justify-center hover:bg-red-100 transition-colors">
+                        <button
+                          onClick={() => handleDelete(p.id)}
+                          className="w-8 h-8 rounded-full bg-white shadow-md text-red-500 flex items-center justify-center hover:bg-red-50 transition-colors"
+                        >
                           <Trash2 size={14} />
                         </button>
                       </div>
                     </div>
-                  </div>
-                </motion.div>
-              ))}
+
+                    {/* Content */}
+                    <div className="p-4 flex-1 flex flex-col">
+                      <div className="text-[10px] font-black text-primary/70 uppercase tracking-widest mb-1">{p.category}</div>
+                      <h3 className="text-sm font-black text-gray-900 line-clamp-2 mb-2 leading-snug">{p.name}</h3>
+
+                      {/* Rating */}
+                      <div className="flex items-center gap-1 mb-3">
+                        {[1,2,3,4,5].map(s => (
+                          <Star key={s} size={11}
+                            className={s <= Math.round(p.rating || 0) ? 'fill-yellow-400 text-yellow-400' : 'text-gray-200 fill-gray-200'}
+                          />
+                        ))}
+                        <span className="text-[10px] text-gray-400 font-bold ml-1">{(p.rating || 0).toFixed(1)}</span>
+                      </div>
+
+                      <div className="mt-auto pt-3 border-t border-gray-50">
+                        <div className="flex items-end justify-between">
+                          <div>
+                            {p.discount > 0 && (
+                              <p className="text-[10px] text-gray-400 line-through font-bold">
+                                Rp {p.price.toLocaleString('id-ID')}
+                              </p>
+                            )}
+                            <p className="text-base font-black text-primary">
+                              Rp {discountedPrice.toLocaleString('id-ID')}
+                            </p>
+                          </div>
+                          <span className={`text-[10px] font-black px-2 py-1 rounded-lg ${
+                            p.stock === 0 ? 'bg-gray-100 text-gray-400' :
+                            p.stock <= 5 ? 'bg-orange-50 text-orange-600' :
+                            'bg-gray-50 text-gray-500'
+                          }`}>
+                            Stok: {p.stock}
+                          </span>
+                        </div>
+                        {/* Bottom action row */}
+                        <div className="flex gap-2 mt-3">
+                          <button
+                            onClick={() => openModalForEdit(p)}
+                            className="flex-1 flex items-center justify-center gap-1.5 py-2 bg-blue-50 text-blue-600 rounded-xl text-xs font-black hover:bg-blue-100 transition-colors"
+                          >
+                            <Edit2 size={12} /> Edit
+                          </button>
+                          <button
+                            onClick={() => handleDelete(p.id)}
+                            className="flex-1 flex items-center justify-center gap-1.5 py-2 bg-red-50 text-red-500 rounded-xl text-xs font-black hover:bg-red-100 transition-colors"
+                          >
+                            <Trash2 size={12} /> Hapus
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </motion.div>
+                );
+              })}
             </AnimatePresence>
           </div>
         )}
