@@ -19,6 +19,7 @@ import {
   ChevronLeft,
   X,
   ShieldCheck,
+  ArrowLeft,
 } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -109,6 +110,7 @@ function ChatPageContent() {
   const searchParams = useSearchParams();
 
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+  const [isCurrentUserSeller, setIsCurrentUserSeller] = useState(false);
   const [loading, setLoading] = useState(true);
   const [chatRooms, setChatRooms] = useState<ChatRoom[]>([]);
   const [activeChat, setActiveChat] = useState<ChatRoom | null>(null);
@@ -176,7 +178,7 @@ function ChatPageContent() {
   }, [messages]);
 
 
-  // 1. Initial auth check
+  // 1. Initial auth check & role detection
   useEffect(() => {
     async function initUser() {
       const { data: { user } } = await supabase.auth.getUser();
@@ -185,6 +187,26 @@ function ChatPageContent() {
         return;
       }
       setCurrentUserId(user.id);
+
+      try {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('is_seller, is_admin')
+          .eq('id', user.id)
+          .maybeSingle();
+
+        const { data: storeProfile } = await supabase
+          .from('store_profiles')
+          .select('id')
+          .eq('id', user.id)
+          .maybeSingle();
+
+        if (profile?.is_seller || profile?.is_admin || storeProfile) {
+          setIsCurrentUserSeller(true);
+        }
+      } catch (err) {
+        console.error('Error checking seller role:', err);
+      }
     }
     initUser();
   }, [router]);
@@ -713,12 +735,32 @@ function ChatPageContent() {
     );
   }
 
+  const backTarget = isCurrentUserSeller ? '/admin/orders' : '/ecommerce';
+  const backLabel = isCurrentUserSeller ? 'Kembali ke Pesanan' : 'Kembali ke Katalog Produk';
+  const backTooltip = isCurrentUserSeller ? 'Kembali ke Halaman Pesanan Penjual' : 'Kembali ke Halaman Katalog Produk';
+
   return (
     <div className="bg-[#f8fafc] min-h-screen pt-20 pb-8 font-sans text-gray-900">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 h-[calc(100vh-7rem)] min-h-[550px]">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 h-[calc(100vh-7.5rem)] min-h-[550px] flex flex-col">
         
+        {/* Top Go Back Bar */}
+        <div className="mb-3 flex items-center justify-between shrink-0">
+          <Link
+            href={backTarget}
+            className="inline-flex items-center gap-2 text-xs sm:text-sm font-bold text-gray-700 hover:text-primary transition-all group px-3.5 py-2 rounded-2xl bg-white border border-gray-200/90 shadow-xs hover:shadow-md hover:border-primary/40 active:scale-95"
+            title={backTooltip}
+          >
+            <ArrowLeft size={18} className="group-hover:-translate-x-1 transition-transform text-gray-500 group-hover:text-primary" />
+            <span>{backLabel}</span>
+          </Link>
+
+          <span className="text-[11px] font-extrabold px-3 py-1 rounded-full uppercase tracking-wider bg-white text-gray-600 border border-gray-200 shadow-2xs">
+            {isCurrentUserSeller ? '🛍️ Akun Penjual' : '🛒 Akun Pembeli'}
+          </span>
+        </div>
+
         {/* Main Chat App Window */}
-        <div className="bg-white rounded-3xl shadow-xl border border-gray-200 overflow-hidden h-full flex flex-col lg:flex-row">
+        <div className="bg-white rounded-3xl shadow-xl border border-gray-200 overflow-hidden flex-1 flex flex-col lg:flex-row min-h-0">
           
           {/* =========================================================================
               LEFT PANEL: Conversation List & Search (Visible on desktop or when mobileViewChat=false)
@@ -729,7 +771,14 @@ function ChatPageContent() {
             
             {/* Header List */}
             <div className="p-4 sm:p-5 border-b border-gray-100 flex items-center justify-between gap-3">
-              <div className="flex items-center gap-2.5">
+              <div className="flex items-center gap-2">
+                <Link
+                  href={backTarget}
+                  className="p-2 -ml-1 text-gray-400 hover:text-primary hover:bg-gray-100 rounded-xl transition-all"
+                  title={backTooltip}
+                >
+                  <ArrowLeft size={20} />
+                </Link>
                 <div className="p-2.5 bg-primary/10 text-primary rounded-2xl">
                   <MessageSquare size={22} />
                 </div>
@@ -935,8 +984,16 @@ function ChatPageContent() {
                     </div>
                   </div>
 
-                  {/* Top Right Action: Store link or details */}
+                  {/* Top Right Action: Back link & store details */}
                   <div className="flex items-center gap-2">
+                    <Link
+                      href={backTarget}
+                      className="inline-flex items-center gap-1.5 text-xs font-bold text-gray-600 hover:text-primary bg-gray-100 hover:bg-gray-200/80 px-2.5 sm:px-3 py-1.5 rounded-xl transition-colors"
+                      title={backTooltip}
+                    >
+                      <ArrowLeft size={14} />
+                      <span className="hidden sm:inline">{isCurrentUserSeller ? 'Pesanan' : 'Katalog'}</span>
+                    </Link>
                     {activeChat.otherUser.isSeller && (
                       <Link
                         href="/ecommerce"
@@ -1102,14 +1159,23 @@ function ChatPageContent() {
                 <p className="text-xs sm:text-sm text-gray-500 max-w-sm mb-6">
                   Pilih salah satu kontak di sisi kiri atau klik tombol &quot;Chat Baru&quot; untuk mengirim pesan ke penjual maupun pembeli.
                 </p>
-                <button
-                  type="button"
-                  onClick={handleOpenNewChatModal}
-                  className="bg-primary hover:bg-[#008810] text-white font-bold text-xs sm:text-sm px-6 py-3 rounded-2xl shadow-lg shadow-primary/20 transition-all flex items-center gap-2 cursor-pointer"
-                >
-                  <Plus size={18} />
-                  Mulai Chat Baru Sekarang
-                </button>
+                <div className="flex flex-wrap items-center justify-center gap-3">
+                  <button
+                    type="button"
+                    onClick={handleOpenNewChatModal}
+                    className="bg-primary hover:bg-[#008810] text-white font-bold text-xs sm:text-sm px-6 py-3 rounded-2xl shadow-lg shadow-primary/20 transition-all flex items-center gap-2 cursor-pointer"
+                  >
+                    <Plus size={18} />
+                    Mulai Chat Baru Sekarang
+                  </button>
+                  <Link
+                    href={backTarget}
+                    className="bg-white hover:bg-gray-100 text-gray-700 font-bold text-xs sm:text-sm px-5 py-3 rounded-2xl border border-gray-200 transition-all flex items-center gap-2 shadow-2xs"
+                  >
+                    <ArrowLeft size={18} />
+                    {backLabel}
+                  </Link>
+                </div>
               </div>
             )}
           </div>
