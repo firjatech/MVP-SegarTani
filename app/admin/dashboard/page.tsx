@@ -70,13 +70,13 @@ export default function SellerDashboardPage() {
         // Fetch orders
         const { data: ordersData, count: orderCount } = await supabase
           .from('orders')
-          .select('id, total_amount, status', { count: 'exact' });
+          .select('id, total_price, status', { count: 'exact' });
 
         let salesSum = 0;
         let pendingCount = 0;
         if (ordersData) {
-          salesSum = ordersData.reduce((acc, o) => acc + (Number(o.total_amount) || 0), 0);
-          pendingCount = ordersData.filter(o => o.status === 'pending' || o.status === 'paid').length;
+          salesSum = ordersData.reduce((acc, o) => acc + (Number(o.total_price) || 0), 0);
+          pendingCount = ordersData.filter(o => o.status === 'pending' || o.status === 'processing').length;
         }
 
         setStats({

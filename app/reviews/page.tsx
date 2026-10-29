@@ -124,7 +124,10 @@ export default function BuyerReviewsPage() {
           const reviewedProductIds = new Set((reviewsData || []).map((r: { product_id: number }) => r.product_id));
           const pending: PendingItem[] = [];
 
-          ordersData.forEach((order: { id: string; created_at: string; order_items?: Array<{ product_id: number; product_name: string; price_at_purchase: number; image_url: string }> }) => {
+          ordersData.forEach((order: { id: string; created_at: string; status?: string; order_items?: Array<{ product_id: number; product_name: string; price_at_purchase: number; image_url: string }> }) => {
+            // Hanya pesanan yang sudah completed yang bisa diulas
+            if (order.status?.toLowerCase() !== 'completed') return;
+
             if (order.order_items) {
               order.order_items.forEach(item => {
                 if (item.product_id && !reviewedProductIds.has(item.product_id)) {

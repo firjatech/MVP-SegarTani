@@ -772,6 +772,11 @@ export default function Navbar() {
                           {item.badge && (
                             <span className="text-[9px] font-black bg-white/10 text-white/60 px-2 py-0.5 rounded-full">{item.badge}</span>
                           )}
+                          {typeof item.badgeCount === 'number' && item.badgeCount > 0 && (
+                            <span className="text-[10px] font-black bg-red-500 text-white px-2 py-0.5 rounded-full shadow-sm">
+                              {item.badgeCount > 99 ? '99+' : item.badgeCount}
+                            </span>
+                          )}
                         </Link>
                       );
                     })}

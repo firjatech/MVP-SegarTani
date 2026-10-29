@@ -180,6 +180,7 @@ export default function OrderDetailPage() {
   const subtotal = order.order_items.reduce(
     (sum, item) => sum + item.price_at_purchase * item.quantity, 0
   );
+  const calculatedShipping = Math.max(0, order.total_price - (subtotal - (order.discount_amount || 0)));
 
   return (
     <div className="bg-gray-50 min-h-screen pt-16 pb-20 font-sans">
@@ -374,7 +375,7 @@ export default function OrderDetailPage() {
                   </div>
                   <div className="flex justify-between text-sm">
                     <span className="font-bold text-gray-400">Biaya Pengiriman</span>
-                    <span className="font-black text-primary">GRATIS</span>
+                    <span className="font-black text-primary">{calculatedShipping > 0 ? formatIDR(calculatedShipping) : 'GRATIS'}</span>
                   </div>
                   {order.voucher_code && (
                     <div className="flex justify-between text-sm">
@@ -391,7 +392,7 @@ export default function OrderDetailPage() {
 
                 <div className="mt-8 p-4 bg-gray-50 rounded-2xl border border-gray-100">
                   <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Metode Pembayaran</p>
-                  <p className="text-sm font-black text-gray-900">COD / WhatsApp</p>
+                  <p className="text-sm font-black text-gray-900">{order.status === 'processing' || order.status === 'completed' ? 'Saldo SegarPay / Lunas' : 'COD / Transfer Bank / QRIS'}</p>
                 </div>
 
                 <Link
