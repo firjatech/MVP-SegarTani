@@ -64,18 +64,21 @@ export default function SellerReviewsPage() {
           setStoreName(storeData.store_name);
         }
 
-        // Fetch reviews for products belonging to this seller
-        // Using products!inner join to filter by seller_id
-        const { data: sellerReviewsData, error: reviewsErr } = await supabase
+        // Fetch reviews for products belonging to this seller (including official/catalog products)
+        const { data: allReviewsData, error: reviewsErr } = await supabase
           .from('reviews')
-          .select('*, products!inner(id, name, image, price, seller_id)')
-          .eq('products.seller_id', user.id)
+          .select('*, products(id, name, image, price, seller_id)')
           .order('created_at', { ascending: false });
 
         if (reviewsErr) {
           console.error('Error fetching seller reviews:', reviewsErr);
-        } else if (!ignore) {
-          setReviews((sellerReviewsData as unknown as SellerReview[]) || []);
+        } else if (!ignore && allReviewsData) {
+          // Tampilkan ulasan untuk produk toko ini atau produk resmi (seller_id null)
+          const filtered = (allReviewsData as unknown as SellerReview[]).filter((r) => {
+            const prodSellerId = r.products?.seller_id;
+            return prodSellerId === user.id || !prodSellerId;
+          });
+          setReviews(filtered);
         }
       } catch (err) {
         console.error('Unexpected error loading seller reviews:', err);
