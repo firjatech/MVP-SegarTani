@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import { Search, Star, ShoppingCart, ChevronDown, ArrowRight } from 'lucide-react';
 import Image from 'next/image';
+import { cleanImageUrl } from '@/lib/image';
 
 // Data Katalog Bahan Masakan SegarTani (Static Data untuk Demo Berkualitas)
 const products = [
@@ -31,7 +32,7 @@ const products = [
   { id: 14, name: "Bawang Putih", category: "Bumbu Masak", price: 30000, discount: 0, rating: 4.5, image: "https://down-id.img.susercontent.com/file/eaf0edba07a24a79e3de6b668a39aaf3" },
   { id: 15, name: "Cabai Merah Keriting", category: "Bumbu Masak", price: 45000, discount: 20, rating: 4.7, image: "https://image.astronauts.cloud/product-images/2024/5/1CoverCabeMerahKeriting_64c962aa-74c6-4242-a0d9-a4800850560c_900x900.png" },
   { id: 16, name: "Jahe", category: "Bumbu Masak", price: 22000, discount: 0, rating: 4.6, image: "https://image.astronauts.cloud/product-images/2024/5/1Cover_ded25d79-1793-43d8-a703-a8595ac4b3a5_900x900.jpg" },
-  { id: 17, name: "Kunyit", category: "Bumbu Masak", price: 15000, discount: 0, rating: 4.5, image: "https://desagrogol.gunungkidulkab.go.id/assets/files/artikel/sedang_1724401291KUNYIT.jpg" },
+  { id: 17, name: "Kunyit", category: "Bumbu Masak", price: 15000, discount: 0, rating: 4.5, image: "/images/kunyit.jpg" },
   { id: 18, name: "Lengkuas", category: "Bumbu Masak", price: 12000, discount: 0, rating: 4.7, image: "https://image.astronauts.cloud/product-images/2025/4/1Cover620f070ad9e4d441239ff305bad8ca1036900x900_915c9b4e-ebaf-48fb-86c8-15b5670d27fa_900x900.png" },
   { id: 19, name: "Tomat Merah", category: "Sayuran", price: 10000, discount: 5, rating: 4.7, image: "https://image.astronauts.cloud/product-images/2024/5/1Cover70_440135bb-63c8-43d8-b2ca-b4f2cbfdecf6_900x900.png" },
   { id: 20, name: "Semangka", category: "Buah", price: 30000, discount: 0, rating: 4.9, image: "https://image.astronauts.cloud/product-images/2025/12/semangkamerah1e2d514cbb12a4c29a3aae53d852f4171900x900_70acf90d-4f7b-48f6-86ce-736ae6b4e284_900x900.jpg" },
@@ -154,9 +155,10 @@ function ProductContent() {
                       </div>
                     )}
                     <Image
-                      src={product.image}
+                      src={cleanImageUrl(product.image)}
                       alt={product.name}
                       fill
+                      unoptimized
                       className="object-cover group-hover:scale-110 transition-transform duration-700 ease-in-out"
                     />
                     <div className="absolute top-5 right-5">

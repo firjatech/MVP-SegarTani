@@ -13,6 +13,7 @@ import {
 export default function SellerDashboardPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [storeName, setStoreName] = useState('Toko Saya');
   const [logoUrl, setLogoUrl] = useState('');
   const [stats, setStats] = useState({
@@ -23,6 +24,12 @@ export default function SellerDashboardPage() {
   });
 
   useEffect(() => {
+    // Safety timeout: pastikan loading tidak stuck selamanya
+    const safetyTimer = setTimeout(() => {
+      setLoading(false);
+      setLoadError('Koneksi lambat. Coba refresh halaman.');
+    }, 8000);
+
     async function loadDashboardData() {
       try {
         const { data: { user } } = await supabase.auth.getUser();
@@ -31,12 +38,12 @@ export default function SellerDashboardPage() {
           return;
         }
 
-        // Verify seller profile
+        // Verify seller profile — pakai maybeSingle() agar tidak throw jika row belum ada
         const { data: profile } = await supabase
           .from('profiles')
           .select('is_admin, is_seller')
           .eq('id', user.id)
-          .single();
+          .maybeSingle();
 
         if (!profile?.is_admin && !profile?.is_seller) {
           router.push('/daftar-penjual');
@@ -80,12 +87,15 @@ export default function SellerDashboardPage() {
         });
       } catch (err) {
         console.error('Error loading seller dashboard:', err);
+        setLoadError('Terjadi kesalahan saat memuat dashboard.');
       } finally {
+        clearTimeout(safetyTimer);
         setLoading(false);
       }
     }
 
     loadDashboardData();
+    return () => clearTimeout(safetyTimer);
   }, [router]);
 
   if (loading) {
@@ -94,6 +104,26 @@ export default function SellerDashboardPage() {
         <div className="flex flex-col items-center gap-3">
           <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
           <p className="text-gray-500 font-bold text-sm">Memuat Dashboard Penjual...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (loadError) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="flex flex-col items-center gap-4 text-center p-6 max-w-sm">
+          <div className="w-14 h-14 bg-red-50 rounded-2xl flex items-center justify-center">
+            <TrendingUp size={28} className="text-red-400" />
+          </div>
+          <h2 className="text-lg font-black text-gray-800">Gagal Memuat Dashboard</h2>
+          <p className="text-sm text-gray-500 font-medium">{loadError}</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="px-6 py-3 bg-primary text-white rounded-2xl font-black text-sm shadow-md hover:bg-primary-dark transition-all cursor-pointer"
+          >
+            Refresh Halaman
+          </button>
         </div>
       </div>
     );

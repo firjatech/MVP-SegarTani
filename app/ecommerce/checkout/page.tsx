@@ -23,7 +23,11 @@ import {
   Lock,
   Sparkles,
   X,
-  FileText
+  FileText,
+  AlertTriangle,
+  AlertCircle,
+  Store,
+  Navigation,
 } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -38,13 +42,48 @@ const formatIDR = (amount: number) => {
   }).format(amount).replace(/\s/g, '');
 };
 
-const DEFAULT_ADDRESS = {
+import {
+  WAREHOUSE_CONFIG,
+  MAX_DELIVERY_DISTANCE,
+  calculateHaversineDistance,
+  calculateShippingFee,
+} from '@/lib/shipping';
+
+
+export interface ShippingAddressData {
+  full_name: string;
+  phone: string;
+  address: string;
+  city: string;
+  province: string;
+  postal_code: string;
+  distance: number; // dalam km — selalu dihitung dari koordinat
+  latitude: number;  // wajib ada
+  longitude: number; // wajib ada
+}
+
+// Koordinat nyata Dusun Klombeyan, Desa Muntung, Candiroto, Temanggung
+const DEFAULT_LAT = -7.217896;
+const DEFAULT_LNG = 110.109055;
+
+const DEFAULT_ADDRESS: ShippingAddressData = {
   full_name: 'Pelanggan SegarTani',
   phone: '081234567890',
-  address: 'Jl. Raya Oro-Oro Ombo No. 12',
-  city: 'Batu',
-  province: 'Jawa Timur',
-  postal_code: '65311',
+  address: 'Jl. Sibajag KM 01, Dusun Klombeyan, Desa Muntung',
+  city: 'Temanggung',
+  province: 'Jawa Tengah',
+  postal_code: '56257',
+  latitude: DEFAULT_LAT,
+  longitude: DEFAULT_LNG,
+  // Jarak dihitung sekali saat modul dimuat
+  distance: parseFloat(
+    calculateHaversineDistance(
+      WAREHOUSE_CONFIG.coordinates.lat,
+      WAREHOUSE_CONFIG.coordinates.lng,
+      DEFAULT_LAT,
+      DEFAULT_LNG,
+    ).toFixed(1)
+  ),
 };
 
 type PaymentMethod = 'cod' | 'transfer' | 'qris' | 'whatsapp';
@@ -103,6 +142,12 @@ export default function CheckoutPage() {
   const [isEditingAddress, setIsEditingAddress] = useState(false);
   const [tempAddress, setTempAddress] = useState(DEFAULT_ADDRESS);
 
+  // State modal koordinat
+  const [tempLat, setTempLat] = useState(String(DEFAULT_LAT));
+  const [tempLng, setTempLng] = useState(String(DEFAULT_LNG));
+  const [geoLoading, setGeoLoading] = useState(false);
+  const [geoError, setGeoError] = useState('');
+
   const [orderNotes, setOrderNotes] = useState('');
 
   const [voucherInput, setVoucherInput] = useState('');
@@ -112,7 +157,31 @@ export default function CheckoutPage() {
   const [copiedBank, setCopiedBank] = useState<string | null>(null);
 
   const selectedItems = cart.filter(item => item.selected);
-  const finalPrice = Math.max(0, totalPrice - discountAmount);
+
+  // Jarak selalu dihitung dari koordinat (bukan dari field bebas-ketik)
+  const hasValidCoords = (
+    shippingAddress.latitude != null &&
+    shippingAddress.longitude != null &&
+    !isNaN(shippingAddress.latitude) &&
+    !isNaN(shippingAddress.longitude) &&
+    shippingAddress.latitude >= -90 &&
+    shippingAddress.latitude <= 90 &&
+    shippingAddress.longitude >= -180 &&
+    shippingAddress.longitude <= 180
+  );
+  const distance = hasValidCoords
+    ? parseFloat(
+        calculateHaversineDistance(
+          WAREHOUSE_CONFIG.coordinates.lat,
+          WAREHOUSE_CONFIG.coordinates.lng,
+          shippingAddress.latitude,
+          shippingAddress.longitude,
+        ).toFixed(1)
+      )
+    : 0;
+  const isDistanceExceeded = hasValidCoords && distance > MAX_DELIVERY_DISTANCE;
+  const shippingFee = hasValidCoords ? calculateShippingFee(distance) : 0;
+  const finalPrice = Math.max(0, totalPrice - discountAmount) + (isDistanceExceeded || !hasValidCoords ? 0 : shippingFee);
 
   useEffect(() => {
     async function loadProfile() {
@@ -150,7 +219,39 @@ export default function CheckoutPage() {
 
   const handleSaveAddress = (e: React.FormEvent) => {
     e.preventDefault();
-    setShippingAddress(tempAddress);
+    setGeoError('');
+
+    const lat = parseFloat(tempLat);
+    const lng = parseFloat(tempLng);
+
+    if (!tempLat.trim() || !tempLng.trim() || isNaN(lat) || isNaN(lng)) {
+      setGeoError('Koordinat latitude dan longitude wajib diisi dengan angka yang valid.');
+      return;
+    }
+    if (lat < -90 || lat > 90) {
+      setGeoError('Latitude harus berada di antara -90 dan 90.');
+      return;
+    }
+    if (lng < -180 || lng > 180) {
+      setGeoError('Longitude harus berada di antara -180 dan 180.');
+      return;
+    }
+
+    const calculatedDistance = parseFloat(
+      calculateHaversineDistance(
+        WAREHOUSE_CONFIG.coordinates.lat,
+        WAREHOUSE_CONFIG.coordinates.lng,
+        lat,
+        lng,
+      ).toFixed(1)
+    );
+
+    setShippingAddress({
+      ...tempAddress,
+      latitude: lat,
+      longitude: lng,
+      distance: calculatedDistance,
+    });
     setIsEditingAddress(false);
   };
 
@@ -195,6 +296,16 @@ export default function CheckoutPage() {
     if (e) e.preventDefault();
     if (loading) return;
 
+    if (!hasValidCoords) {
+      alert('Koordinat lokasi pengiriman belum ditentukan atau tidak valid. Silakan klik "Ubah Alamat" untuk mengisi atau mendeteksi koordinat Anda.');
+      return;
+    }
+
+    if (isDistanceExceeded) {
+      alert(`Checkout diblokir: Alamat Anda (${distance} km) melebihi batas pengiriman maksimal ${MAX_DELIVERY_DISTANCE} km dari ${WAREHOUSE_CONFIG.name}.`);
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -214,9 +325,9 @@ export default function CheckoutPage() {
         }
       }
 
-      const fullAddressNote = orderNotes.trim()
-        ? `${shippingAddress.address} (Catatan: ${orderNotes.trim()})`
-        : shippingAddress.address;
+      const fullAddressNote = `${shippingAddress.address} [Jarak: ${distance} km, Ongkir: ${formatIDR(shippingFee)}]${
+        orderNotes.trim() ? ` (Catatan: ${orderNotes.trim()})` : ''
+      }`;
 
       const { data: orderData, error: orderError } = await supabase
         .from('orders')
@@ -385,6 +496,9 @@ export default function CheckoutPage() {
                   type="button"
                   onClick={() => {
                     setTempAddress(shippingAddress);
+                    setTempLat(shippingAddress.latitude != null ? String(shippingAddress.latitude) : '');
+                    setTempLng(shippingAddress.longitude != null ? String(shippingAddress.longitude) : '');
+                    setGeoError('');
                     setIsEditingAddress(true);
                   }}
                   className="inline-flex items-center gap-1.5 text-xs font-black text-primary hover:text-[#008810] px-3 py-1.5 rounded-xl hover:bg-primary/5 transition-colors cursor-pointer"
@@ -395,38 +509,168 @@ export default function CheckoutPage() {
               </div>
 
               {/* Address Preview Card */}
-              <div className="bg-gray-50/80 rounded-2xl p-4 sm:p-5 border border-gray-100 flex items-start gap-4">
-                <div className="p-2.5 bg-white text-primary rounded-xl shadow-xs shrink-0 border border-gray-100">
-                  <MapPin size={20} />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-1 flex-wrap">
-                    <span className="text-xs font-black text-primary bg-primary/10 px-2 py-0.5 rounded-md uppercase tracking-wider">
-                      Alamat Default
-                    </span>
-                    <span className="font-black text-gray-900 text-sm">{shippingAddress.full_name}</span>
-                    <span className="text-gray-400 text-xs font-medium">({shippingAddress.phone})</span>
+              <div className={`rounded-2xl p-4 sm:p-5 border transition-all ${
+                isDistanceExceeded
+                  ? 'bg-red-50/80 border-red-200'
+                  : 'bg-gray-50/80 border-gray-100'
+              }`}>
+                <div className="flex items-start gap-4">
+                  <div className={`p-2.5 rounded-xl shadow-xs shrink-0 border ${
+                    isDistanceExceeded
+                      ? 'bg-red-100 text-red-600 border-red-200'
+                      : 'bg-white text-primary border-gray-100'
+                  }`}>
+                    <MapPin size={20} />
                   </div>
-                  <p className="text-xs sm:text-sm text-gray-600 font-medium leading-relaxed mt-1">
-                    {shippingAddress.address}, {shippingAddress.city}, {shippingAddress.province} {shippingAddress.postal_code}
-                  </p>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-1 flex-wrap">
+                      <span className="text-xs font-black text-primary bg-primary/10 px-2 py-0.5 rounded-md uppercase tracking-wider">
+                        Alamat Pengiriman
+                      </span>
+                      <span className="font-black text-gray-900 text-sm">{shippingAddress.full_name}</span>
+                      <span className="text-gray-400 text-xs font-medium">({shippingAddress.phone})</span>
+                    </div>
+                    <p className="text-xs sm:text-sm text-gray-600 font-medium leading-relaxed mt-1">
+                      {shippingAddress.address}, {shippingAddress.city}, {shippingAddress.province} {shippingAddress.postal_code}
+                    </p>
+
+                    <div className="mt-3 flex items-center gap-2 flex-wrap">
+                      {!hasValidCoords ? (
+                        <span className="text-[11px] font-bold px-2.5 py-1 rounded-lg flex items-center gap-1.5 bg-amber-100 text-amber-800 border border-amber-200">
+                          <AlertTriangle size={13} />
+                          Koordinat belum ditentukan — klik &quot;Ubah Alamat&quot;
+                        </span>
+                      ) : (
+                        <>
+                          <span className={`text-[11px] font-bold px-2.5 py-1 rounded-lg flex items-center gap-1.5 ${
+                            isDistanceExceeded
+                              ? 'bg-red-100 text-red-700 border border-red-200'
+                              : 'bg-emerald-100 text-emerald-800 border border-emerald-200'
+                          }`}>
+                            <Truck size={13} />
+                            Jarak Pengiriman: <strong>{distance} km</strong> dari {WAREHOUSE_CONFIG.name}
+                          </span>
+
+                          {!isDistanceExceeded ? (
+                            <span className="text-[11px] font-bold text-gray-600 bg-white border border-gray-200 px-2.5 py-1 rounded-lg">
+                              Ongkir: <strong>{formatIDR(shippingFee)}</strong> (Rp5.000 + {distance} × Rp2.000/km)
+                            </span>
+                          ) : (
+                            <span className="text-[11px] font-black text-red-600 bg-red-100 px-2.5 py-1 rounded-lg">
+                              Melebihi Batas Maksimal {MAX_DELIVERY_DISTANCE} km
+                            </span>
+                          )}
+                        </>
+                      )}
+                    </div>
+                  </div>
                 </div>
+
+                {/* Banner Peringatan jika > 15 km */}
+                {isDistanceExceeded && (
+                  <div className="mt-3.5 p-3 bg-red-100/90 border border-red-300 rounded-xl text-red-800 text-xs flex items-start gap-2.5">
+                    <AlertTriangle size={18} className="text-red-600 shrink-0 mt-0.5" />
+                    <div>
+                      <p className="font-black text-red-900">Pengiriman Ditolak: Di Luar Jangkauan ({distance} km)</p>
+                      <p className="mt-0.5 text-[11px] leading-relaxed">
+                        Kurir SegarTani Express hanya melayani pengiriman maksimal <strong>{MAX_DELIVERY_DISTANCE} km</strong> dari {WAREHOUSE_CONFIG.name} demi menjaga kesegaran produk sayur & buah. Silakan ganti alamat pengiriman Anda ke lokasi dalam radius {MAX_DELIVERY_DISTANCE} km.
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                {/* Preset Tombol Uji Cepat Skenario Presisi (Inverse Haversine) */}
+                {/* Panel ini hanya tampil jika NEXT_PUBLIC_SHOW_TEST_PANEL=true — jangan hapus kode ini */}
+                {process.env.NEXT_PUBLIC_SHOW_TEST_PANEL === 'true' && (
+                <div className="mt-3 pt-3 border-t border-gray-200/70">
+                  <div className="flex items-center justify-between mb-1.5 flex-wrap gap-1">
+                    <span className="text-[10px] font-black uppercase tracking-wider text-gray-500">
+                      Titik Uji Presisi (Gudang: {WAREHOUSE_CONFIG.coordinates.lat}, {WAREHOUSE_CONFIG.coordinates.lng}):
+                    </span>
+                    <span className="text-[10px] text-gray-400">Toleransi &plusmn;0,05 km</span>
+                  </div>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5">
+                    {[
+                      { label: 'Uji 7,0 km • Rp19.000', km: 7.0, lat: -7.217896, lng: 110.109055, name: 'Candiroto Timur (7,0 km)' },
+                      { label: 'Uji 14,0 km • Rp33.000', km: 14.0, lat: -7.217882, lng: 110.172511, name: 'Area Temanggung (14,0 km)' },
+                      { label: 'Uji 14,9 km • Rp34.800', km: 14.9, lat: -7.217880, lng: 110.180669, name: 'Batas Radius (14,9 km)' },
+                      { label: 'Uji 15,1 km • Diblokir', km: 15.1, lat: -7.217880, lng: 110.182482, name: 'Luar Radius (15,1 km)' },
+                      { label: 'Uji 16,0 km • Diblokir', km: 16.0, lat: -7.217877, lng: 110.190641, name: 'Luar Radius (16,0 km)' },
+                      { label: 'Uji 22,0 km • Diblokir', km: 22.0, lat: -7.217857, lng: 110.245031, name: 'Luar Jangkauan (22,0 km)' },
+                      { label: 'Muntung (1,0 km • Nyata)', km: 1.0, lat: -7.213900, lng: 110.053600, name: 'Desa Muntung, Candiroto (1,0 km)' },
+                      { label: 'Kota Temanggung (18,2 km)', km: 18.2, lat: -7.315000, lng: 110.175000, name: 'Alun-alun Temanggung (18,2 km)' },
+                    ].map((preset) => {
+                      const isSelected = Math.abs(distance - preset.km) < 0.05;
+                      const isExceed = preset.km > MAX_DELIVERY_DISTANCE;
+                      return (
+                        <button
+                          key={preset.km}
+                          type="button"
+                          onClick={() => {
+                            const exactDistance = calculateHaversineDistance(
+                              WAREHOUSE_CONFIG.coordinates.lat,
+                              WAREHOUSE_CONFIG.coordinates.lng,
+                              preset.lat,
+                              preset.lng
+                            );
+                            const roundedDistance = parseFloat(exactDistance.toFixed(1));
+                            const updatedAddr = {
+                              ...shippingAddress,
+                              address: preset.name,
+                              city: 'Temanggung',
+                              province: 'Jawa Tengah',
+                              distance: roundedDistance,
+                              latitude: preset.lat,
+                              longitude: preset.lng,
+                            };
+                            setShippingAddress(updatedAddr);
+                            setTempAddress(updatedAddr);
+                          }}
+                          className={`text-[11px] font-bold px-2.5 py-1.5 rounded-xl transition-all cursor-pointer text-left truncate ${
+                            isSelected
+                              ? isExceed
+                                ? 'bg-red-600 text-white shadow-sm ring-2 ring-red-400'
+                                : 'bg-primary text-white shadow-sm ring-2 ring-primary/40'
+                              : isExceed
+                                ? 'bg-red-50 text-red-700 border border-red-200 hover:bg-red-100'
+                                : 'bg-white text-gray-700 border border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                          }`}
+                        >
+                          {preset.label}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+                )}
               </div>
 
               {/* Shipping Method Banner */}
               <div className="mt-4 pt-4 border-t border-gray-100 flex items-center justify-between text-xs">
                 <div className="flex items-center gap-2.5">
-                  <div className="p-1.5 rounded-lg bg-emerald-50 text-emerald-600">
+                  <div className={`p-1.5 rounded-lg ${
+                    isDistanceExceeded ? 'bg-red-50 text-red-600' : 'bg-emerald-50 text-emerald-600'
+                  }`}>
                     <Truck size={16} />
                   </div>
                   <div>
                     <p className="font-bold text-gray-800">SegarTani Express (1 Hari Tiba)</p>
-                    <p className="text-gray-400 text-[11px]">Dikemas khusus dengan ice gel higienis</p>
+                    <p className="text-gray-400 text-[11px]">
+                      {isDistanceExceeded
+                        ? `Alamat ${distance} km tidak dapat diproses`
+                        : `Jarak ${distance} km (Dasar Rp5.000 + Rp2.000/km)`}
+                    </p>
                   </div>
                 </div>
-                <span className="font-black text-emerald-600 uppercase tracking-wider bg-emerald-50 px-2 py-1 rounded-md">
-                  GRATIS
-                </span>
+                {isDistanceExceeded ? (
+                  <span className="font-black text-red-600 uppercase tracking-wider bg-red-50 px-2 py-1 rounded-md text-[11px]">
+                    DIBLOKIR (&gt;15 KM)
+                  </span>
+                ) : (
+                  <span className="font-black text-emerald-600 uppercase tracking-wider bg-emerald-50 px-2.5 py-1 rounded-md text-xs">
+                    {formatIDR(shippingFee)}
+                  </span>
+                )}
               </div>
             </div>
 
@@ -505,14 +749,14 @@ export default function CheckoutPage() {
                   >
                     <div className="flex items-center gap-2 text-gray-900 font-bold">
                       <Building2 size={16} className="text-primary" />
-                      <span>Nomor Rekening Resmi SegarTani Batu:</span>
+                      <span>Nomor Rekening Resmi SegarTani Temanggung:</span>
                     </div>
 
                     {/* BCA */}
                     <div className="bg-white p-3 rounded-xl border border-gray-200 flex items-center justify-between">
                       <div>
                         <p className="font-black text-gray-900">BCA: <span className="font-mono text-sm tracking-wider">1234567890</span></p>
-                        <p className="text-[11px] text-gray-400">a.n. SegarTani Batu Sejahtera</p>
+                        <p className="text-[11px] text-gray-400">a.n. SegarTani Temanggung Sejahtera</p>
                       </div>
                       <button
                         type="button"
@@ -528,7 +772,7 @@ export default function CheckoutPage() {
                     <div className="bg-white p-3 rounded-xl border border-gray-200 flex items-center justify-between">
                       <div>
                         <p className="font-black text-gray-900">Mandiri: <span className="font-mono text-sm tracking-wider">1400012345678</span></p>
-                        <p className="text-[11px] text-gray-400">a.n. SegarTani Batu Sejahtera</p>
+                        <p className="text-[11px] text-gray-400">a.n. SegarTani Temanggung Sejahtera</p>
                       </div>
                       <button
                         type="button"
@@ -648,9 +892,18 @@ export default function CheckoutPage() {
                   {selectedItems.map((item) => (
                     <div key={item.id} className="flex gap-3 items-center">
                       <div className="w-14 h-14 bg-gray-50 rounded-xl overflow-hidden shrink-0 border border-gray-100 relative">
-                        <Image src={item.image} alt={item.name} fill className="object-cover" sizes="56px" />
+                        <Image src={item.image} alt={item.name} fill unoptimized className="object-cover" sizes="56px" />
                       </div>
                       <div className="flex-1 min-w-0">
+                        <Link
+                          href={item.seller_id ? `/seller/${item.seller_id}` : '/seller/official'}
+                          target="_blank"
+                          className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-700 hover:text-emerald-900 hover:underline mb-0.5 w-fit"
+                          title="Buka profil penjual di tab baru"
+                        >
+                          <Store size={10} className="shrink-0" />
+                          <span className="truncate">{item.seller_name || 'SegarTani Official'}</span>
+                        </Link>
                         <h4 className="text-xs sm:text-sm font-bold text-gray-900 truncate">{item.name}</h4>
                         <p className="text-xs text-gray-400 mt-0.5">
                           {item.quantity} x {formatIDR(item.price)}
@@ -734,10 +987,21 @@ export default function CheckoutPage() {
                   </div>
 
                   <div className="flex justify-between items-center text-gray-500">
-                    <span>Biaya Pengiriman</span>
-                    <span className="font-black text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded">
-                      GRATIS
-                    </span>
+                    <div>
+                      <span>Biaya Pengiriman</span>
+                      <span className="text-[10px] text-gray-400 block font-normal">
+                        Jarak {distance} km (Dasar Rp5.000 + Rp2.000/km)
+                      </span>
+                    </div>
+                    {isDistanceExceeded ? (
+                      <span className="font-black text-red-600 bg-red-50 px-2 py-0.5 rounded text-[11px]">
+                        Di Luar Jangkauan (&gt;15 km)
+                      </span>
+                    ) : (
+                      <span className="font-black text-gray-900 bg-gray-50 px-2 py-0.5 rounded">
+                        {formatIDR(shippingFee)}
+                      </span>
+                    )}
                   </div>
 
                   {discountAmount > 0 && (
@@ -750,9 +1014,11 @@ export default function CheckoutPage() {
                   <div className="pt-3 border-t border-gray-200 flex justify-between items-baseline">
                     <div>
                       <span className="text-sm font-black text-gray-900">Total Pembayaran</span>
-                      <p className="text-[10px] text-gray-400">Termasuk pajak & pengemasan</p>
+                      <p className="text-[10px] text-gray-400">Termasuk ongkir, pajak & pengemasan</p>
                     </div>
-                    <span className="text-2xl font-black text-primary">
+                    <span className={`text-2xl font-black ${
+                      isDistanceExceeded ? 'text-gray-400 line-through' : 'text-primary'
+                    }`}>
                       {formatIDR(finalPrice)}
                     </span>
                   </div>
@@ -760,15 +1026,53 @@ export default function CheckoutPage() {
 
                 {/* Primary CTA Button: BAYAR SEKARANG */}
                 <div className="pt-6">
+                  {!hasValidCoords ? (
+                    <div className="mb-3.5 p-3.5 bg-amber-50 border border-amber-200 rounded-2xl text-amber-800 text-xs font-bold flex items-start gap-2.5">
+                      <AlertTriangle size={18} className="shrink-0 text-amber-600 mt-0.5" />
+                      <div>
+                        <p className="font-black text-amber-900">Koordinat Lokasi Belum Ditentukan</p>
+                        <p className="text-[11px] font-medium text-amber-700 mt-0.5">
+                          Silakan klik &quot;Ubah Alamat&quot; untuk mengisi atau mendeteksi koordinat lokasi pengiriman Anda.
+                        </p>
+                      </div>
+                    </div>
+                  ) : isDistanceExceeded ? (
+                    <div className="mb-3.5 p-3.5 bg-red-50 border border-red-200 rounded-2xl text-red-700 text-xs font-bold flex items-start gap-2.5">
+                      <AlertCircle size={18} className="shrink-0 text-red-600 mt-0.5" />
+                      <div>
+                        <p className="font-black text-red-800">Checkout Diblokir Sementara</p>
+                        <p className="text-[11px] font-medium text-red-600 mt-0.5">
+                          Jarak pengiriman Anda ({distance} km) melebihi batas operasional {MAX_DELIVERY_DISTANCE} km. Silakan pilih atau ubah alamat dalam radius {MAX_DELIVERY_DISTANCE} km dari {WAREHOUSE_CONFIG.name}.
+                        </p>
+                      </div>
+                    </div>
+                  ) : null}
+
                   <button
                     type="submit"
-                    disabled={loading}
-                    className="w-full bg-primary hover:bg-[#008810] disabled:bg-gray-300 text-white font-black py-4 px-6 rounded-2xl transition-all shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 flex items-center justify-center gap-2.5 text-base cursor-pointer disabled:cursor-not-allowed group active:scale-[0.99]"
+                    disabled={loading || isDistanceExceeded || !hasValidCoords}
+                    className={`w-full text-white font-black py-4 px-6 rounded-2xl transition-all shadow-lg flex items-center justify-center gap-2.5 text-base cursor-pointer disabled:cursor-not-allowed group active:scale-[0.99] ${
+                      !hasValidCoords
+                        ? 'bg-amber-500/80 hover:bg-amber-500 shadow-amber-200 cursor-not-allowed'
+                        : isDistanceExceeded
+                        ? 'bg-red-500/80 hover:bg-red-500 shadow-red-200 cursor-not-allowed'
+                        : 'bg-primary hover:bg-[#008810] disabled:bg-gray-300 shadow-primary/25 hover:shadow-xl hover:shadow-primary/30'
+                    }`}
                   >
                     {loading ? (
                       <>
                         <Loader2 size={20} className="animate-spin" />
                         <span>Sedang Memproses...</span>
+                      </>
+                    ) : !hasValidCoords ? (
+                      <>
+                        <AlertTriangle size={18} />
+                        <span>Tentukan Koordinat Pengiriman</span>
+                      </>
+                    ) : isDistanceExceeded ? (
+                      <>
+                        <AlertTriangle size={18} />
+                        <span>Checkout Diblokir (Jarak &gt; 15 km)</span>
                       </>
                     ) : (
                       <>
@@ -801,19 +1105,39 @@ export default function CheckoutPage() {
       <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-gray-200 px-4 py-3 z-40 shadow-2xl flex items-center justify-between gap-4">
         <div>
           <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block">Total Pembayaran</span>
-          <span className="text-lg font-black text-primary leading-tight">{formatIDR(finalPrice)}</span>
+          <span className={`text-lg font-black leading-tight ${
+            !hasValidCoords ? 'text-amber-600 text-xs' : isDistanceExceeded ? 'text-red-500 text-sm' : 'text-primary'
+          }`}>
+            {!hasValidCoords ? 'Koordinat Belum Ada' : isDistanceExceeded ? 'Di Luar Jangkauan' : formatIDR(finalPrice)}
+          </span>
         </div>
 
         <button
           type="button"
           onClick={() => handleSubmit()}
-          disabled={loading}
-          className="bg-primary hover:bg-[#008810] disabled:bg-gray-300 text-white px-6 py-3 rounded-xl font-black text-sm shadow-md shadow-primary/20 flex items-center gap-2 transition-transform active:scale-95 shrink-0 cursor-pointer"
+          disabled={loading || isDistanceExceeded || !hasValidCoords}
+          className={`px-6 py-3 rounded-xl font-black text-sm shadow-md flex items-center gap-2 transition-transform active:scale-95 shrink-0 cursor-pointer disabled:cursor-not-allowed ${
+            !hasValidCoords
+              ? 'bg-amber-500 text-white'
+              : isDistanceExceeded
+              ? 'bg-red-500 text-white'
+              : 'bg-primary hover:bg-[#008810] disabled:bg-gray-300 text-white shadow-primary/20'
+          }`}
         >
           {loading ? (
             <>
               <Loader2 size={16} className="animate-spin" />
               <span>Memproses...</span>
+            </>
+          ) : !hasValidCoords ? (
+            <>
+              <AlertTriangle size={15} />
+              <span>Isi Koordinat</span>
+            </>
+          ) : isDistanceExceeded ? (
+            <>
+              <AlertTriangle size={15} />
+              <span>Diblokir (&gt;15 km)</span>
             </>
           ) : (
             <>
@@ -914,6 +1238,129 @@ export default function CheckoutPage() {
                     onChange={(e) => setTempAddress({ ...tempAddress, province: e.target.value })}
                     className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 font-medium text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
                   />
+                </div>
+
+                {/* ── Koordinat & Jarak Otomatis ── */}
+                <div className="p-3.5 bg-gray-50 rounded-2xl border border-gray-200 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <label className="block font-bold text-gray-900 text-xs flex items-center gap-1.5">
+                      <MapPin size={13} className="text-primary" />
+                      Koordinat Lokasi Pengiriman
+                    </label>
+                    {/* Tombol Gunakan Lokasi Saya */}
+                    <button
+                      type="button"
+                      disabled={geoLoading}
+                      onClick={() => {
+                        if (!navigator.geolocation) {
+                          setGeoError('Browser Anda tidak mendukung geolocation.');
+                          return;
+                        }
+                        setGeoLoading(true);
+                        setGeoError('');
+                        navigator.geolocation.getCurrentPosition(
+                          (pos) => {
+                            setTempLat(String(pos.coords.latitude));
+                            setTempLng(String(pos.coords.longitude));
+                            setGeoLoading(false);
+                          },
+                          () => {
+                            setGeoError('Tidak dapat mengakses lokasi. Pastikan izin lokasi diaktifkan.');
+                            setGeoLoading(false);
+                          },
+                          { enableHighAccuracy: true, timeout: 10000 }
+                        );
+                      }}
+                      className="inline-flex items-center gap-1.5 text-[11px] font-black text-primary hover:text-[#008810] bg-primary/10 hover:bg-primary/20 px-2.5 py-1.5 rounded-lg transition-colors cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
+                    >
+                      {geoLoading
+                        ? <Loader2 size={12} className="animate-spin" />
+                        : <Navigation size={12} />}
+                      {geoLoading ? 'Mendeteksi...' : 'Gunakan lokasi saya'}
+                    </button>
+                  </div>
+
+                  {/* Input Lat / Lng */}
+                  <div className="grid grid-cols-2 gap-2">
+                    <div>
+                      <label className="block text-[10px] font-bold text-gray-600 mb-1">
+                        Latitude
+                      </label>
+                      <input
+                        type="number"
+                        step="any"
+                        placeholder="contoh: -7.2178"
+                        value={tempLat}
+                        onChange={(e) => { setTempLat(e.target.value); setGeoError(''); }}
+                        className="w-full bg-white border border-gray-200 rounded-xl px-3 py-2 text-xs font-medium text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary placeholder-gray-300"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-bold text-gray-600 mb-1">
+                        Longitude
+                      </label>
+                      <input
+                        type="number"
+                        step="any"
+                        placeholder="contoh: 110.1090"
+                        value={tempLng}
+                        onChange={(e) => { setTempLng(e.target.value); setGeoError(''); }}
+                        className="w-full bg-white border border-gray-200 rounded-xl px-3 py-2 text-xs font-medium text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary placeholder-gray-300"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Petunjuk salin dari Google Maps */}
+                  <p className="text-[10px] text-gray-400 leading-relaxed">
+                    💡 Cara mudah: buka <strong className="text-gray-600">Google Maps</strong>, klik kanan pada lokasi rumah Anda, lalu salin koordinat (angka pertama = Latitude, angka kedua = Longitude).
+                  </p>
+
+                  {/* Jarak Hasil Haversine — read-only */}
+                  {(() => {
+                    const lat = parseFloat(tempLat);
+                    const lng = parseFloat(tempLng);
+                    const valid = tempLat.trim() !== '' && tempLng.trim() !== '' && !isNaN(lat) && !isNaN(lng)
+                      && lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180;
+                    if (!valid) return null;
+                    const d = parseFloat(
+                      calculateHaversineDistance(
+                        WAREHOUSE_CONFIG.coordinates.lat,
+                        WAREHOUSE_CONFIG.coordinates.lng,
+                        lat, lng,
+                      ).toFixed(1)
+                    );
+                    const exceeded = d > MAX_DELIVERY_DISTANCE;
+                    return (
+                      <div className={`flex items-center justify-between rounded-xl px-3 py-2 border text-xs font-bold ${
+                        exceeded
+                          ? 'bg-red-50 border-red-200 text-red-700'
+                          : 'bg-emerald-50 border-emerald-200 text-emerald-800'
+                      }`}>
+                        <span className="flex items-center gap-1.5">
+                          <Truck size={13} />
+                          Jarak ke Gudang
+                        </span>
+                        <span>
+                          {d} km — {exceeded
+                            ? `Di Luar Jangkauan (maks. ${MAX_DELIVERY_DISTANCE} km)`
+                            : `Ongkir ${formatIDR(calculateShippingFee(d))}`}
+                        </span>
+                      </div>
+                    );
+                  })()}
+
+                  {/* Error geolocation / validasi */}
+                  {geoError && (
+                    <p className="text-[11px] font-semibold text-red-600 flex items-start gap-1.5">
+                      <AlertTriangle size={13} className="shrink-0 mt-0.5" />
+                      {geoError}
+                    </p>
+                  )}
+
+                  {/* Info koordinat gudang */}
+                  <div className="text-[10px] text-gray-400 bg-white p-2 rounded-xl border border-gray-100">
+                    📍 Gudang: {WAREHOUSE_CONFIG.name} ({WAREHOUSE_CONFIG.coordinates.lat}, {WAREHOUSE_CONFIG.coordinates.lng}) • Maks. {MAX_DELIVERY_DISTANCE} km
+                  </div>
                 </div>
 
                 <div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-100">

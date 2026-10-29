@@ -10,6 +10,8 @@ export interface CartItem {
   quantity: number;
   category: string;
   selected: boolean;
+  seller_id?: string | null;
+  seller_name?: string | null;
 }
 
 export interface Voucher {

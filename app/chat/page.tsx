@@ -188,38 +188,46 @@ function ChatPageContent() {
   // 1. Initial auth check & role detection
   useEffect(() => {
     async function initUser() {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        router.push('/login?redirect=/chat');
-        return;
-      }
-      setCurrentUserId(user.id);
-
       try {
-        const storedRole = localStorage.getItem('segar-tani-role');
-        if (storedRole === 'seller') {
-          setIsCurrentUserSeller(true);
-        } else if (storedRole === 'buyer') {
-          setIsCurrentUserSeller(false);
-        } else {
-          const { data: profile } = await supabase
-            .from('profiles')
-            .select('is_seller, is_admin')
-            .eq('id', user.id)
-            .maybeSingle();
-
-          const { data: storeProfile } = await supabase
-            .from('store_profiles')
-            .select('id')
-            .eq('id', user.id)
-            .maybeSingle();
-
-          if (profile?.is_seller || profile?.is_admin || storeProfile) {
-            setIsCurrentUserSeller(true);
-          }
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) {
+          router.push('/login?redirect=/chat');
+          setLoading(false);
+          return;
         }
+        setCurrentUserId(user.id);
+
+        try {
+          const storedRole = localStorage.getItem('segar-tani-role');
+          if (storedRole === 'seller') {
+            setIsCurrentUserSeller(true);
+          } else if (storedRole === 'buyer') {
+            setIsCurrentUserSeller(false);
+          } else {
+            const { data: profile } = await supabase
+              .from('profiles')
+              .select('is_seller, is_admin')
+              .eq('id', user.id)
+              .maybeSingle();
+
+            const { data: storeProfile } = await supabase
+              .from('store_profiles')
+              .select('id')
+              .eq('id', user.id)
+              .maybeSingle();
+
+            if (profile?.is_seller || profile?.is_admin || storeProfile) {
+              setIsCurrentUserSeller(true);
+            }
+          }
+        } catch (err) {
+          console.error('Error checking seller role:', err);
+        }
+        // Note: setLoading(false) is handled inside fetchChatRooms which is
+        // triggered reactively when currentUserId is set above.
       } catch (err) {
-        console.error('Error checking seller role:', err);
+        console.error('Error during auth check:', err);
+        setLoading(false);
       }
     }
     initUser();

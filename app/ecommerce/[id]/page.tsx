@@ -17,10 +17,13 @@ import {
 	Heart,
 	MessageSquare,
 	Send,
+	Store,
+	ArrowRight,
 } from "lucide-react";
 import Image from "next/image";
 import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
+import { cleanImageUrl } from "@/lib/image";
 
 interface Product {
 	id: number;
@@ -33,6 +36,8 @@ interface Product {
 	description: string;
 	stock: number;
 	seller_id: string;
+	seller_name?: string | null;
+	seller_city?: string | null;
 }
 
 interface Review {
@@ -79,7 +84,27 @@ export default function ProductDetailPage() {
 					.single();
 
 				if (error) throw error;
-				setProduct(data);
+				if (data) {
+					let sellerName = 'SegarTani Official';
+					let sellerCity = 'Kantor Pusat';
+					if (data.seller_id) {
+						const { data: storeData } = await supabase
+							.from("store_profiles")
+							.select("store_name, store_city")
+							.eq("id", data.seller_id)
+							.single();
+						if (storeData?.store_name) {
+							sellerName = storeData.store_name;
+							sellerCity = storeData.store_city || 'Indonesia';
+						}
+					}
+					setProduct({
+						...data,
+						image: cleanImageUrl(data.image),
+						seller_name: sellerName,
+						seller_city: sellerCity
+					});
+				}
 			} catch (err) {
 				console.error("Error fetching product:", err);
 			} finally {
@@ -225,9 +250,10 @@ export default function ProductDetailPage() {
 								)}
 
 								<Image
-									src={product.image}
+									src={cleanImageUrl(product.image)}
 									alt={product.name}
 									fill
+									unoptimized
 									className={`object-contain transition-transform duration-500 ${isOutOfStock ? "opacity-50" : "hover:scale-105"}`}
 								/>
 							</div>
@@ -251,6 +277,22 @@ export default function ProductDetailPage() {
 									Stok: {product.stock} pcs
 								</span>
 							</div>
+
+							{/* Informasi Toko / Penjual */}
+							<Link
+								href={product.seller_id ? `/seller/${product.seller_id}` : '/seller/official'}
+								className="inline-flex items-center gap-2 text-xs text-emerald-800 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200/70 px-3.5 py-1.5 rounded-xl w-fit mb-3 font-bold transition-all group/badge cursor-pointer"
+								title="Klik untuk lihat profil toko penjual"
+							>
+								<Store size={14} className="text-emerald-600 group-hover/badge:scale-110 transition-transform" />
+								<span className="group-hover/badge:underline decoration-emerald-500 underline-offset-2">
+									Toko: {product.seller_name || 'SegarTani Official'}
+								</span>
+								{product.seller_city && (
+									<span className="text-emerald-600/70 font-medium text-[11px]">• {product.seller_city}</span>
+								)}
+								<ArrowRight size={12} className="text-emerald-500 opacity-60 group-hover/badge:opacity-100 group-hover/badge:translate-x-0.5 transition-all ml-0.5" />
+							</Link>
 
 							<h1 className="text-4xl md:text-5xl font-black text-gray-900 mb-4 leading-tight">
 								{product.name}
@@ -325,6 +367,8 @@ export default function ProductDetailPage() {
 											image: product.image,
 											quantity: quantity,
 											category: product.category,
+											seller_id: product.seller_id,
+											seller_name: product.seller_name || 'SegarTani Official',
 										})
 									}
 									className={`flex-1 font-black py-5 rounded-2xl transition-all shadow-xl flex items-center justify-center gap-3 text-lg active:scale-95 ${

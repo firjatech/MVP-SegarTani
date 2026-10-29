@@ -66,6 +66,7 @@ export default function BuyerReviewsPage() {
   const [submitting, setSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [successToast, setSuccessToast] = useState<string | null>(null);
+  const [loadError, setLoadError] = useState<string | null>(null);
 
   const [refreshKey, setRefreshKey] = useState(0);
 
@@ -77,11 +78,22 @@ export default function BuyerReviewsPage() {
   useEffect(() => {
     let ignore = false;
 
+    // Safety timeout: jika Supabase tidak merespons dalam 8 detik
+    const safetyTimer = setTimeout(() => {
+      if (!ignore) {
+        setLoading(false);
+        setLoadError('Koneksi lambat atau gagal. Coba refresh halaman.');
+      }
+    }, 8000);
+
     async function loadData() {
       try {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) {
-          if (!ignore) setLoading(false);
+        const { data: { user }, error: authError } = await supabase.auth.getUser();
+        if (authError || !user) {
+          if (!ignore) {
+            setLoading(false);
+            if (authError) setLoadError('Sesi Anda telah berakhir. Silakan login kembali.');
+          }
           return;
         }
 
@@ -135,7 +147,9 @@ export default function BuyerReviewsPage() {
         }
       } catch (err) {
         console.error('Unexpected error loading reviews:', err);
+        if (!ignore) setLoadError('Terjadi kesalahan. Silakan coba lagi.');
       } finally {
+        clearTimeout(safetyTimer);
         if (!ignore) {
           setLoading(false);
         }
@@ -146,6 +160,7 @@ export default function BuyerReviewsPage() {
 
     return () => {
       ignore = true;
+      clearTimeout(safetyTimer);
     };
   }, [refreshKey]);
 
@@ -252,6 +267,24 @@ export default function BuyerReviewsPage() {
         <div className="flex flex-col items-center gap-3">
           <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
           <p className="text-gray-500 font-bold text-sm">Memuat Ulasan Anda...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (loadError) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center font-sans">
+        <div className="flex flex-col items-center gap-4 text-center p-6 max-w-sm">
+          <AlertCircle size={48} className="text-red-400" />
+          <h2 className="text-lg font-black text-gray-800">Gagal Memuat Ulasan</h2>
+          <p className="text-sm text-gray-500 font-medium">{loadError}</p>
+          <button
+            onClick={() => { setLoadError(null); setLoading(true); setRefreshKey(k => k + 1); }}
+            className="px-6 py-3 bg-primary text-white rounded-2xl font-black text-sm shadow-md hover:bg-primary-dark transition-all cursor-pointer"
+          >
+            Coba Lagi
+          </button>
         </div>
       </div>
     );

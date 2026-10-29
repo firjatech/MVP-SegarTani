@@ -10,6 +10,7 @@ import {
 import Image from 'next/image';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
+import { cleanImageUrl } from '@/lib/image';
 
 type Product = {
   id: number;
@@ -64,7 +65,7 @@ function AdminProductsContent() {
       .order('created_at', { ascending: false });
 
     if (!error && data) {
-      setProducts(data);
+      setProducts(data.map(p => ({ ...p, image: cleanImageUrl(p.image) })));
     }
     setLoading(false);
   }, []);
@@ -126,18 +127,35 @@ function AdminProductsContent() {
     setError(null);
 
     const previousProducts = [...products];
-    const payload = { ...currentProduct, seller_id: userId };
+    const { id: targetId, ...productData } = currentProduct;
+
+    // Bersihkan payload agar tidak menyertakan kolom id (GENERATED ALWAYS AS IDENTITY)
+    const payload = {
+      name: productData.name,
+      category: productData.category,
+      price: Number(productData.price) || 0,
+      discount: Number(productData.discount) || 0,
+      stock: Number(productData.stock) || 0,
+      description: productData.description || '',
+      image: cleanImageUrl(productData.image || ''),
+      seller_id: currentProduct.seller_id || userId,
+    };
 
     try {
-      if (isEditing && currentProduct.id) {
+      if (isEditing && targetId) {
         // Optimistic UI for Update
-        setProducts(products.map(p => p.id === currentProduct.id ? { ...p, ...payload } as Product : p));
+        setProducts(products.map(p => p.id === targetId ? { ...p, ...payload, id: targetId } as Product : p));
         setIsModalOpen(false);
 
-        const { error } = await supabase.from('products').update(payload).eq('id', currentProduct.id);
+        const { data: updatedData, error } = await supabase.from('products').update(payload).eq('id', targetId).select();
         if (error) {
           setProducts(previousProducts);
           alert('Gagal mengupdate produk: ' + error.message);
+        } else if (!updatedData || updatedData.length === 0) {
+          setProducts(previousProducts);
+          alert('Gagal menyimpan: Perubahan tidak tersimpan di database. Pastikan produk ini milik akun toko Anda.');
+        } else {
+          setProducts(prev => prev.map(p => p.id === targetId ? { ...p, ...updatedData[0], image: cleanImageUrl(updatedData[0].image) } : p));
         }
       } else {
         const { data, error } = await supabase.from('products').insert([payload]).select().single();
@@ -266,7 +284,7 @@ function AdminProductsContent() {
                     {/* Image */}
                     <div className="relative aspect-square w-full bg-gray-100 overflow-hidden">
                       {p.image ? (
-                        <Image src={p.image} alt={p.name} fill className="object-cover group-hover:scale-105 transition-transform duration-500" />
+                        <Image src={cleanImageUrl(p.image)} alt={p.name} fill unoptimized className="object-cover group-hover:scale-105 transition-transform duration-500" />
                       ) : (
                         <div className="w-full h-full flex flex-col items-center justify-center text-gray-300">
                           <ImageIcon size={32} />
@@ -401,14 +419,31 @@ function AdminProductsContent() {
                       <div className="w-32 h-32 rounded-2xl bg-gray-50 border-2 border-dashed border-gray-200 overflow-hidden flex items-center justify-center shrink-0">
                         {currentProduct.image ? (
                           <div className="relative w-full h-full">
-                            <Image src={currentProduct.image} alt="Preview" fill className="object-cover" />
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img
+                              src={cleanImageUrl(currentProduct.image)}
+                              alt="Preview"
+                              className="w-full h-full object-cover"
+                              onError={(e) => {
+                                (e.target as HTMLElement).style.opacity = '0.3';
+                              }}
+                            />
                           </div>
                         ) : (
                           <ImageIcon size={32} className="text-gray-300" />
                         )}
                       </div>
                       <div className="flex-1 space-y-3">
-                        <input type="text" placeholder="URL Gambar..." value={currentProduct.image || ''} onChange={e => setCurrentProduct(p => ({ ...p, image: e.target.value }))} className={inputCls} />
+                        <input
+                          type="text"
+                          placeholder="URL Gambar (atau link gambar Google)..."
+                          value={currentProduct.image || ''}
+                          onChange={e => {
+                            const cleaned = cleanImageUrl(e.target.value);
+                            setCurrentProduct(p => ({ ...p, image: cleaned }));
+                          }}
+                          className={inputCls}
+                        />
                         <div className="flex gap-3">
                           <input type="file" accept="image/*" ref={fileInputRef} className="hidden" onChange={handleImageUpload} />
                           <button type="button" onClick={() => fileInputRef.current?.click()} disabled={uploading}

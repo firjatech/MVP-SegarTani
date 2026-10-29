@@ -4,6 +4,7 @@ import React from 'react';
 
 import { AnimatePresence, motion } from 'framer-motion';
 import {
+  ArrowLeftRight,
   Bell,
   CreditCard,
   Heart,
@@ -44,6 +45,7 @@ export default function Navbar() {
   const [user, setUser] = useState<User | null>(null);
   const [currentRole, setCurrentRole] = useState<'buyer' | 'seller'>('buyer');
   const [unreadChatCount, setUnreadChatCount] = useState(0);
+  const [profile, setProfile] = useState<{ full_name: string; is_seller: boolean; is_admin: boolean } | null>(null);
   const pathname = usePathname();
   const router = useRouter();
   const { setIsCartOpen, totalItems } = useCart();
@@ -109,12 +111,22 @@ export default function Navbar() {
   useEffect(() => {
     let currentUserId: string | null = null;
 
+    const loadProfile = async (userId: string) => {
+      const { data } = await supabase
+        .from('profiles')
+        .select('full_name, is_seller, is_admin')
+        .eq('id', userId)
+        .single();
+      if (data) setProfile(data);
+    };
+
     // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);
       if (session?.user) {
         currentUserId = session.user.id;
         fetchUnreadCount(session.user.id);
+        loadProfile(session.user.id);
       }
     });
 
@@ -124,9 +136,11 @@ export default function Navbar() {
       if (session?.user) {
         currentUserId = session.user.id;
         fetchUnreadCount(session.user.id);
+        loadProfile(session.user.id);
       } else {
         currentUserId = null;
         setUnreadChatCount(0);
+        setProfile(null);
       }
     });
 
@@ -166,6 +180,18 @@ export default function Navbar() {
     localStorage.removeItem('segar-tani-role');
     window.dispatchEvent(new Event('roleChange'));
     router.push('/login');
+  };
+
+  const handleSwitchMode = () => {
+    const newRole = isSeller ? 'buyer' : 'seller';
+    localStorage.setItem('segar-tani-role', newRole);
+    window.dispatchEvent(new Event('roleChange'));
+    setIsSidebarOpen(false);
+    if (newRole === 'seller') {
+      router.push('/admin/dashboard');
+    } else {
+      router.push('/ecommerce');
+    }
   };
 
   if (pathname === '/login' || pathname === '/register' || pathname === '/daftar-penjual') {
@@ -432,13 +458,17 @@ export default function Navbar() {
               animate={{ x: 0 }}
               exit={{ x: '-100%' }}
               transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-              className="fixed left-0 top-0 h-full w-64 bg-primary shadow-2xl z-70 flex flex-col"
+              className="fixed left-0 top-0 h-full w-72 bg-primary shadow-2xl z-70 flex flex-col"
             >
-              {/* Header - fixed */}
-              <div className="flex justify-between items-center px-6 pt-6 pb-4 shrink-0 border-b border-white/10">
+              {/* Header */}
+              <div className="flex justify-between items-center px-5 pt-5 pb-4 shrink-0">
                 <div className="flex items-center gap-2">
-                  <span className="text-white font-black text-lg">
-                    Menu
+                  <span className={`text-[10px] font-black px-2.5 py-1 rounded-full ${
+                    isSeller
+                      ? 'bg-orange-400/20 text-orange-200 border border-orange-300/30'
+                      : 'bg-white/10 text-white/70 border border-white/20'
+                  }`}>
+                    {isSeller ? '🏪 Mode Penjual' : '🛍️ Mode Pembeli'}
                   </span>
                 </div>
                 <button
@@ -449,9 +479,44 @@ export default function Navbar() {
                   <X size={20} />
                 </button>
               </div>
+
+              {/* Profile Card */}
+              {user && (
+                <div className="mx-4 mb-4 bg-white/10 rounded-2xl p-4 border border-white/10">
+                  <div className="flex items-center gap-3">
+                    <div className="w-11 h-11 rounded-full bg-white/20 flex items-center justify-center shrink-0">
+                      <UserIcon size={20} className="text-white" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-white font-black text-sm truncate">
+                        {profile?.full_name || 'Pengguna'}
+                      </p>
+                      <p className="text-white/50 text-[11px] truncate">{user.email}</p>
+                    </div>
+                  </div>
+                  {/* Switch Mode Button */}
+                  {(profile?.is_seller || profile?.is_admin) && (
+                    <button
+                      type="button"
+                      onClick={handleSwitchMode}
+                      className={`mt-3 w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-black transition-all ${
+                        isSeller
+                          ? 'bg-white text-primary hover:bg-gray-100'
+                          : 'bg-orange-400 text-white hover:bg-orange-500'
+                      }`}
+                    >
+                      <ArrowLeftRight size={15} />
+                      {isSeller ? 'Beralih ke Mode Pembeli' : 'Beralih ke Mode Penjual'}
+                    </button>
+                  )}
+                </div>
+              )}
+
+              {/* Divider */}
+              <div className="h-px bg-white/10 mx-4 mb-3" />
               {/* Sidebar Menu Items - scrollable */}
               <div
-                className="flex-1 overflow-y-auto no-scrollbar px-6 pb-6 space-y-1.5"
+                className="flex-1 overflow-y-auto no-scrollbar px-4 pb-6 space-y-1"
                 style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' } as React.CSSProperties}
               >
                 {/* ===== MENU PEMBELI (KHUSUS PEMBELI) ===== */}

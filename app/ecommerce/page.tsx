@@ -1,13 +1,14 @@
 'use client';
 
 import React, { useState, useEffect, useMemo } from 'react';
-import { Search, Star, ShoppingCart, ChevronDown } from 'lucide-react';
+import { Search, Star, ShoppingCart, ChevronDown, Store } from 'lucide-react';
 import Image from 'next/image';
 import { supabase } from '@/lib/supabase';
 import Link from 'next/link';
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import { useCart } from '@/context/CartContext';
 import WishlistButton from '@/components/WishlistButton';
+import { cleanImageUrl } from '@/lib/image';
 
 interface Product {
   id: number;
@@ -18,6 +19,9 @@ interface Product {
   rating: number;
   image: string;
   stock: number;
+  seller_id?: string | null;
+  seller_name?: string | null;
+  seller_city?: string | null;
 }
 
 const formatIDR = (amount: number) => {
@@ -64,24 +68,61 @@ function EcommerceContent() {
 
   const categories = ['Semua', 'Sayuran', 'Buah', 'Daging', 'Bumbu Masak'];
 
-  useEffect(() => {
-    async function fetchProducts() {
-      try {
-        const { data, error } = await supabase
-          .from('products')
-          .select('*')
-          .order('created_at', { ascending: false });
+  const doFetchProducts = async (
+    setter: (p: Product[]) => void,
+    loadSetter: (v: boolean) => void
+  ) => {
+    try {
+      const [{ data: productsData, error }, { data: storesData }] = await Promise.all([
+        supabase.from('products').select('*').order('created_at', { ascending: false }),
+        supabase.from('store_profiles').select('id, store_name, store_city')
+      ]);
 
-        if (error) throw error;
-        if (data) setProducts(data);
-      } catch (err) {
-        console.error('Error fetching products:', err);
-      } finally {
-        setLoading(false);
+      if (error) throw error;
+      if (productsData) {
+        const storeMap = new Map((storesData || []).map(s => [s.id, s]));
+        const mapped: Product[] = productsData.map(p => {
+          const store = p.seller_id ? storeMap.get(p.seller_id) : null;
+          return {
+            ...p,
+            image: cleanImageUrl(p.image),
+            seller_name: store?.store_name || 'SegarTani Official',
+            seller_city: store?.store_city || 'Kantor Pusat'
+          };
+        });
+        setter(mapped);
       }
+    } catch (err) {
+      console.error('Error fetching products:', err);
+    } finally {
+      loadSetter(false);
     }
+  };
 
-    fetchProducts();
+  useEffect(() => {
+    doFetchProducts(setProducts, setLoading);
+
+    // Realtime channel agar saat penjual edit produk, katalog pembeli otomatis update!
+    const channel = supabase
+      .channel('ecommerce-products-realtime')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'products' },
+        () => {
+          doFetchProducts(setProducts, setLoading);
+        }
+      )
+      .subscribe();
+
+    const handleFocus = () => {
+      doFetchProducts(setProducts, setLoading);
+    };
+    window.addEventListener('focus', handleFocus);
+
+    return () => {
+      supabase.removeChannel(channel);
+      window.removeEventListener('focus', handleFocus);
+    };
   }, []);
 
   // Filter Logic
@@ -194,9 +235,10 @@ function EcommerceContent() {
                       )}
 
                       <Image
-                        src={product.image}
+                        src={cleanImageUrl(product.image)}
                         alt={product.name}
                         fill
+                        unoptimized
                         className={`object-cover transition-transform duration-700 ease-in-out ${isOutOfStock ? '' : 'group-hover:scale-110'}`}
                       />
                       <div className="absolute top-5 right-5 flex flex-col items-end gap-2 z-10">
@@ -225,6 +267,23 @@ function EcommerceContent() {
                         </span>
                       </div>
 
+                      {/* Toko / Penjual */}
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          router.push(product.seller_id ? `/seller/${product.seller_id}` : '/seller/official');
+                        }}
+                        className="inline-flex items-center gap-1.5 text-xs text-emerald-800 hover:text-emerald-950 font-bold mb-1.5 group/seller text-left w-fit cursor-pointer"
+                        title="Klik untuk lihat profil penjual"
+                      >
+                        <Store size={12} className="shrink-0 text-emerald-600 group-hover/seller:scale-110 transition-transform" />
+                        <span className="truncate group-hover/seller:underline decoration-emerald-500 underline-offset-2">
+                          {product.seller_name || 'SegarTani Official'}
+                        </span>
+                      </button>
+
                       <h3 className="text-lg font-bold text-gray-900 leading-tight mb-4 group-hover:text-primary transition-colors line-clamp-2">
                         {product.name}
                       </h3>
@@ -252,7 +311,9 @@ function EcommerceContent() {
                               price: discountPrice,
                               image: product.image,
                               quantity: 1,
-                              category: product.category
+                              category: product.category,
+                              seller_id: product.seller_id,
+                              seller_name: product.seller_name || 'SegarTani Official'
                             });
                           }}
                           className={`p-3.5 rounded-2xl transition-all shadow-sm ${

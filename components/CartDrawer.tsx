@@ -2,10 +2,12 @@
 
 import React from 'react';
 import { useCart } from '@/context/CartContext';
-import { X, Minus, Plus, Trash2, ShoppingBag, ArrowRight, Check } from 'lucide-react';
+import { X, Minus, Plus, Trash2, ShoppingBag, ArrowRight, Check, Store } from 'lucide-react';
 import Image from 'next/image';
+import { cleanImageUrl } from '@/lib/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 const formatIDR = (amount: number) => {
   return new Intl.NumberFormat('id-ID', {
@@ -98,9 +100,22 @@ export default function CartDrawer() {
                     </button>
 
                     <div className="w-20 h-20 bg-gray-50 rounded-2xl overflow-hidden shrink-0 border border-gray-100 relative">
-                      <Image src={item.image} alt={item.name} fill className="object-cover" />
+                      <Image src={cleanImageUrl(item.image)} alt={item.name} fill unoptimized className="object-cover" />
                     </div>
-                    <div className="flex-1 flex flex-col justify-center">
+                    <div className="flex-1 flex flex-col justify-center min-w-0">
+                      {/* Informasi Penjual (Bisa diklik untuk ke profil penjual) */}
+                      <Link
+                        href={item.seller_id ? `/seller/${item.seller_id}` : '/seller/official'}
+                        onClick={() => setIsCartOpen(false)}
+                        className="inline-flex items-center gap-1.5 text-[11px] font-bold text-emerald-800 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200/70 px-2 py-0.5 rounded-md w-fit mb-1.5 transition-all group/badge cursor-pointer"
+                        title="Klik untuk lihat profil penjual"
+                      >
+                        <Store size={12} className="text-emerald-600 shrink-0 group-hover/badge:scale-110 transition-transform" />
+                        <span className="truncate max-w-[150px] group-hover/badge:underline decoration-emerald-500 underline-offset-2">
+                          {item.seller_name || 'SegarTani Official'}
+                        </span>
+                        <ArrowRight size={10} className="text-emerald-500 opacity-60 group-hover/badge:opacity-100 group-hover/badge:translate-x-0.5 transition-all" />
+                      </Link>
                       <div className="flex justify-between items-start mb-1">
                         <h3 className="font-bold text-gray-900 text-sm leading-tight line-clamp-1">{item.name}</h3>
                         <button 
