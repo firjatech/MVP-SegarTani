@@ -5,6 +5,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { CartProvider } from "@/context/CartContext";
 import { WishlistProvider } from "@/context/WishlistContext";
+import { NotificationProvider } from "@/context/NotificationContext";
 import CartDrawer from "@/components/CartDrawer";
 import AOSInit from "@/components/AOSInit";
 
@@ -35,17 +36,19 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col font-sans">
-        <CartProvider>
-          <WishlistProvider>
-            <Navbar />
-            <main className="flex-grow pt-20">
-              {children}
-            </main>
-            <Footer />
-            <CartDrawer />
-            <AOSInit />
-          </WishlistProvider>
-        </CartProvider>
+        <NotificationProvider>
+          <CartProvider>
+            <WishlistProvider>
+              <Navbar />
+              <main className="flex-grow pt-20">
+                {children}
+              </main>
+              <Footer />
+              <CartDrawer />
+              <AOSInit />
+            </WishlistProvider>
+          </CartProvider>
+        </NotificationProvider>
       </body>
     </html>
   );

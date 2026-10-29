@@ -30,6 +30,8 @@ import { useEffect, useState, useCallback } from 'react';
 
 import { useCart } from '@/context/CartContext';
 import { useWishlist } from '@/context/WishlistContext';
+import { useNotifications } from '@/context/NotificationContext';
+import NotificationDropdown from '@/components/NotificationDropdown';
 import { supabase } from '@/lib/supabase';
 import type { User } from '@supabase/supabase-js';
 
@@ -45,6 +47,8 @@ export default function Navbar() {
   const [user, setUser] = useState<User | null>(null);
   const [currentRole, setCurrentRole] = useState<'buyer' | 'seller'>('buyer');
   const [unreadChatCount, setUnreadChatCount] = useState(0);
+  const { unreadCount: unreadNotifCount } = useNotifications();
+  const [isNotifOpen, setIsNotifOpen] = useState(false);
   const [profile, setProfile] = useState<{ full_name: string; is_seller: boolean; is_admin: boolean } | null>(null);
   const pathname = usePathname();
   const router = useRouter();
@@ -312,14 +316,28 @@ export default function Navbar() {
           {/* Mobile Right Controls: Notifikasi, Chat & Cart (Cart hanya untuk pembeli) */}
           <div className="flex md:hidden items-center gap-2">
             {user && (
-              <button
-                type="button"
-                className="relative p-2 text-gray-700 bg-gray-50 rounded-full"
-                title="Notifikasi"
-              >
-                <Bell size={18} />
-                <span className="absolute top-1 right-1 w-1.5 h-1.5 bg-red-500 rounded-full"></span>
-              </button>
+              <div className="relative">
+                <button
+                  type="button"
+                  onClick={() => setIsNotifOpen((prev) => !prev)}
+                  className={`relative p-2 text-gray-700 rounded-full transition-colors ${
+                    isNotifOpen ? 'bg-primary/10 text-primary' : 'bg-gray-50'
+                  }`}
+                  title="Notifikasi"
+                >
+                  <Bell size={18} />
+                  {unreadNotifCount > 0 && (
+                    <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[9px] font-black w-4 h-4 flex items-center justify-center rounded-full">
+                      {unreadNotifCount > 9 ? '9+' : unreadNotifCount}
+                    </span>
+                  )}
+                </button>
+                <NotificationDropdown
+                  isOpen={isNotifOpen}
+                  onClose={() => setIsNotifOpen(false)}
+                  align="right"
+                />
+              </div>
             )}
 
             {user && (
@@ -370,14 +388,28 @@ export default function Navbar() {
 
             {/* Lonceng Notifikasi (Tersedia untuk pembeli & penjual) */}
             {user && (
-              <button
-                type="button"
-                className="relative p-2 text-gray-700 hover:text-primary transition-colors bg-gray-50 rounded-full cursor-pointer"
-                title="Notifikasi"
-              >
-                <Bell size={22} />
-                <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full"></span>
-              </button>
+              <div className="relative">
+                <button
+                  type="button"
+                  onClick={() => setIsNotifOpen((prev) => !prev)}
+                  className={`relative p-2 text-gray-700 hover:text-primary transition-colors rounded-full cursor-pointer ${
+                    isNotifOpen ? 'bg-primary/10 text-primary' : 'bg-gray-50'
+                  }`}
+                  title="Notifikasi"
+                >
+                  <Bell size={22} />
+                  {unreadNotifCount > 0 && (
+                    <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-black w-5 h-5 flex items-center justify-center rounded-full shadow-sm border-2 border-white animate-pulse">
+                      {unreadNotifCount > 9 ? '9+' : unreadNotifCount}
+                    </span>
+                  )}
+                </button>
+                <NotificationDropdown
+                  isOpen={isNotifOpen}
+                  onClose={() => setIsNotifOpen(false)}
+                  align="right"
+                />
+              </div>
             )}
 
             {/* Chat Button (Tersedia untuk pembeli & penjual) */}
@@ -668,12 +700,22 @@ export default function Navbar() {
 
                     {/* Notifikasi */}
                     <Link
-                      href="#"
+                      href="/notifications"
                       onClick={() => setIsSidebarOpen(false)}
-                      className="flex items-center justify-between p-3 rounded-xl transition-all font-bold text-sm text-white/90 hover:text-white hover:bg-white/10"
+                      className={`flex items-center justify-between p-3 rounded-xl transition-all font-bold text-sm ${
+                        pathname === '/notifications'
+                          ? 'bg-white text-primary shadow-lg'
+                          : 'text-white/90 hover:text-white hover:bg-white/10'
+                      }`}
                     >
                       <span className="flex items-center gap-3"><Bell size={18} /> Notifikasi</span>
-                      <span className="text-[9px] font-black bg-white/10 text-white/60 px-2 py-0.5 rounded-full">Segera</span>
+                      {unreadNotifCount > 0 ? (
+                        <span className="text-[10px] font-black bg-red-500 text-white px-2 py-0.5 rounded-full">
+                          {unreadNotifCount} baru
+                        </span>
+                      ) : (
+                        <span className="text-[10px] font-bold text-white/60">Lihat</span>
+                      )}
                     </Link>
                   </>
                 )}
@@ -697,6 +739,7 @@ export default function Navbar() {
                       { name: 'Produk', href: '/admin/products', icon: Package },
                       { name: 'Pesanan', href: '/admin/orders', icon: ShoppingBag },
                       { name: 'Chat', href: '/chat', icon: MessageSquare },
+                      { name: 'Notifikasi', href: '/notifications', icon: Bell, badgeCount: unreadNotifCount },
                       { name: 'Ulasan', href: '/admin/reviews', icon: Star },
                       { name: 'Saldo', href: '#', icon: Wallet, badge: 'Segera' },
                       { name: 'Promo', href: '#', icon: Tag, badge: 'Segera' },
