@@ -332,7 +332,7 @@ function LoginForm() {
               <p className="text-xs font-medium text-gray-500">
                 Belum punya akun?{' '}
                 <Link
-                  href={selectedRole === 'seller' ? '/daftar-penjual' : '/register'}
+                  href={selectedRole === 'seller' ? '/register?role=seller' : '/register?role=buyer'}
                   className={`font-black hover:underline ${selectedRole === 'seller' ? 'text-amber-700' : 'text-primary'}`}
                 >
                   Daftar
