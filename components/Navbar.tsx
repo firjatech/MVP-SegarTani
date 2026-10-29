@@ -511,15 +511,7 @@ export default function Navbar() {
             >
               {/* Header */}
               <div className="flex justify-between items-center px-5 pt-5 pb-4 shrink-0">
-                <div className="flex items-center gap-2">
-                  <span className={`text-[10px] font-black px-2.5 py-1 rounded-full ${
-                    isSeller
-                      ? 'bg-orange-400/20 text-orange-200 border border-orange-300/30'
-                      : 'bg-white/10 text-white/70 border border-white/20'
-                  }`}>
-                    {isSeller ? '🏪 Mode Penjual' : '🛍️ Mode Pembeli'}
-                  </span>
-                </div>
+                <span className="text-white font-black text-lg tracking-tight">SegarTani</span>
                 <button
                   type="button"
                   onClick={() => setIsSidebarOpen(false)}
