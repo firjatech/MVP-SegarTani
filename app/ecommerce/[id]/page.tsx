@@ -116,9 +116,14 @@ export default function ProductDetailPage() {
 			fetchProduct();
 			fetchReviews();
 
-			supabase.auth.getUser().then(({ data: { user } }) => {
-				setUser(user);
-			});
+			supabase.auth
+				.getUser()
+				.then(({ data }) => {
+					setUser(data?.user ?? null);
+				})
+				.catch(() => {
+					setUser(null);
+				});
 		}
 
 		async function fetchReviews() {

@@ -65,35 +65,40 @@ export default function ProfilePage() {
 
 	useEffect(() => {
 		async function loadProfile() {
-			const {
-				data: { user },
-			} = await supabase.auth.getUser();
-			if (!user) {
-				router.push("/login");
-				return;
-			}
-			setUserEmail(user.email || "");
+			try {
+				const { data: authData, error } = await supabase.auth.getUser();
+				const user = authData?.user;
+				if (error || !user) {
+					router.push("/login");
+					return;
+				}
+				setUserEmail(user.email || "");
 
-			const { data } = await supabase
-				.from("profiles")
-				.select("*")
-				.eq("id", user.id)
-				.single();
+				const { data: profileData } = await supabase
+					.from("profiles")
+					.select("*")
+					.eq("id", user.id)
+					.single();
 
-			if (data) {
-				setProfile({
-					full_name: data.full_name || "",
-					phone: data.phone || "",
-					address: data.address || "",
-					city: data.city || "",
-					province: data.province || "",
-					postal_code: data.postal_code || "",
-					is_admin: data.is_admin || false,
-					is_seller: data.is_seller || false,
-				});
-			}
+				if (profileData) {
+					setProfile({
+						full_name: profileData.full_name || "",
+						phone: profileData.phone || "",
+						address: profileData.address || "",
+						city: profileData.city || "",
+						province: profileData.province || "",
+						postal_code: profileData.postal_code || "",
+						is_admin: profileData.is_admin || false,
+						is_seller: profileData.is_seller || false,
+					});
+				}
+			} catch (err) {
+			console.error("Error loading profile:", err);
+			router.push("/login");
+		} finally {
 			setLoading(false);
 		}
+	}
 
 		loadProfile();
 	}, [router]);
@@ -104,10 +109,9 @@ export default function ProfilePage() {
 		setSuccess(false);
 
 		try {
-			const {
-				data: { user },
-			} = await supabase.auth.getUser();
-			if (!user) throw new Error("User tidak ditemukan");
+			const { data, error: userError } = await supabase.auth.getUser();
+			const user = data?.user;
+			if (userError || !user) throw new Error("User tidak ditemukan");
 
 			const { error } = await supabase.from("profiles").upsert({
 				id: user.id,

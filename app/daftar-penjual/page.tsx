@@ -27,13 +27,17 @@ export default function SellerRegisterPage() {
   const [session, setSession] = useState<Session | null>(null);
 
   React.useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session?.user) {
-        setSession(session);
-        setStep(2); // Langsung ke info toko jika sudah login
-        setEmail(session.user.email || '');
-      }
-    });
+    supabase.auth
+      .getSession()
+      .then(({ data }) => {
+        const session = data?.session;
+        if (session?.user) {
+          setSession(session);
+          setStep(2); // Langsung ke info toko jika sudah login
+          setEmail(session.user.email || '');
+        }
+      })
+      .catch(() => {});
   }, []);
 
   const handleRegister = async (e: React.FormEvent) => {

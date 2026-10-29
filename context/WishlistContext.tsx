@@ -32,7 +32,8 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
     async function loadWishlist() {
       setLoading(true);
       try {
-        const { data: { user } } = await supabase.auth.getUser();
+        const { data } = await supabase.auth.getUser();
+        const user = data?.user;
 
         if (user) {
           // Load from Supabase
@@ -102,7 +103,8 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
 
   const addToWishlist = async (item: WishlistItem) => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const { data } = await supabase.auth.getUser();
+      const user = data?.user;
 
       if (user) {
         const { error } = await supabase
@@ -125,7 +127,8 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
 
   const removeFromWishlist = async (id: number) => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const { data } = await supabase.auth.getUser();
+      const user = data?.user;
 
       if (user) {
         const { error } = await supabase

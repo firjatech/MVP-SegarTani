@@ -121,14 +121,30 @@ export default function Navbar() {
     };
 
     // Get initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user ?? null);
-      if (session?.user) {
-        currentUserId = session.user.id;
-        fetchUnreadCount(session.user.id);
-        loadProfile(session.user.id);
-      }
-    });
+    supabase.auth
+      .getSession()
+      .then(({ data, error }) => {
+        if (error) {
+          if (error.message?.toLowerCase().includes('refresh token')) {
+            supabase.auth.signOut({ scope: 'local' }).catch(() => {});
+          }
+          setUser(null);
+          return;
+        }
+        const session = data?.session;
+        setUser(session?.user ?? null);
+        if (session?.user) {
+          currentUserId = session.user.id;
+          fetchUnreadCount(session.user.id);
+          loadProfile(session.user.id);
+        }
+      })
+      .catch((err) => {
+        if (err?.message?.toLowerCase().includes('refresh token')) {
+          supabase.auth.signOut({ scope: 'local' }).catch(() => {});
+        }
+        setUser(null);
+      });
 
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
