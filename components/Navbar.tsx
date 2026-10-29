@@ -8,6 +8,7 @@ import {
   Bell,
   CreditCard,
   Heart,
+  HelpCircle,
   LayoutDashboard,
   LogOut,
   MapPin,
@@ -570,33 +571,10 @@ export default function Navbar() {
                 {/* ===== MENU PEMBELI (KHUSUS PEMBELI) ===== */}
                 {!isSeller && user && (
                   <>
-                    {/* Akun Saya */}
-                    <p className="text-[10px] font-black text-white/40 uppercase tracking-widest px-3 mb-2">Akun Saya</p>
-                    {[
-                      { name: 'Profil Saya', href: '/profile', icon: UserIcon },
-                      { name: 'Rekening / Metode Pembayaran', href: '#', icon: CreditCard, badge: 'Segera' },
-                    ].map(item => {
-                      const Icon = item.icon;
-                      const isActive = item.href !== '#' && pathname === item.href;
-                      return (
-                        <Link key={item.name} href={item.href} onClick={() => setIsSidebarOpen(false)}
-                          className={`flex items-center justify-between p-3 rounded-xl transition-all font-bold text-sm ${
-                            isActive ? 'bg-white text-primary shadow-lg' : 'text-white/90 hover:text-white hover:bg-white/10'
-                          }`}>
-                          <span className="flex items-center gap-3"><Icon size={18} /> {item.name}</span>
-                          {item.badge && (
-                            <span className="text-[9px] font-black bg-white/10 text-white/60 px-2 py-0.5 rounded-full">{item.badge}</span>
-                          )}
-                        </Link>
-                      );
-                    })}
-
-                    <div className="h-px bg-white/10 my-3" />
-
-                    {/* Menu Pembeli */}
-                    <p className="text-[10px] font-black text-white/40 uppercase tracking-widest px-3 mb-2">Menu Pembeli</p>
+                    {/* Aktivitas Belanja */}
+                    <p className="text-[10px] font-black text-white/40 uppercase tracking-widest px-3 mb-2">Belanja</p>
                     
-                    {/* Dashboard */}
+                    {/* Katalog Belanja */}
                     <Link
                       href="/ecommerce"
                       onClick={() => setIsSidebarOpen(false)}
@@ -604,8 +582,30 @@ export default function Navbar() {
                         pathname === '/ecommerce' ? 'bg-white text-primary shadow-lg' : 'text-white/90 hover:text-white hover:bg-white/10'
                       }`}
                     >
-                      <LayoutDashboard size={18} /> Dashboard
+                      <Store size={18} /> Katalog Belanja
                     </Link>
+
+                    {/* Keranjang Belanja */}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsSidebarOpen(false);
+                        setIsCartOpen(true);
+                      }}
+                      className="w-full flex items-center justify-between p-3 rounded-xl transition-all font-bold text-sm text-white/90 hover:text-white hover:bg-white/10 cursor-pointer text-left"
+                    >
+                      <span className="flex items-center gap-3"><ShoppingCart size={18} /> Keranjang Belanja</span>
+                      {totalItems > 0 && (
+                        <span className="bg-secondary text-white text-[10px] font-black min-w-[20px] h-5 px-1.5 flex items-center justify-center rounded-full">
+                          {totalItems}
+                        </span>
+                      )}
+                    </button>
+
+                    <div className="h-px bg-white/10 my-3" />
+
+                    {/* Transaksi Saya */}
+                    <p className="text-[10px] font-black text-white/40 uppercase tracking-widest px-3 mb-2">Transaksi Saya</p>
 
                     {/* Pesanan Saya */}
                     <Link
@@ -615,23 +615,23 @@ export default function Navbar() {
                         pathname === '/orders' ? 'bg-white text-primary shadow-lg' : 'text-white/90 hover:text-white hover:bg-white/10'
                       }`}
                     >
-                      <ShoppingBag size={18} /> Pesanan Saya
+                      <Package size={18} /> Pesanan Saya
                     </Link>
 
-                    {/* Chat */}
+                    {/* Voucher & Promo Saya */}
                     <Link
-                      href="/chat"
+                      href="/vouchers"
                       onClick={() => setIsSidebarOpen(false)}
                       className={`flex items-center justify-between p-3 rounded-xl transition-all font-bold text-sm ${
-                        pathname === '/chat' ? 'bg-white text-primary shadow-lg' : 'text-white/90 hover:text-white hover:bg-white/10'
+                        pathname === '/vouchers' || pathname === '/promo'
+                          ? 'bg-white text-primary shadow-lg'
+                          : 'text-white/90 hover:text-white hover:bg-white/10'
                       }`}
                     >
-                      <span className="flex items-center gap-3"><MessageSquare size={18} /> Chat</span>
-                      {unreadChatCount > 0 && (
-                        <span className="bg-red-500 text-white text-[10px] font-black min-w-[20px] h-5 px-1 flex items-center justify-center rounded-full">
-                          {unreadChatCount > 9 ? '9+' : unreadChatCount}
-                        </span>
-                      )}
+                      <span className="flex items-center gap-3"><Tag size={18} /> Voucher & Promo</span>
+                      <span className="text-[9px] font-black bg-secondary text-primary px-2 py-0.5 rounded-full shadow-sm">
+                        Klaim
+                      </span>
                     </Link>
 
                     {/* Ulasan Saya */}
@@ -644,6 +644,11 @@ export default function Navbar() {
                     >
                       <Star size={18} /> Ulasan Saya
                     </Link>
+
+                    <div className="h-px bg-white/10 my-3" />
+
+                    {/* Aktivitas & Favorit */}
+                    <p className="text-[10px] font-black text-white/40 uppercase tracking-widest px-3 mb-2">Aktivitas & Favorit</p>
 
                     {/* Favorit / Wishlist */}
                     <Link
@@ -661,47 +666,20 @@ export default function Navbar() {
                       )}
                     </Link>
 
-                    {/* Keranjang */}
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setIsSidebarOpen(false);
-                        setIsCartOpen(true);
-                      }}
-                      className="w-full flex items-center justify-between p-3 rounded-xl transition-all font-bold text-sm text-white/90 hover:text-white hover:bg-white/10 cursor-pointer text-left"
-                    >
-                      <span className="flex items-center gap-3"><ShoppingCart size={18} /> Keranjang</span>
-                      {totalItems > 0 && (
-                        <span className="bg-secondary text-white text-[10px] font-black min-w-[20px] h-5 px-1.5 flex items-center justify-center rounded-full">
-                          {totalItems}
-                        </span>
-                      )}
-                    </button>
-
-                    {/* Voucher & Promo Saya */}
+                    {/* Chat Penjual */}
                     <Link
-                      href="/vouchers"
+                      href="/chat"
                       onClick={() => setIsSidebarOpen(false)}
                       className={`flex items-center justify-between p-3 rounded-xl transition-all font-bold text-sm ${
-                        pathname === '/vouchers'
-                          ? 'bg-white text-primary shadow-lg'
-                          : 'text-white/90 hover:text-white hover:bg-white/10'
+                        pathname === '/chat' ? 'bg-white text-primary shadow-lg' : 'text-white/90 hover:text-white hover:bg-white/10'
                       }`}
                     >
-                      <span className="flex items-center gap-3"><Tag size={18} /> Voucher & Promo Saya</span>
-                      <span className="text-[9px] font-black bg-secondary text-primary px-2 py-0.5 rounded-full shadow-sm">
-                        Klaim
-                      </span>
-                    </Link>
-
-                    {/* Saldo / Dompet */}
-                    <Link
-                      href="#"
-                      onClick={() => setIsSidebarOpen(false)}
-                      className="flex items-center justify-between p-3 rounded-xl transition-all font-bold text-sm text-white/90 hover:text-white hover:bg-white/10"
-                    >
-                      <span className="flex items-center gap-3"><Wallet size={18} /> Saldo / Dompet</span>
-                      <span className="text-[9px] font-black bg-white/10 text-white/60 px-2 py-0.5 rounded-full">Segera</span>
+                      <span className="flex items-center gap-3"><MessageSquare size={18} /> Chat Penjual</span>
+                      {unreadChatCount > 0 && (
+                        <span className="bg-red-500 text-white text-[10px] font-black min-w-[20px] h-5 px-1 flex items-center justify-center rounded-full">
+                          {unreadChatCount > 9 ? '9+' : unreadChatCount}
+                        </span>
+                      )}
                     </Link>
 
                     {/* Notifikasi */}
@@ -722,6 +700,33 @@ export default function Navbar() {
                       ) : (
                         <span className="text-[10px] font-bold text-white/60">Lihat</span>
                       )}
+                    </Link>
+
+                    <div className="h-px bg-white/10 my-3" />
+
+                    {/* Akun & Bantuan */}
+                    <p className="text-[10px] font-black text-white/40 uppercase tracking-widest px-3 mb-2">Akun & Bantuan</p>
+
+                    {/* Profil Saya */}
+                    <Link
+                      href="/profile"
+                      onClick={() => setIsSidebarOpen(false)}
+                      className={`flex items-center gap-3 p-3 rounded-xl transition-all font-bold text-sm ${
+                        pathname === '/profile' ? 'bg-white text-primary shadow-lg' : 'text-white/90 hover:text-white hover:bg-white/10'
+                      }`}
+                    >
+                      <UserIcon size={18} /> Profil Saya
+                    </Link>
+
+                    {/* Pusat Bantuan */}
+                    <Link
+                      href="/contact"
+                      onClick={() => setIsSidebarOpen(false)}
+                      className={`flex items-center gap-3 p-3 rounded-xl transition-all font-bold text-sm ${
+                        pathname === '/contact' ? 'bg-white text-primary shadow-lg' : 'text-white/90 hover:text-white hover:bg-white/10'
+                      }`}
+                    >
+                      <HelpCircle size={18} /> Pusat Bantuan
                     </Link>
                   </>
                 )}
