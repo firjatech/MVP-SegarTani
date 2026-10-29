@@ -680,12 +680,18 @@ export default function Navbar() {
 
                     {/* Voucher & Promo Saya */}
                     <Link
-                      href="#"
+                      href="/vouchers"
                       onClick={() => setIsSidebarOpen(false)}
-                      className="flex items-center justify-between p-3 rounded-xl transition-all font-bold text-sm text-white/90 hover:text-white hover:bg-white/10"
+                      className={`flex items-center justify-between p-3 rounded-xl transition-all font-bold text-sm ${
+                        pathname === '/vouchers'
+                          ? 'bg-white text-primary shadow-lg'
+                          : 'text-white/90 hover:text-white hover:bg-white/10'
+                      }`}
                     >
                       <span className="flex items-center gap-3"><Tag size={18} /> Voucher & Promo Saya</span>
-                      <span className="text-[9px] font-black bg-white/10 text-white/60 px-2 py-0.5 rounded-full">Segera</span>
+                      <span className="text-[9px] font-black bg-secondary text-primary px-2 py-0.5 rounded-full shadow-sm">
+                        Klaim
+                      </span>
                     </Link>
 
                     {/* Saldo / Dompet */}
@@ -742,7 +748,7 @@ export default function Navbar() {
                       { name: 'Notifikasi', href: '/notifications', icon: Bell, badgeCount: unreadNotifCount },
                       { name: 'Ulasan', href: '/admin/reviews', icon: Star },
                       { name: 'Saldo', href: '#', icon: Wallet, badge: 'Segera' },
-                      { name: 'Promo', href: '#', icon: Tag, badge: 'Segera' },
+                      { name: 'Promo & Voucher', href: '/admin/promos', icon: Tag },
                     ].map((item) => {
                       const Icon = item.icon;
                       const isActive = pathname === item.href || (item.href !== '#' && pathname.startsWith(item.href));
