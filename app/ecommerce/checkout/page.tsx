@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useCart } from '@/context/CartContext';
+import { useWallet } from '@/context/WalletContext';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import {
@@ -27,6 +28,8 @@ import {
   AlertTriangle,
   AlertCircle,
   Store,
+  Wallet,
+  ExternalLink,
   Navigation,
 } from 'lucide-react';
 import Image from 'next/image';
@@ -86,7 +89,7 @@ const DEFAULT_ADDRESS: ShippingAddressData = {
   ),
 };
 
-type PaymentMethod = 'cod' | 'transfer' | 'qris' | 'whatsapp';
+type PaymentMethod = 'wallet' | 'cod' | 'transfer' | 'qris' | 'whatsapp';
 
 interface PaymentOption {
   id: PaymentMethod;
@@ -97,6 +100,13 @@ interface PaymentOption {
 }
 
 const PAYMENT_OPTIONS: PaymentOption[] = [
+  {
+    id: 'wallet',
+    title: 'Saldo SegarTani (SegarPay)',
+    subtitle: 'Bayar instan dengan saldo digital Anda tanpa perlu transfer.',
+    badge: '1-Klik Instan',
+    icon: Wallet,
+  },
   {
     id: 'cod',
     title: 'COD (Bayar di Tempat)',
@@ -131,6 +141,7 @@ export default function CheckoutPage() {
     cart, totalPrice, clearCart,
     appliedVoucher, applyVoucher, removeVoucher, discountAmount,
   } = useCart();
+  const { balance: walletBalance, payWithWallet } = useWallet();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [fetchingProfile, setFetchingProfile] = useState(true);
@@ -329,6 +340,12 @@ export default function CheckoutPage() {
         orderNotes.trim() ? ` (Catatan: ${orderNotes.trim()})` : ''
       }`;
 
+      if (paymentMethod === 'wallet' && walletBalance < finalPrice) {
+        alert(`Saldo SegarTani Anda (${formatIDR(walletBalance)}) tidak mencukupi untuk pembayaran ini (${formatIDR(finalPrice)}). Silakan isi saldo terlebih dahulu atau gunakan metode pembayaran lain.`);
+        setLoading(false);
+        return;
+      }
+
       const { data: orderData, error: orderError } = await supabase
         .from('orders')
         .insert({
@@ -340,7 +357,7 @@ export default function CheckoutPage() {
           province: shippingAddress.province,
           postal_code: shippingAddress.postal_code,
           total_price: finalPrice,
-          status: 'pending',
+          status: paymentMethod === 'wallet' ? 'processing' : 'pending',
           voucher_code: appliedVoucher?.code || null,
           discount_amount: discountAmount,
         })
@@ -370,6 +387,10 @@ export default function CheckoutPage() {
           p_qty: item.quantity,
         });
         if (decreaseError) console.error(`Gagal mengurangi stok ${item.name}:`, decreaseError);
+      }
+
+      if (paymentMethod === 'wallet') {
+        await payWithWallet(finalPrice, String(orderData.id));
       }
 
       setCreatedOrderId(orderData.id);
@@ -739,6 +760,48 @@ export default function CheckoutPage() {
 
               {/* Dynamic Payment Details */}
               <AnimatePresence mode="wait">
+                {paymentMethod === 'wallet' && (
+                  <motion.div
+                    key="wallet"
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    exit={{ opacity: 0, height: 0 }}
+                    className="mt-5 p-4 sm:p-5 rounded-2xl bg-emerald-50/80 border border-emerald-200 text-xs space-y-3"
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <Wallet size={18} className="text-primary" />
+                        <span className="font-bold text-gray-900">Saldo SegarPay Anda Saat Ini:</span>
+                      </div>
+                      <span className="text-base font-black text-emerald-800">{formatIDR(walletBalance)}</span>
+                    </div>
+
+                    {walletBalance >= finalPrice ? (
+                      <div className="flex items-center gap-2 p-3 bg-white rounded-xl border border-emerald-200 text-emerald-800 font-bold">
+                        <CheckCircle2 size={16} className="text-emerald-600 shrink-0" />
+                        <span>Saldo Anda mencukupi! Pesanan akan otomatis berstatus lunas setelah Anda klik tombol buat pesanan.</span>
+                      </div>
+                    ) : (
+                      <div className="p-3 bg-white rounded-xl border border-red-200 text-red-700 space-y-2">
+                        <div className="flex items-center gap-2 font-bold">
+                          <AlertCircle size={16} className="text-red-600 shrink-0" />
+                          <span>Saldo Anda kurang sebesar {formatIDR(finalPrice - walletBalance)}.</span>
+                        </div>
+                        <p className="text-[11px] text-gray-600 font-medium">
+                          Anda dapat mengisi saldo terlebih dahulu atau memilih metode pembayaran lain (COD / Transfer Bank / QRIS).
+                        </p>
+                        <Link
+                          href="/wallet"
+                          target="_blank"
+                          className="inline-flex items-center gap-1.5 text-xs font-black text-primary hover:underline"
+                        >
+                          <span>Buka Halaman Dompet & Isi Saldo</span>
+                          <ExternalLink size={12} />
+                        </Link>
+                      </div>
+                    )}
+                  </motion.div>
+                )}
                 {paymentMethod === 'transfer' && (
                   <motion.div
                     key="transfer"

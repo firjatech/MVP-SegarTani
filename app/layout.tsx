@@ -6,6 +6,7 @@ import Footer from "@/components/Footer";
 import { CartProvider } from "@/context/CartContext";
 import { WishlistProvider } from "@/context/WishlistContext";
 import { NotificationProvider } from "@/context/NotificationContext";
+import { WalletProvider } from "@/context/WalletContext";
 import CartDrawer from "@/components/CartDrawer";
 import AOSInit from "@/components/AOSInit";
 
@@ -37,17 +38,19 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col font-sans">
         <NotificationProvider>
-          <CartProvider>
-            <WishlistProvider>
-              <Navbar />
-              <main className="flex-grow pt-20">
-                {children}
-              </main>
-              <Footer />
-              <CartDrawer />
-              <AOSInit />
-            </WishlistProvider>
-          </CartProvider>
+          <WalletProvider>
+            <CartProvider>
+              <WishlistProvider>
+                <Navbar />
+                <main className="flex-grow pt-20">
+                  {children}
+                </main>
+                <Footer />
+                <CartDrawer />
+                <AOSInit />
+              </WishlistProvider>
+            </CartProvider>
+          </WalletProvider>
         </NotificationProvider>
       </body>
     </html>

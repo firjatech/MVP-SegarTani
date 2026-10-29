@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React from 'react';
 
@@ -165,7 +165,7 @@ export default function Navbar() {
       }
     });
 
-    // Realtime subscription for new messages → update unread badge
+    // Realtime subscription for new messages â†’ update unread badge
     const channel = supabase
       .channel('navbar-unread-messages')
       .on(
@@ -610,6 +610,20 @@ export default function Navbar() {
                       <Package size={18} /> Pesanan Saya
                     </Link>
 
+                    {/* Saldo & Dompet */}
+                    <Link
+                      href="/wallet"
+                      onClick={() => setIsSidebarOpen(false)}
+                      className={`flex items-center justify-between p-3 rounded-xl transition-all font-bold text-sm ${
+                        pathname === '/wallet' || pathname === '/saldo'
+                          ? 'bg-white text-primary shadow-lg'
+                          : 'text-white/90 hover:text-white hover:bg-white/10'
+                      }`}
+                    >
+                      <span className="flex items-center gap-3"><Wallet size={18} /> Saldo & Dompet</span>
+                      <span className="text-[10px] font-bold text-emerald-200">SegarPay</span>
+                    </Link>
+
                     {/* Voucher & Promo Saya */}
                     <Link
                       href="/vouchers"
@@ -736,7 +750,7 @@ export default function Navbar() {
 
                     <div className="h-px bg-white/10 my-3" />
                     <p className="text-[10px] font-black text-white/40 uppercase tracking-widest px-3 mb-2">Menu Penjual</p>
-                    {[
+                    {([
                       { name: 'Profil Toko', href: '/admin/store-profile', icon: Store },
                       { name: 'Dashboard', href: '/admin/dashboard', icon: LayoutDashboard },
                       { name: 'Produk', href: '/admin/products', icon: Package },
@@ -744,9 +758,9 @@ export default function Navbar() {
                       { name: 'Chat', href: '/chat', icon: MessageSquare },
                       { name: 'Notifikasi', href: '/notifications', icon: Bell, badgeCount: unreadNotifCount },
                       { name: 'Ulasan', href: '/admin/reviews', icon: Star },
-                      { name: 'Saldo', href: '#', icon: Wallet, badge: 'Segera' },
+                      { name: 'Saldo & Dompet', href: '/admin/wallet', icon: Wallet },
                       { name: 'Promo & Voucher', href: '/admin/promos', icon: Tag },
-                    ].map((item) => {
+                    ] as { name: string; href: string; icon: React.ElementType; badge?: string; badgeCount?: number }[]).map((item) => {
                       const Icon = item.icon;
                       const isActive = pathname === item.href || (item.href !== '#' && pathname.startsWith(item.href));
                       return (
