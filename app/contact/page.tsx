@@ -35,7 +35,7 @@ const FAQ_DATA: FAQItem[] = [
   {
     id: 'b-1',
     category: 'buyer',
-    categoryLabel: '🛍️ Pembeli',
+    categoryLabel: 'Pembeli',
     question: 'Bagaimana cara berbelanja sayur dan buah segar di SegarTani?',
     answer:
       'Untuk berbelanja, Anda cukup membuka halaman "Katalog Belanja", pilih produk sayuran atau buah yang diinginkan, tentukan jumlahnya, lalu klik "Tambah ke Keranjang". Setelah selesai memilih, buka keranjang belanja Anda, periksa ringkasan pesanan, gunakan voucher diskon jika ada, lalu lanjutkan ke halaman Checkout untuk mengisi alamat pengiriman dan konfirmasi pembayaran.',
@@ -43,7 +43,7 @@ const FAQ_DATA: FAQItem[] = [
   {
     id: 'b-2',
     category: 'buyer',
-    categoryLabel: '🛍️ Pembeli',
+    categoryLabel: 'Pembeli',
     question: 'Apakah produk sayuran dan buah benar-benar dipetik segar langsung dari petani?',
     answer:
       'Ya, 100% segar! SegarTani bermitra langsung dengan kelompok tani lokal di area Batu dan Malang. Produk sayuran dan buah baru dipanen sesuai pesanan yang masuk sehingga menjaga tingkat nutrisi, kesegaran, dan kerenyahan maksimal sampai ke dapur Anda tanpa perantara berbelit.',
@@ -51,7 +51,7 @@ const FAQ_DATA: FAQItem[] = [
   {
     id: 'b-3',
     category: 'buyer',
-    categoryLabel: '🛍️ Pembeli',
+    categoryLabel: 'Pembeli',
     question: 'Bagaimana jika produk yang saya terima layu, rusak, atau busuk? (Garansi Kesegaran 100%)',
     answer:
       'Kami memiliki Kebijakan Garansi Kesegaran 100%. Jika ada produk yang rusak, layu tidak wajar, atau tidak sesuai pesanan, segera foto produk tersebut bersama nota pesanan dalam waktu 1x24 jam setelah barang diterima. Hubungi kami via WhatsApp Layanan Pelanggan atau Chat Penjual, dan kami akan segera mengirimkan produk pengganti baru atau pengembalian dana (refund) tanpa proses yang rumit.',
@@ -59,7 +59,7 @@ const FAQ_DATA: FAQItem[] = [
   {
     id: 'b-4',
     category: 'buyer',
-    categoryLabel: '🛍️ Pembeli',
+    categoryLabel: 'Pembeli',
     question: 'Bagaimana cara melacak pesanan saya yang sedang dikirim?',
     answer:
       'Anda dapat memantau status pesanan kapan saja melalui menu panel "Pesanan Saya" (/orders). Di sana status akan terupdate secara real-time: Menunggu Konfirmasi → Sedang Diproses Petani → Dalam Pengiriman Kurir → Pesanan Selesai. Anda juga akan menerima notifikasi otomatis saat kurir mulai mengantar pesanan Anda.',
@@ -67,7 +67,7 @@ const FAQ_DATA: FAQItem[] = [
   {
     id: 'b-5',
     category: 'buyer',
-    categoryLabel: '🛍️ Pembeli',
+    categoryLabel: 'Pembeli',
     question: 'Apakah saya bisa berkonsultasi atau bertanya langsung ke petani sebelum membeli?',
     answer:
       'Tentu saja! SegarTani menyediakan fitur "Chat Penjual" (/chat). Anda dapat langsung mengirim pesan kepada pemilik toko/petani untuk menanyakan ketersediaan panen hari ini, tingkat kematangan buah, atau permintaan kemasan khusus.',
@@ -75,7 +75,7 @@ const FAQ_DATA: FAQItem[] = [
   {
     id: 'b-6',
     category: 'buyer',
-    categoryLabel: '🛍️ Pembeli',
+    categoryLabel: 'Pembeli',
     question: 'Bagaimana cara memberikan ulasan dan rating untuk produk yang telah saya beli?',
     answer:
       'Setelah pesanan Anda berstatus "Selesai", Anda dapat membuka menu "Ulasan Saya" (/reviews) atau riwayat pesanan Anda. Klik tombol "Beri Ulasan", berikan rating bintang 1 hingga 5, serta tuliskan pengalaman kesegaran produk dan pelayanan penjual. Ulasan Anda sangat berharga bagi kemajuan petani lokal!',
@@ -85,7 +85,7 @@ const FAQ_DATA: FAQItem[] = [
   {
     id: 's-1',
     category: 'seller',
-    categoryLabel: '🏪 Penjual & Petani',
+    categoryLabel: 'Penjual & Petani',
     question: 'Bagaimana cara mendaftar sebagai Penjual atau Mitra Petani di SegarTani?',
     answer:
       'Untuk mendaftar, buka halaman Registrasi (/register) dan pilih tab "Daftar sebagai Penjual", atau akses menu "Daftar Penjual" (/daftar-penjual). Isi formulir berupa nama toko, nomor WhatsApp aktif, lokasi kebun/gudang, dan jenis komoditas hasil tani yang Anda kelola. Akun toko Anda akan langsung aktif dan siap digunakan untuk memajang produk panen.',
@@ -93,7 +93,7 @@ const FAQ_DATA: FAQItem[] = [
   {
     id: 's-2',
     category: 'seller',
-    categoryLabel: '🏪 Penjual & Petani',
+    categoryLabel: 'Penjual & Petani',
     question: 'Apa saja kriteria produk hasil tani yang boleh dipasarkan di SegarTani?',
     answer:
       'SegarTani mengutamakan komoditas sayuran segar, buah-buahan organik, rempah & bumbu dapur, umbi-umbian, serta produk olahan hasil panen lokal yang higienis, bebas bahan kimia berbahaya berlebih, dan layak konsumsi. Penjual wajib mencantumkan deskripsi kondisi barang, tanggal panen jika ada, dan foto asli produk.',
@@ -101,7 +101,7 @@ const FAQ_DATA: FAQItem[] = [
   {
     id: 's-3',
     category: 'seller',
-    categoryLabel: '🏪 Penjual & Petani',
+    categoryLabel: 'Penjual & Petani',
     question: 'Bagaimana cara mengunggah produk baru dan memperbarui stok barang?',
     answer:
       'Masuk ke "Mode Penjual", lalu buka menu "Produk" (/admin/products). Klik tombol "Tambah Produk", masukkan nama produk, kategori, harga per kilogram/ikat, stok panen yang tersedia, serta unggah foto produk berkualitas baik. Anda dapat mengedit harga dan menambah stok kapan saja dengan satu kali klik.',
@@ -109,7 +109,7 @@ const FAQ_DATA: FAQItem[] = [
   {
     id: 's-4',
     category: 'seller',
-    categoryLabel: '🏪 Penjual & Petani',
+    categoryLabel: 'Penjual & Petani',
     question: 'Apa yang harus dilakukan penjual saat ada pesanan baru masuk?',
     answer:
       'Ketika ada pesanan masuk, Anda akan menerima notifikasi lonceng secara langsung. Buka menu "Pesanan" (/admin/orders), periksa rincian barang yang dipesan dan alamat pembeli, lalu ubah status menjadi "Sedang Diproses" untuk mulai menyiapkan panen dan packing. Setelah barang diserahkan ke kurir, ubah status menjadi "Dalam Pengiriman".',
@@ -117,7 +117,7 @@ const FAQ_DATA: FAQItem[] = [
   {
     id: 's-5',
     category: 'seller',
-    categoryLabel: '🏪 Penjual & Petani',
+    categoryLabel: 'Penjual & Petani',
     question: 'Bagaimana panduan pengemasan (packing) sayur & buah agar tidak rusak di perjalanan?',
     answer:
       'Pastikan sayuran berdaun dalam kondisi kering dari tetesan air berlebih sebelum dibungkus kertas/plastik berpori agar tidak mudah busuk. Untuk buah-buahan yang mudah memar, gunakan jaring busa (foam net) atau sekat kardus. Jangan mencampur komoditas yang menghasilkan gas etilen tinggi (seperti pisang/tomat matang) dengan sayuran hijau sensitif dalam satu kantong rapat.',
@@ -125,7 +125,7 @@ const FAQ_DATA: FAQItem[] = [
   {
     id: 's-6',
     category: 'seller',
-    categoryLabel: '🏪 Penjual & Petani',
+    categoryLabel: 'Penjual & Petani',
     question: 'Kapan dan bagaimana dana hasil penjualan masuk ke penjual?',
     answer:
       'Dana hasil penjualan pesanan Anda akan otomatis dicatat ke akun penjual setelah pembeli mengonfirmasi penerimaan barang atau saat pesanan diselesaikan oleh sistem. Anda dapat memantau akumulasi penjualan di menu "Dashboard Penjual" (/admin/dashboard).',
@@ -135,7 +135,7 @@ const FAQ_DATA: FAQItem[] = [
   {
     id: 'p-1',
     category: 'payment',
-    categoryLabel: '💳 Pembayaran & Promo',
+    categoryLabel: 'Pembayaran & Voucher',
     question: 'Metode pembayaran apa saja yang diterima di SegarTani?',
     answer:
       'SegarTani mendukung berbagai metode pembayaran yang mudah dan aman: Transfer Bank Otomatis (BCA, Mandiri, BRI, BNI), QRIS (GoPay, OVO, Dana, ShopeePay, LinkAja), serta fitur pembayaran langsung saat kurir mengantar pesanan (COD - Cash on Delivery) untuk wilayah tertentu.',
@@ -143,7 +143,7 @@ const FAQ_DATA: FAQItem[] = [
   {
     id: 'p-2',
     category: 'payment',
-    categoryLabel: '💳 Pembayaran & Promo',
+    categoryLabel: 'Pembayaran & Voucher',
     question: 'Bagaimana cara mengklaim dan menggunakan voucher promo diskon?',
     answer:
       'Kunjungi halaman "Voucher & Promo Saya" (/vouchers). Di sana Anda bisa melihat berbagai kupon seperti SEGAR10 (Diskon 10%), DISKON20K (Potongan Rp 20.000), atau ONGKIRSEGAR (Potongan Ongkir). Klik tombol "Gunakan Voucher", maka diskon akan otomatis memotong total belanjaan Anda saat di halaman Checkout.',
@@ -151,7 +151,7 @@ const FAQ_DATA: FAQItem[] = [
   {
     id: 'p-3',
     category: 'payment',
-    categoryLabel: '💳 Pembayaran & Promo',
+    categoryLabel: 'Pembayaran & Voucher',
     question: 'Apakah kode voucher bisa digabungkan dengan promo lainnya?',
     answer:
       'Dalam satu kali transaksi checkout, Anda dapat memasangkan 1 kode voucher diskon belanja utama. Namun, harga produk yang sudah memiliki diskon coret di katalog tetap berlaku dan dapat diakumulasikan dengan potongan voucher Anda.',
@@ -161,7 +161,7 @@ const FAQ_DATA: FAQItem[] = [
   {
     id: 'k-1',
     category: 'shipping',
-    categoryLabel: '🚚 Pengiriman & Kurir',
+    categoryLabel: 'Pengiriman',
     question: 'Wilayah mana saja yang dijangkau oleh pengiriman SegarTani?',
     answer:
       'Saat ini pengiriman kilat panen segar kami melayani seluruh area Kota Batu, Kota Malang, dan Kabupaten Malang. Untuk produk hasil tani tahan lama (umbi-umbian, rempah kering, olahan agribisnis), kami juga melayani pengiriman ke seluruh Jawa Timur dan kota-kota besar di Indonesia melalui ekspedisi reguler bergaransi.',
@@ -169,7 +169,7 @@ const FAQ_DATA: FAQItem[] = [
   {
     id: 'k-2',
     category: 'shipping',
-    categoryLabel: '🚚 Pengiriman & Kurir',
+    categoryLabel: 'Pengiriman',
     question: 'Kapan jadwal waktu pengiriman panen dilakukan?',
     answer:
       'Untuk menjamin sayur dan buah tetap segar, pengiriman harian dilakukan dalam dua sesi: Sesi Pagi (07.00 - 11.00 WIB) untuk pesanan yang masuk malam sebelumnya, dan Sesi Sore (14.00 - 17.30 WIB). Pesanan panen pagi akan langsung diantar pada hari yang sama.',
@@ -177,7 +177,7 @@ const FAQ_DATA: FAQItem[] = [
   {
     id: 'k-3',
     category: 'shipping',
-    categoryLabel: '🚚 Pengiriman & Kurir',
+    categoryLabel: 'Pengiriman',
     question: 'Berapa tarif ongkos kirim dan bagaimana cara mendapatkan gratis ongkir?',
     answer:
       'Tarif ongkos kirim dihitung berdasarkan jarak kilometer dari kebun petani mitra ke alamat penerima. Anda bisa mendapatkan gratis ongkir atau potongan ongkir hingga Rp 15.000 dengan menggunakan voucher "ONGKIRSEGAR" pada transaksi minimal Rp 75.000 di halaman checkout.',
@@ -234,10 +234,10 @@ export default function ContactPage() {
 
   const categoryTabs = [
     { id: 'all', label: 'Semua Pertanyaan', count: FAQ_DATA.length, icon: HelpCircle },
-    { id: 'buyer', label: '🛍️ Pembeli', count: FAQ_DATA.filter((f) => f.category === 'buyer').length, icon: ShoppingBag },
-    { id: 'seller', label: '🏪 Penjual & Petani', count: FAQ_DATA.filter((f) => f.category === 'seller').length, icon: Store },
-    { id: 'payment', label: '💳 Pembayaran & Voucher', count: FAQ_DATA.filter((f) => f.category === 'payment').length, icon: CreditCard },
-    { id: 'shipping', label: '🚚 Pengiriman', count: FAQ_DATA.filter((f) => f.category === 'shipping').length, icon: Truck },
+    { id: 'buyer', label: 'Pembeli', count: FAQ_DATA.filter((f) => f.category === 'buyer').length, icon: ShoppingBag },
+    { id: 'seller', label: 'Penjual & Petani', count: FAQ_DATA.filter((f) => f.category === 'seller').length, icon: Store },
+    { id: 'payment', label: 'Pembayaran & Voucher', count: FAQ_DATA.filter((f) => f.category === 'payment').length, icon: CreditCard },
+    { id: 'shipping', label: 'Pengiriman', count: FAQ_DATA.filter((f) => f.category === 'shipping').length, icon: Truck },
   ];
 
   return (
@@ -299,6 +299,7 @@ export default function ContactPage() {
                       : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200'
                   }`}
                 >
+                  <tab.icon size={15} className="shrink-0" />
                   <span>{tab.label}</span>
                   <span
                     className={`text-[11px] px-2 py-0.5 rounded-full ${
