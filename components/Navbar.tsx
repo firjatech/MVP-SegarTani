@@ -228,15 +228,15 @@ export default function Navbar() {
     <nav
       className={`fixed w-full z-50 transition-all duration-300 bg-white shadow-sm py-4`}
     >
-      <div className="container mx-auto px-6 flex justify-between items-center relative">
-        <div className="flex items-center gap-4">
+      <div className="container mx-auto px-3 sm:px-6 flex justify-between items-center relative">
+        <div className="flex items-center gap-2 sm:gap-4 shrink-0">
           {/* Hamburger Icon - Only show when user is logged in */}
           {user && (
             <button
               type="button"
               aria-label="Buka Menu Navigasi"
               onClick={() => setIsSidebarOpen(true)}
-              className="p-2 hover:bg-gray-50 rounded-lg text-gray-700 transition-colors"
+              className="p-1.5 sm:p-2 hover:bg-gray-50 rounded-lg text-gray-700 transition-colors shrink-0"
             >
               <Menu size={24} />
             </button>
@@ -251,11 +251,9 @@ export default function Navbar() {
                 width={60}
                 height={60}
                 priority
-                className="h-12 w-auto object-contain"
+                className="h-9 sm:h-12 w-auto object-contain"
               />
-              <span className={`text-2xl font-bold text-primary tracking-tight`}>
-                Segar<span className="text-secondary">Tani</span>
-              </span>
+              <span className="hidden sm:inline text-2xl font-bold text-primary tracking-tight">Segar<span className="text-secondary">Tani</span></span>
             </Link>
           ) : user && pathname.startsWith('/ecommerce') ? (
             <div className="flex items-center space-x-2">
@@ -265,11 +263,9 @@ export default function Navbar() {
                 width={60}
                 height={60}
                 priority
-                className="h-12 w-auto object-contain"
+                className="h-9 sm:h-12 w-auto object-contain"
               />
-              <span className={`text-2xl font-bold text-primary tracking-tight`}>
-                Segar<span className="text-secondary">Tani</span>
-              </span>
+              <span className="hidden sm:inline text-2xl font-bold text-primary tracking-tight">Segar<span className="text-secondary">Tani</span></span>
             </div>
           ) : user ? (
             <Link href="/ecommerce" className="flex items-center space-x-2 group">
@@ -279,11 +275,9 @@ export default function Navbar() {
                 width={60}
                 height={60}
                 priority
-                className="h-12 w-auto object-contain"
+                className="h-9 sm:h-12 w-auto object-contain"
               />
-              <span className={`text-2xl font-bold text-primary tracking-tight`}>
-                Segar<span className="text-secondary">Tani</span>
-              </span>
+              <span className="hidden sm:inline text-2xl font-bold text-primary tracking-tight">Segar<span className="text-secondary">Tani</span></span>
             </Link>
           ) : (
             <Link href="/" className="flex items-center space-x-2 group">
@@ -293,11 +287,9 @@ export default function Navbar() {
                 width={60}
                 height={60}
                 priority
-                className="h-12 w-auto object-contain"
+                className="h-9 sm:h-12 w-auto object-contain"
               />
-              <span className={`text-2xl font-bold text-primary tracking-tight`}>
-                Segar<span className="text-secondary">Tani</span>
-              </span>
+              <span className="hidden sm:inline text-2xl font-bold text-primary tracking-tight">Segar<span className="text-secondary">Tani</span></span>
             </Link>
           )}
         </div>
@@ -319,15 +311,15 @@ export default function Navbar() {
         )}
 
         {/* Desktop Buttons and Quick Actions */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
           {/* Mobile Right Controls: Notifikasi, Chat & Cart (Cart hanya untuk pembeli) */}
-          <div className="flex md:hidden items-center gap-2">
+          <div className="flex md:hidden items-center gap-1.5 sm:gap-2 shrink-0">
             {user && (
               <div className="relative">
                 <button
                   type="button"
                   onClick={() => setIsNotifOpen((prev) => !prev)}
-                  className={`relative p-2 text-gray-700 rounded-full transition-colors ${
+                  className={`relative p-1.5 sm:p-2 text-gray-700 rounded-full transition-colors ${
                     isNotifOpen ? 'bg-primary/10 text-primary' : 'bg-gray-50'
                   }`}
                   title="Notifikasi"
@@ -351,7 +343,7 @@ export default function Navbar() {
             {user && (
               <Link
                 href="/chat"
-                className={`relative p-2 text-gray-700 bg-gray-50 rounded-full ${pathname === '/chat' ? 'text-primary bg-primary/10' : ''
+                className={`relative p-1.5 sm:p-2 text-gray-700 bg-gray-50 rounded-full ${pathname === '/chat' ? 'text-primary bg-primary/10' : ''
                   }`}
                 title="Pesan & Chat"
                 aria-label="Buka Pesan dan Chat"
@@ -371,7 +363,7 @@ export default function Navbar() {
                 type="button"
                 onClick={() => setIsCartOpen(true)}
                 aria-label="Buka Keranjang Belanja"
-                className="relative p-2 text-gray-700 bg-gray-50 rounded-full"
+                className="relative p-1.5 sm:p-2 text-gray-700 bg-gray-50 rounded-full"
               >
                 <ShoppingCart size={18} />
                 {totalItems > 0 && (
