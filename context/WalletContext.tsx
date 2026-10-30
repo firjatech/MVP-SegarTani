@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/lib/supabase';
+import { runWhenIdle } from '@/lib/scheduler';
 import { useNotifications } from './NotificationContext';
 
 export interface WalletTransaction {
@@ -166,11 +167,13 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   useEffect(() => {
+    let cancelIdle: (() => void) | undefined;
+
     supabase.auth.getSession().then(({ data }) => {
       const user = data?.session?.user;
       if (user) {
         setCurrentUserId(user.id);
-        loadWallet(user.id);
+        cancelIdle = runWhenIdle(() => loadWallet(user.id), 2000);
       } else {
         setCurrentUserId(null);
         setBalance(0);
@@ -184,7 +187,7 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
       const user = session?.user;
       if (user) {
         setCurrentUserId(user.id);
-        loadWallet(user.id);
+        cancelIdle = runWhenIdle(() => loadWallet(user.id), 2000);
       } else {
         setCurrentUserId(null);
         setBalance(0);
@@ -195,6 +198,7 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
     });
 
     return () => {
+      cancelIdle?.();
       subscription.unsubscribe();
     };
   }, [loadWallet]);

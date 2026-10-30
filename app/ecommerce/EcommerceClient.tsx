@@ -227,12 +227,13 @@ export default function EcommerceClient({ initialProducts }: EcommerceClientProp
                         sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 25vw, 300px"
                         priority={index === 0}
                         loading={index === 0 ? undefined : 'lazy'}
+                        fetchPriority={index === 0 ? 'high' : 'auto'}
                         className={`object-cover transition-transform duration-700 ease-in-out ${
                           isOutOfStock ? '' : 'group-hover:scale-110'
                         }`}
                       />
                       <div className="absolute top-5 right-5 flex flex-col items-end gap-2 z-10">
-                        <span className="bg-white/90 backdrop-blur-sm text-primary text-[10px] font-black px-3 py-1 rounded-lg border border-primary/20">
+                        <span className="bg-white/90 backdrop-blur-sm text-emerald-850 text-[10px] font-black px-3 py-1 rounded-lg border border-emerald-200 text-emerald-800">
                           {product.category}
                         </span>
                         <WishlistButton
@@ -282,7 +283,7 @@ export default function EcommerceClient({ initialProducts }: EcommerceClientProp
                       <div className="mt-auto pt-4 flex items-center justify-between border-t border-gray-50">
                         <div className="flex flex-col">
                           {product.discount > 0 && (
-                            <span className="text-xs text-gray-500 line-through font-medium">
+                            <span className="text-xs text-gray-600 line-through font-medium">
                               {formatIDR(product.price)}
                             </span>
                           )}

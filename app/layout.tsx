@@ -31,6 +31,10 @@ export default function RootLayout({
       lang="id"
       className={`${geistSans.variable} h-full antialiased`}
     >
+      <head>
+        <link rel="preconnect" href="https://qjfuebkxlnnrdjgakdrm.supabase.co" crossOrigin="anonymous" />
+        <link rel="dns-prefetch" href="https://qjfuebkxlnnrdjgakdrm.supabase.co" />
+      </head>
       <body className="min-h-full flex flex-col font-sans">
         <NotificationProvider>
           <WalletProvider>

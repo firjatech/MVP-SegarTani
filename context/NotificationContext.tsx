@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/lib/supabase';
+import { runWhenIdle } from '@/lib/scheduler';
 
 export interface NotificationItem {
   id: string;
@@ -221,11 +222,13 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
 
   // Auth & Realtime Listener
   useEffect(() => {
+    let cancelIdle: (() => void) | undefined;
+
     supabase.auth.getSession().then(({ data }) => {
       const user = data?.session?.user;
       if (user) {
         setCurrentUserId(user.id);
-        fetchNotifications(user.id);
+        cancelIdle = runWhenIdle(() => fetchNotifications(user.id), 1500);
       } else {
         setCurrentUserId(null);
         setNotifications([]);
@@ -238,7 +241,7 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
       const user = session?.user;
       if (user) {
         setCurrentUserId(user.id);
-        fetchNotifications(user.id);
+        cancelIdle = runWhenIdle(() => fetchNotifications(user.id), 1500);
       } else {
         setCurrentUserId(null);
         setNotifications([]);
@@ -267,6 +270,7 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
       .subscribe();
 
     return () => {
+      cancelIdle?.();
       subscription.unsubscribe();
       supabase.removeChannel(channel);
     };

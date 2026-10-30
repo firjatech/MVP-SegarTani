@@ -34,6 +34,7 @@ import { useNotifications } from '@/context/NotificationContext';
 import dynamic from 'next/dynamic';
 const NotificationDropdown = dynamic(() => import('@/components/NotificationDropdown'), { ssr: false });
 import { supabase } from '@/lib/supabase';
+import { runWhenIdle } from '@/lib/scheduler';
 import type { User } from '@supabase/supabase-js';
 
 const navLinks = [
@@ -140,8 +141,10 @@ export default function Navbar() {
         setUser(session?.user ?? null);
         if (session?.user) {
           currentUserId = session.user.id;
+          runWhenIdle(() => {
           fetchUnreadCount(session.user.id);
           loadProfile(session.user.id);
+        }, 2000);
         }
       })
       .catch((err) => {
@@ -156,8 +159,10 @@ export default function Navbar() {
       setUser(session?.user ?? null);
       if (session?.user) {
         currentUserId = session.user.id;
-        fetchUnreadCount(session.user.id);
-        loadProfile(session.user.id);
+        runWhenIdle(() => {
+          fetchUnreadCount(session.user.id);
+          loadProfile(session.user.id);
+        }, 2000);
       } else {
         currentUserId = null;
         setUnreadChatCount(0);

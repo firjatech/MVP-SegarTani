@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
+import { runWhenIdle } from '@/lib/scheduler';
 
 export interface WishlistItem {
   id: number;
@@ -25,19 +26,32 @@ const WishlistContext = createContext<WishlistContextType | undefined>(undefined
 
 export function WishlistProvider({ children }: { children: React.ReactNode }) {
   const [wishlist, setWishlist] = useState<WishlistItem[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   // Load wishlist
   useEffect(() => {
-    async function loadWishlist() {
+    let isMounted = true;
+
+    // Jalankan pemuatan data secara asinkron agar tidak memblokir render utama
+    const cancelIdle = runWhenIdle(async () => {
       setLoading(true);
+      // 1. Baca cache lokal terlebih dahulu
+      try {
+        const savedWishlist = localStorage.getItem('segar-tani-wishlist');
+        if (savedWishlist && isMounted) {
+          setWishlist(JSON.parse(savedWishlist));
+        }
+      } catch (e) {
+        console.error('Failed to parse cached wishlist', e);
+      }
+
+      // 2. Sinkronisasi dengan Supabase jika user sudah login
       try {
         const { data } = await supabase.auth.getUser();
         const user = data?.user;
 
-        if (user) {
-          // Load from Supabase
-          const { data, error } = await supabase
+        if (user && isMounted) {
+          const { data: dbData, error } = await supabase
             .from('wishlist')
             .select(`
               product_id,
@@ -45,9 +59,7 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
             `)
             .eq('user_id', user.id);
 
-          if (error) throw error;
-
-          if (data) {
+          if (!error && dbData && isMounted) {
             type WishlistQueryResult = {
               product_id: number;
               products: {
@@ -60,38 +72,34 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
               };
             };
 
-            const items: WishlistItem[] = (data as unknown as WishlistQueryResult[]).map((item) => {
-              const p = item.products;
-              const discountPrice = p.price - (p.price * p.discount / 100);
-              return {
-                id: p.id,
-                name: p.name,
-                price: discountPrice,
-                image: p.image,
-                category: p.category
-              };
-            });
+            const items: WishlistItem[] = (dbData as unknown as WishlistQueryResult[])
+              .filter((item) => Boolean(item.products))
+              .map((item) => {
+                const p = item.products;
+                const discountPrice = p.price - (p.price * (p.discount || 0)) / 100;
+                return {
+                  id: p.id,
+                  name: p.name,
+                  price: discountPrice,
+                  image: p.image,
+                  category: p.category,
+                };
+              });
+
             setWishlist(items);
-          }
-        } else {
-          // Load from localStorage for guest users
-          const savedWishlist = localStorage.getItem('segar-tani-wishlist');
-          if (savedWishlist) {
-            try {
-              setWishlist(JSON.parse(savedWishlist));
-            } catch (e) {
-              console.error('Failed to parse wishlist', e);
-            }
           }
         }
       } catch (err) {
-        console.error('Error loading wishlist:', err);
+        console.error('Error syncing wishlist with Supabase:', err);
       } finally {
-        setLoading(false);
+        if (isMounted) setLoading(false);
       }
-    }
+    }, 1500);
 
-    loadWishlist();
+    return () => {
+      isMounted = false;
+      cancelIdle();
+    };
   }, []);
 
   // Save to localStorage as backup/for guest sessions
