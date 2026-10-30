@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React from 'react';
 
@@ -31,7 +31,8 @@ import { useEffect, useState, useCallback } from 'react';
 import { useCart } from '@/context/CartContext';
 import { useWishlist } from '@/context/WishlistContext';
 import { useNotifications } from '@/context/NotificationContext';
-import NotificationDropdown from '@/components/NotificationDropdown';
+import dynamic from 'next/dynamic';
+const NotificationDropdown = dynamic(() => import('@/components/NotificationDropdown'), { ssr: false });
 import { supabase } from '@/lib/supabase';
 import type { User } from '@supabase/supabase-js';
 

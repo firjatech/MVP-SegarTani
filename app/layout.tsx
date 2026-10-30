@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -7,17 +7,10 @@ import { CartProvider } from "@/context/CartContext";
 import { WishlistProvider } from "@/context/WishlistContext";
 import { NotificationProvider } from "@/context/NotificationContext";
 import { WalletProvider } from "@/context/WalletContext";
-import CartDrawer from "@/components/CartDrawer";
-import AOSInit from "@/components/AOSInit";
+import ClientOverlays from "@/components/ClientOverlays";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
-  subsets: ["latin"],
-  display: "swap",
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
   subsets: ["latin"],
   display: "swap",
 });
@@ -36,7 +29,7 @@ export default function RootLayout({
   return (
     <html
       lang="id"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${geistSans.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col font-sans">
         <NotificationProvider>
@@ -48,8 +41,7 @@ export default function RootLayout({
                   {children}
                 </main>
                 <Footer />
-                <CartDrawer />
-                <AOSInit />
+                <ClientOverlays />
               </WishlistProvider>
             </CartProvider>
           </WalletProvider>
