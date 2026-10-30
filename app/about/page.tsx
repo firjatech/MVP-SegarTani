@@ -137,7 +137,7 @@ export default function AboutPage() {
 						>
 							<div className="mb-4 flex items-center justify-center h-20 w-20 rounded-full bg-white overflow-hidden p-3 shadow-sm border border-gray-100">
 								<Image
-									src="/images/trust.jfif"
+									src="/images/trust.jpg"
 									alt="Kejujuran"
 									width={80}
 									height={80}
@@ -157,7 +157,7 @@ export default function AboutPage() {
 						>
 							<div className="mb-4 flex items-center justify-center h-20 w-20 rounded-full bg-white overflow-hidden p-3 shadow-sm border border-gray-100">
 								<Image
-									src="/images/keberlanjutan.jfif"
+									src="/images/keberlanjutan.jpg"
 									alt="Keberlanjutan"
 									width={80}
 									height={80}
