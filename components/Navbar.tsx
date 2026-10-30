@@ -251,9 +251,9 @@ export default function Navbar() {
                 width={60}
                 height={60}
                 priority
-                className="h-9 sm:h-12 w-auto object-contain"
+                className="h-11 sm:h-12 w-auto object-contain"
               />
-              <span className="hidden sm:inline text-2xl font-bold text-primary tracking-tight">Segar<span className="text-secondary">Tani</span></span>
+              <span className="text-base sm:text-2xl font-bold text-primary tracking-tight">Segar<span className="text-secondary">Tani</span></span>
             </Link>
           ) : user && pathname.startsWith('/ecommerce') ? (
             <div className="flex items-center space-x-2">
@@ -263,9 +263,9 @@ export default function Navbar() {
                 width={60}
                 height={60}
                 priority
-                className="h-9 sm:h-12 w-auto object-contain"
+                className="h-11 sm:h-12 w-auto object-contain"
               />
-              <span className="hidden sm:inline text-2xl font-bold text-primary tracking-tight">Segar<span className="text-secondary">Tani</span></span>
+              <span className="text-base sm:text-2xl font-bold text-primary tracking-tight">Segar<span className="text-secondary">Tani</span></span>
             </div>
           ) : user ? (
             <Link href="/ecommerce" className="flex items-center space-x-2 group">
@@ -275,9 +275,9 @@ export default function Navbar() {
                 width={60}
                 height={60}
                 priority
-                className="h-9 sm:h-12 w-auto object-contain"
+                className="h-11 sm:h-12 w-auto object-contain"
               />
-              <span className="hidden sm:inline text-2xl font-bold text-primary tracking-tight">Segar<span className="text-secondary">Tani</span></span>
+              <span className="text-base sm:text-2xl font-bold text-primary tracking-tight">Segar<span className="text-secondary">Tani</span></span>
             </Link>
           ) : (
             <Link href="/" className="flex items-center space-x-2 group">
@@ -287,9 +287,9 @@ export default function Navbar() {
                 width={60}
                 height={60}
                 priority
-                className="h-9 sm:h-12 w-auto object-contain"
+                className="h-11 sm:h-12 w-auto object-contain"
               />
-              <span className="hidden sm:inline text-2xl font-bold text-primary tracking-tight">Segar<span className="text-secondary">Tani</span></span>
+              <span className="text-base sm:text-2xl font-bold text-primary tracking-tight">Segar<span className="text-secondary">Tani</span></span>
             </Link>
           )}
         </div>
