@@ -45,10 +45,11 @@ export default function WishlistButton({ product }: WishlistButtonProps) {
       type="button"
       onClick={handleToggle}
       disabled={isPending}
+      aria-label={optimisticLiked ? `Hapus ${product.name} dari Wishlist` : `Tambah ${product.name} ke Wishlist`}
       className={`w-10 h-10 flex items-center justify-center rounded-full backdrop-blur-md transition-all shadow-md ${
         optimisticLiked 
           ? 'bg-red-500 text-white shadow-red-200 scale-110' 
-          : 'bg-white/80 text-gray-400 hover:text-red-500 hover:scale-110'
+          : 'bg-white/80 text-gray-500 hover:text-red-500 hover:scale-110'
       } ${isPending ? 'opacity-80' : 'active:scale-95'}`}
       title={optimisticLiked ? "Hapus dari Wishlist" : "Tambah ke Wishlist"}
     >

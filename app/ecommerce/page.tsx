@@ -165,22 +165,28 @@ function EcommerceContent() {
 
             {/* Search Input Part */}
             <div className="relative grow w-full border-b sm:border-b-0 sm:border-r border-gray-100">
+              <label htmlFor="search-input" className="sr-only">Cari bahan masakan</label>
               <input
+                id="search-input"
                 type="text"
                 placeholder="Cari bahan masakan..."
+                aria-label="Cari bahan masakan"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-14 pr-6 py-4 md:py-5 focus:outline-none bg-transparent text-gray-800 placeholder-gray-400 font-bold"
+                className="w-full pl-14 pr-6 py-4 md:py-5 focus:outline-none bg-transparent text-gray-800 placeholder-gray-500 font-bold"
               />
-              <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-primary h-6 w-6" />
+              <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-primary h-6 w-6" aria-hidden="true" />
             </div>
 
             {/* Category Dropdown Part */}
             <div className="relative w-full sm:w-72 bg-white">
+              <label htmlFor="category-select" className="sr-only">Pilih Kategori Produk</label>
               <select
+                id="category-select"
+                aria-label="Pilih Kategori Produk"
                 value={activeCategory}
                 onChange={(e) => setActiveCategory(e.target.value)}
-                className="w-full appearance-none bg-transparent text-gray-700 py-4 md:py-5 px-6 pr-12 focus:outline-none font-black cursor-pointer text-xs uppercase tracking-wider"
+                className="w-full appearance-none bg-transparent text-gray-800 py-4 md:py-5 px-6 pr-12 focus:outline-none font-black cursor-pointer text-xs uppercase tracking-wider"
               >
                 {categories.map((cat) => (
                   <option key={cat} value={cat} className="font-sans normal-case">
@@ -188,7 +194,7 @@ function EcommerceContent() {
                   </option>
                 ))}
               </select>
-              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-5 text-primary">
+              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-5 text-primary" aria-hidden="true">
                 <ChevronDown size={20} strokeWidth={3} />
               </div>
             </div>
@@ -235,10 +241,12 @@ function EcommerceContent() {
                       )}
 
                       <Image
-                        src={cleanImageUrl(product.image)}
+                        src={cleanImageUrl(product.image) || '/images/panen-kangkung.png'}
                         alt={product.name}
                         fill
-                        unoptimized
+                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 25vw, 300px"
+                        priority={index === 0}
+                        loading={index === 0 ? undefined : 'lazy'}
                         className={`object-cover transition-transform duration-700 ease-in-out ${isOutOfStock ? '' : 'group-hover:scale-110'}`}
                       />
                       <div className="absolute top-5 right-5 flex flex-col items-end gap-2 z-10">
@@ -259,10 +267,10 @@ function EcommerceContent() {
 
                     {/* Details Container */}
                     <div className="p-6 flex flex-col grow">
-                      <div className="flex items-center gap-1 text-yellow-400 mb-2">
-                        <Star size={14} className="fill-current" />
-                        <span className="text-xs font-bold text-gray-400 ml-1">{Number(product.rating || 0).toFixed(1)}</span>
-                        <span className="text-[10px] text-gray-300 ml-2 font-bold uppercase tracking-wider">
+                      <div className="flex items-center gap-1 text-yellow-500 mb-2">
+                        <Star size={14} className="fill-current text-yellow-400" aria-hidden="true" />
+                        <span className="text-xs font-bold text-gray-600 ml-1">{Number(product.rating || 0).toFixed(1)}</span>
+                        <span className="text-[10px] text-gray-600 ml-2 font-bold uppercase tracking-wider">
                           Stok: {product.stock}
                         </span>
                       </div>
@@ -270,6 +278,7 @@ function EcommerceContent() {
                       {/* Toko / Penjual */}
                       <button
                         type="button"
+                        aria-label={`Lihat profil penjual ${product.seller_name || 'SegarTani Official'}`}
                         onClick={(e) => {
                           e.preventDefault();
                           e.stopPropagation();
@@ -278,7 +287,7 @@ function EcommerceContent() {
                         className="inline-flex items-center gap-1.5 text-xs text-emerald-800 hover:text-emerald-950 font-bold mb-1.5 group/seller text-left w-fit cursor-pointer"
                         title="Klik untuk lihat profil penjual"
                       >
-                        <Store size={12} className="shrink-0 text-emerald-600 group-hover/seller:scale-110 transition-transform" />
+                        <Store size={12} className="shrink-0 text-emerald-600 group-hover/seller:scale-110 transition-transform" aria-hidden="true" />
                         <span className="truncate group-hover/seller:underline decoration-emerald-500 underline-offset-2">
                           {product.seller_name || 'SegarTani Official'}
                         </span>
@@ -291,7 +300,7 @@ function EcommerceContent() {
                       <div className="mt-auto pt-4 flex items-center justify-between border-t border-gray-50">
                         <div className="flex flex-col">
                           {product.discount > 0 && (
-                            <span className="text-xs text-gray-400 line-through font-medium">
+                            <span className="text-xs text-gray-500 line-through font-medium">
                               {formatIDR(product.price)}
                             </span>
                           )}
@@ -302,6 +311,7 @@ function EcommerceContent() {
                         <button 
                           type="button"
                           disabled={isOutOfStock}
+                          aria-label={isOutOfStock ? `Stok ${product.name} habis` : `Tambah ${product.name} ke Keranjang`}
                           onClick={(e) => {
                             e.preventDefault();
                             e.stopPropagation();
@@ -322,7 +332,7 @@ function EcommerceContent() {
                               : 'bg-white border border-gray-100 text-gray-900 hover:bg-primary hover:text-white'
                           }`}
                         >
-                          <ShoppingCart size={20} />
+                          <ShoppingCart size={20} aria-hidden="true" />
                         </button>
                       </div>
                     </div>
@@ -333,7 +343,7 @@ function EcommerceContent() {
           ) : (
             <div className="col-span-full text-center py-32 bg-white rounded-5xl border border-dashed border-gray-200">
               <h3 className="text-2xl font-black text-gray-900 mb-2">Produk Tidak Ditemukan</h3>
-              <p className="text-gray-400 max-w-sm mx-auto mb-10">
+              <p className="text-gray-600 max-w-sm mx-auto mb-10">
                 Maaf, bahan masakan yang Anda cari tidak tersedia.
               </p>
               <button

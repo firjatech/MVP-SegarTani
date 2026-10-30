@@ -6,7 +6,6 @@ import { AnimatePresence, motion } from 'framer-motion';
 import {
   ArrowLeftRight,
   Bell,
-  CreditCard,
   Heart,
   HelpCircle,
   LayoutDashboard,
@@ -229,6 +228,7 @@ export default function Navbar() {
           {user && (
             <button
               type="button"
+              aria-label="Buka Menu Navigasi"
               onClick={() => setIsSidebarOpen(true)}
               className="p-2 hover:bg-gray-50 rounded-lg text-gray-700 transition-colors"
             >
@@ -325,6 +325,7 @@ export default function Navbar() {
                     isNotifOpen ? 'bg-primary/10 text-primary' : 'bg-gray-50'
                   }`}
                   title="Notifikasi"
+                  aria-label="Lihat Notifikasi"
                 >
                   <Bell size={18} />
                   {unreadNotifCount > 0 && (
@@ -347,6 +348,7 @@ export default function Navbar() {
                 className={`relative p-2 text-gray-700 bg-gray-50 rounded-full ${pathname === '/chat' ? 'text-primary bg-primary/10' : ''
                   }`}
                 title="Pesan & Chat"
+                aria-label="Buka Pesan dan Chat"
               >
                 <MessageSquare size={18} />
                 {unreadChatCount > 0 && (
@@ -362,6 +364,7 @@ export default function Navbar() {
               <button
                 type="button"
                 onClick={() => setIsCartOpen(true)}
+                aria-label="Buka Keranjang Belanja"
                 className="relative p-2 text-gray-700 bg-gray-50 rounded-full"
               >
                 <ShoppingCart size={18} />
@@ -397,6 +400,7 @@ export default function Navbar() {
                     isNotifOpen ? 'bg-primary/10 text-primary' : 'bg-gray-50'
                   }`}
                   title="Notifikasi"
+                  aria-label="Lihat Notifikasi"
                 >
                   <Bell size={22} />
                   {unreadNotifCount > 0 && (
@@ -420,6 +424,7 @@ export default function Navbar() {
                 className={`relative p-2 text-gray-700 hover:text-primary transition-colors bg-gray-50 rounded-full ${pathname === '/chat' ? 'text-primary bg-primary/10' : ''
                   }`}
                 title="Pesan & Chat"
+                aria-label="Buka Pesan dan Chat"
               >
                 <MessageSquare size={22} />
                 {unreadChatCount > 0 && (
@@ -434,6 +439,7 @@ export default function Navbar() {
             {user && !isSeller && pathname.startsWith('/ecommerce') && (
               <Link
                 href="/wishlist"
+                aria-label="Lihat Daftar Favorit"
                 className="relative p-2 text-gray-700 hover:text-red-500 transition-colors bg-gray-50 rounded-full"
               >
                 <Heart size={22} className={totalWishlistItems > 0 ? "fill-red-500 text-red-500" : ""} />
@@ -450,6 +456,7 @@ export default function Navbar() {
               <button
                 type="button"
                 onClick={() => setIsCartOpen(true)}
+                aria-label="Buka Keranjang Belanja"
                 className="relative p-2 text-gray-700 hover:text-primary transition-colors bg-gray-50 rounded-full"
               >
                 <ShoppingCart size={22} />
@@ -515,6 +522,7 @@ export default function Navbar() {
                 <button
                   type="button"
                   onClick={() => setIsSidebarOpen(false)}
+                  aria-label="Tutup Menu Navigasi"
                   className="text-white/80 hover:text-white bg-white/10 p-2 rounded-xl transition-all cursor-pointer"
                 >
                   <X size={20} />

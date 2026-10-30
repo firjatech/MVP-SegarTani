@@ -12,9 +12,7 @@ import {
   Search,
   ExternalLink,
   Loader2,
-  Calendar,
   AlertCircle,
-  Truck,
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -105,37 +103,43 @@ export default function AdminPromosPage() {
     expiry_date: '2026-12-31',
   });
 
-  const fetchVouchers = async () => {
-    try {
-      setLoading(true);
-      const { data, error } = await supabase
-        .from('vouchers')
-        .select('*')
-        .order('id', { ascending: false });
-
-      if (!error && data && data.length > 0) {
-        setVouchers(
-          data.map((v) => ({
-            id: v.id,
-            code: v.code,
-            discount_type: v.discount_type,
-            discount_value: Number(v.discount_value),
-            min_purchase: Number(v.min_purchase || 0),
-            is_active: v.is_active ?? true,
-            expiry_date: v.expiry_date,
-            created_at: v.created_at,
-          }))
-        );
-      }
-    } catch {
-      // Fallback
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
-    fetchVouchers();
+    let ignore = false;
+    async function loadVouchers() {
+      try {
+        const { data, error } = await supabase
+          .from('vouchers')
+          .select('*')
+          .order('id', { ascending: false });
+
+        if (!ignore && !error && data && data.length > 0) {
+          setVouchers(
+            data.map((v) => ({
+              id: v.id,
+              code: v.code,
+              discount_type: v.discount_type,
+              discount_value: Number(v.discount_value),
+              min_purchase: Number(v.min_purchase || 0),
+              is_active: v.is_active ?? true,
+              expiry_date: v.expiry_date,
+              created_at: v.created_at,
+            }))
+          );
+        }
+      } catch {
+        // Fallback
+      } finally {
+        if (!ignore) {
+          setLoading(false);
+        }
+      }
+    }
+
+    loadVouchers();
+
+    return () => {
+      ignore = true;
+    };
   }, []);
 
   const handleToggleStatus = async (voucher: VoucherData) => {

@@ -99,6 +99,7 @@ function SocialIcon({ icon }: { icon: string }) {
   return (
     <a
       href="#"
+      aria-label={`Kunjungi media sosial ${icon} SegarTani`}
       className="w-10 h-10 rounded-full bg-zinc-800/80 flex items-center justify-center hover:bg-primary text-white transition-all duration-300 hover:-translate-y-1 shrink-0 overflow-hidden"
     >
       <IconMapper name={icon} />
@@ -111,6 +112,7 @@ function DownloadButton({ platform }: { platform: 'app-store' | 'google-play' })
   return (
     <a
       href="#"
+      aria-label={isAppStore ? "Unduh aplikasi SegarTani di App Store" : "Unduh aplikasi SegarTani di Google Play"}
       className="flex items-center gap-3 px-5 py-3 bg-[#0a0c10] hover:bg-zinc-900 border border-zinc-800/50 rounded-xl text-white transition-all duration-200 group w-fit min-w-[200px]"
     >
       {isAppStore ? (

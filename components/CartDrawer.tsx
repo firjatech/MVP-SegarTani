@@ -62,6 +62,7 @@ export default function CartDrawer() {
               <button 
                 type="button"
                 onClick={() => setIsCartOpen(false)}
+                aria-label="Tutup Keranjang Belanja"
                 className="p-2 hover:bg-gray-100 rounded-full transition-colors"
               >
                 <X size={24} className="text-gray-400" />
@@ -74,6 +75,7 @@ export default function CartDrawer() {
                 <button 
                   type="button"
                   onClick={() => toggleSelectAll(!allSelected)}
+                  aria-label="Pilih semua produk"
                   className="flex items-center gap-3 group"
                 >
                   <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center transition-all ${allSelected ? 'bg-primary border-primary' : 'bg-white border-gray-200 group-hover:border-primary'}`}>
@@ -94,6 +96,7 @@ export default function CartDrawer() {
                     <button 
                       type="button"
                       onClick={() => toggleSelect(item.id)}
+                      aria-label={`Pilih ${item.name}`}
                       className={`w-6 h-6 rounded-lg border-2 shrink-0 flex items-center justify-center transition-all ${item.selected ? 'bg-primary border-primary shadow-md shadow-primary/20' : 'bg-white border-gray-100 hover:border-primary'}`}
                     >
                       {item.selected && <Check size={14} className="text-white" strokeWidth={4} />}
@@ -121,7 +124,8 @@ export default function CartDrawer() {
                         <button 
                           type="button"
                           onClick={() => removeFromCart(item.id)}
-                          className="text-gray-300 hover:text-red-500 transition-colors"
+                          aria-label={`Hapus ${item.name} dari keranjang`}
+                          className="text-gray-400 hover:text-red-500 transition-colors"
                         >
                           <Trash2 size={16} />
                         </button>
@@ -133,6 +137,7 @@ export default function CartDrawer() {
                           <button 
                             type="button"
                             onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                            aria-label={`Kurangi jumlah ${item.name}`}
                             className="w-7 h-7 flex items-center justify-center bg-white rounded-md shadow-sm hover:text-primary"
                           >
                             <Minus size={14} />
@@ -141,6 +146,7 @@ export default function CartDrawer() {
                           <button 
                             type="button"
                             onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                            aria-label={`Tambah jumlah ${item.name}`}
                             className="w-7 h-7 flex items-center justify-center bg-white rounded-md shadow-sm hover:text-primary"
                           >
                             <Plus size={14} />

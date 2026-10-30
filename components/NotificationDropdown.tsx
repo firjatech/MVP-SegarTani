@@ -266,6 +266,7 @@ export default function NotificationDropdown({
                     {/* Delete button on hover */}
                     <button
                       type="button"
+                      aria-label="Hapus notifikasi"
                       onClick={(e) => {
                         e.stopPropagation();
                         deleteNotification(notif.id);
