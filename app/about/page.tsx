@@ -5,9 +5,9 @@ export default function AboutPage() {
 	return (
 		<div className="flex flex-col">
 			{/* Header Section */}
-			<section className="bg-white py-20 border-b border-gray-50">
-				<div className="container mx-auto px-6 text-center" data-aos="fade-up">
-					<h1 className="text-4xl md:text-5xl font-black text-gray-900 mb-6">
+			<section className="bg-white py-10 sm:py-20 border-b border-gray-50">
+				<div className="container mx-auto px-4 sm:px-6 text-center" data-aos="fade-up">
+					<h1 className="text-3xl sm:text-5xl font-black text-gray-900 mb-6">
 						Tentang <span className="text-primary">Segar</span>
 						<span className="text-secondary">Tani</span>
 					</h1>
@@ -20,11 +20,11 @@ export default function AboutPage() {
 			</section>
 
 			{/* History Section */}
-			<section className="py-24 bg-white">
-				<div className="container mx-auto px-6">
+			<section className="py-12 sm:py-24 bg-white">
+				<div className="container mx-auto px-4 sm:px-6">
 					<div className="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
 						<div
-							className="relative h-[400px] rounded-3xl overflow-hidden shadow-2xl"
+							className="relative h-[240px] sm:h-[400px] rounded-2xl sm:rounded-3xl overflow-hidden shadow-2xl"
 							data-aos="fade-right"
 							data-aos-delay="100"
 						>
@@ -66,8 +66,8 @@ export default function AboutPage() {
 			</section>
 
 			{/* Vision & Mission */}
-			<section className="py-24 bg-white border-y border-gray-50">
-				<div className="container mx-auto px-6 grid grid-cols-1 md:grid-cols-2 gap-12">
+			<section className="py-12 sm:py-24 bg-white border-y border-gray-50">
+				<div className="container mx-auto px-4 sm:px-6 grid grid-cols-1 md:grid-cols-2 gap-12">
 					<div
 						className="bg-white p-12 rounded-3xl shadow-sm border border-gray-100"
 						data-aos="fade-right"
@@ -120,8 +120,8 @@ export default function AboutPage() {
 			</section>
 
 			{/* Values Section */}
-			<section className="py-24 bg-white text-center">
-				<div className="container mx-auto px-6">
+			<section className="py-12 sm:py-24 bg-white text-center">
+				<div className="container mx-auto px-4 sm:px-6">
 					<h2
 						className="text-3xl font-bold text-gray-900 mb-16"
 						data-aos="fade-up"

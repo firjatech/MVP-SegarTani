@@ -180,22 +180,22 @@ function AdminOrdersContent() {
           </div>
         </header>
 
-        <div className="bg-white rounded-[3rem] shadow-xl border border-gray-100 overflow-hidden">
+        <div className="bg-white rounded-2xl sm:rounded-4xl shadow-xl border border-gray-100 overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-left">
               <thead>
                 <tr className="bg-gray-50/50 border-b border-gray-100">
-                  <th className="px-10 py-8 text-[10px] font-black text-gray-400 uppercase tracking-widest">DETAIL PESANAN</th>
-                  <th className="px-10 py-8 text-[10px] font-black text-gray-400 uppercase tracking-widest">PELANGGAN</th>
-                  <th className="px-10 py-8 text-[10px] font-black text-gray-400 uppercase tracking-widest">PRODUK</th>
-                  <th className="px-10 py-8 text-[10px] font-black text-gray-400 uppercase tracking-widest">TOTAL</th>
-                  <th className="px-10 py-8 text-[10px] font-black text-gray-400 uppercase tracking-widest">ATUR STATUS</th>
+                  <th className="px-5 sm:px-10 py-4 sm:py-8 text-[10px] font-black text-gray-400 uppercase tracking-widest">DETAIL PESANAN</th>
+                  <th className="px-5 sm:px-10 py-4 sm:py-8 text-[10px] font-black text-gray-400 uppercase tracking-widest">PELANGGAN</th>
+                  <th className="px-5 sm:px-10 py-4 sm:py-8 text-[10px] font-black text-gray-400 uppercase tracking-widest">PRODUK</th>
+                  <th className="px-5 sm:px-10 py-4 sm:py-8 text-[10px] font-black text-gray-400 uppercase tracking-widest">TOTAL</th>
+                  <th className="px-5 sm:px-10 py-4 sm:py-8 text-[10px] font-black text-gray-400 uppercase tracking-widest">ATUR STATUS</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-50">
                 {filteredOrders.map((order) => (
                   <tr key={order.id} className="hover:bg-gray-50/30 transition-colors">
-                    <td className="px-10 py-8">
+                    <td className="px-5 sm:px-10 py-4 sm:py-8">
                       <p className="text-xs font-black text-gray-900 mb-1 truncate max-w-[120px]">#{String(order.id).toUpperCase()}</p>
                       <p className="text-[10px] font-bold text-gray-400">
                         {new Date(order.created_at).toLocaleDateString('id-ID', {
@@ -206,11 +206,11 @@ function AdminOrdersContent() {
                         })}
                       </p>
                     </td>
-                    <td className="px-10 py-8">
+                    <td className="px-5 sm:px-10 py-4 sm:py-8">
                       <h4 className="text-sm font-black text-gray-900 mb-1">{order.full_name}</h4>
                       <p className="text-[10px] font-bold text-gray-400 uppercase">{order.city}</p>
                     </td>
-                    <td className="px-10 py-8">
+                    <td className="px-5 sm:px-10 py-4 sm:py-8">
                       <div className="flex -space-x-4">
                         {order.order_items.slice(0, 3).map((item, i) => (
                           <div key={i} className="w-12 h-12 rounded-2xl border-4 border-white overflow-hidden shadow-sm bg-white group-hover:scale-110 transition-transform relative">
@@ -224,10 +224,10 @@ function AdminOrdersContent() {
                         )}
                       </div>
                     </td>
-                    <td className="px-10 py-8">
+                    <td className="px-5 sm:px-10 py-4 sm:py-8">
                       <span className="text-lg font-black text-primary">{formatIDR(Number(order.total_price))}</span>
                     </td>
-                    <td className="px-10 py-8">
+                    <td className="px-5 sm:px-10 py-4 sm:py-8">
                       <div className="flex items-center gap-3">
                         <select
                           value={order.status}

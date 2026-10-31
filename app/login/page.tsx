@@ -116,10 +116,10 @@ function LoginForm() {
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4 md:p-8">
-      <div className="bg-white w-full max-w-6xl rounded-[3rem] shadow-2xl overflow-hidden flex flex-col lg:flex-row min-h-[720px]">
+      <div className="bg-white w-full max-w-6xl rounded-3xl sm:rounded-[3rem] shadow-2xl overflow-hidden flex flex-col lg:flex-row min-h-0 lg:min-h-[720px]">
 
         {/* Left Side: Form */}
-        <div className="flex-1 p-8 md:p-14 flex flex-col justify-center relative bg-white">
+        <div className="flex-1 p-5 sm:p-8 md:p-14 flex flex-col justify-center relative bg-white">
           <div className="mb-6 flex flex-col items-center lg:items-start w-full">
             <div className="mb-3 flex items-center gap-2">
               <Image src="/images/logo.jpg" alt="Logo" width={48} height={48} priority className="h-10 w-auto" />
@@ -146,7 +146,7 @@ function LoginForm() {
                     setError(null);
                     setNotSellerPrompt(false);
                   }}
-                  className={`flex-1 py-3 px-3 rounded-xl font-black text-xs sm:text-sm flex items-center justify-center gap-2 transition-all cursor-pointer ${selectedRole === 'buyer'
+                  className={`flex-1 py-2.5 px-2 sm:px-3 rounded-xl font-black text-xs sm:text-sm flex items-center justify-center gap-1.5 sm:gap-2 transition-all cursor-pointer ${selectedRole === 'buyer'
                       ? 'bg-primary text-white shadow-md shadow-primary/25 scale-[1.02]'
                       : 'text-gray-600 hover:text-gray-900 hover:bg-gray-200/60'
                     }`}
@@ -162,7 +162,7 @@ function LoginForm() {
                     setError(null);
                     setNotSellerPrompt(false);
                   }}
-                  className={`flex-1 py-3 px-3 rounded-xl font-black text-xs sm:text-sm flex items-center justify-center gap-2 transition-all cursor-pointer ${selectedRole === 'seller'
+                  className={`flex-1 py-2.5 px-2 sm:px-3 rounded-xl font-black text-xs sm:text-sm flex items-center justify-center gap-1.5 sm:gap-2 transition-all cursor-pointer ${selectedRole === 'seller'
                       ? 'bg-amber-600 text-white shadow-md shadow-amber-600/25 scale-[1.02]'
                       : 'text-gray-600 hover:text-gray-900 hover:bg-gray-200/60'
                     }`}

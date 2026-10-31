@@ -222,7 +222,7 @@ export default function ProductDetailPage() {
 
 	return (
 		<div className="bg-gray-50 min-h-screen pt-16 pb-20">
-			<div className="container mx-auto px-6 max-w-7xl">
+			<div className="container mx-auto px-4 sm:px-6 max-w-7xl">
 				<button
 					onClick={() => router.back()}
 					className="flex items-center gap-2 text-gray-500 font-bold hover:text-primary transition-colors mb-2 group"
@@ -233,10 +233,10 @@ export default function ProductDetailPage() {
 					Kembali ke Katalog
 				</button>
 
-				<div className="bg-white rounded-[3rem] shadow-xl overflow-hidden border border-gray-100">
+				<div className="bg-white rounded-2xl sm:rounded-[3rem] shadow-xl overflow-hidden border border-gray-100">
 					<div className="flex flex-col lg:flex-row items-start">
 						{/* Left: Image */}
-						<div className="lg:w-1/2 p-8 md:p-12 bg-white flex items-start justify-center border-b lg:border-b-0 lg:border-r border-gray-50">
+						<div className="lg:w-1/2 p-4 sm:p-8 md:p-12 bg-white flex items-start justify-center border-b lg:border-b-0 lg:border-r border-gray-50">
 							<div className="relative aspect-square w-full max-w-md mt-4">
 								{product.discount > 0 && (
 									<div className="absolute top-0 left-0 z-10">
@@ -299,7 +299,7 @@ export default function ProductDetailPage() {
 								<ArrowRight size={12} className="text-emerald-500 opacity-60 group-hover/badge:opacity-100 group-hover/badge:translate-x-0.5 transition-all ml-0.5" />
 							</Link>
 
-							<h1 className="text-4xl md:text-5xl font-black text-gray-900 mb-4 leading-tight">
+							<h1 className="text-2xl sm:text-4xl md:text-5xl font-black text-gray-900 mb-4 leading-tight">
 								{product.name}
 							</h1>
 
@@ -310,7 +310,7 @@ export default function ProductDetailPage() {
 											{formatIDR(product.price)}
 										</span>
 									)}
-									<span className="text-4xl font-black text-primary">
+									<span className="text-3xl sm:text-4xl font-black text-primary">
 										{formatIDR(discountPrice)}
 									</span>
 								</div>

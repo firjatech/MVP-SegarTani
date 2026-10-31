@@ -8,18 +8,23 @@ import {
   Bell,
   Heart,
   HelpCircle,
+  Home,
+  Info,
+  LogIn,
   LayoutDashboard,
   LogOut,
   MapPin,
   Menu,
   MessageSquare,
   Package,
+  Phone,
   ShoppingBag,
   ShoppingCart,
   Star,
   Store,
   Tag,
   User as UserIcon,
+  UserPlus,
   Wallet,
   X,
 } from 'lucide-react';
@@ -187,7 +192,11 @@ export default function Navbar() {
           if (currentUserId) fetchUnreadCount(currentUserId);
         }
       )
-      .subscribe();
+      .subscribe((status) => {
+        if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
+          // Prevent unhandled WebSocket rejection
+        }
+      });
 
     // Poll every 30s as fallback
     const pollInterval = setInterval(() => {
@@ -230,17 +239,15 @@ export default function Navbar() {
     >
       <div className="container mx-auto px-3 sm:px-6 flex justify-between items-center relative">
         <div className="flex items-center gap-2 sm:gap-4 shrink-0">
-          {/* Hamburger Icon - Only show when user is logged in */}
-          {user && (
-            <button
-              type="button"
-              aria-label="Buka Menu Navigasi"
-              onClick={() => setIsSidebarOpen(true)}
-              className="p-1.5 sm:p-2 hover:bg-gray-50 rounded-lg text-gray-700 transition-colors shrink-0"
-            >
-              <Menu size={24} />
-            </button>
-          )}
+          {/* Hamburger Icon - Show for logged-in users on all sizes, and for guests on mobile (md:hidden) */}
+          <button
+            type="button"
+            aria-label="Buka Menu Navigasi"
+            onClick={() => setIsSidebarOpen(true)}
+            className={`p-1.5 sm:p-2 hover:bg-gray-50 rounded-lg text-gray-700 transition-colors shrink-0 ${!user ? 'md:hidden' : ''}`}
+          >
+            <Menu size={24} />
+          </button>
 
           {/* Conditional Logo: Seller -> /admin/dashboard, Buyer on ecommerce -> static, Buyer elsewhere -> /ecommerce, Guest -> / */}
           {user && isSeller ? (
@@ -296,12 +303,12 @@ export default function Navbar() {
 
         {/* Desktop Menu Links (Centered) - Only show if NOT logged in */}
         {!user && (
-          <div className="hidden md:flex absolute left-1/2 transform -translate-x-1/2 items-center space-x-8">
+          <div className="hidden md:flex lg:absolute lg:left-1/2 lg:-translate-x-1/2 items-center gap-3 md:gap-4 lg:gap-8 shrink-0">
             {navLinks.map((link) => (
               <Link
                 key={link.name}
                 href={link.href}
-                className={`text-sm font-medium transition-colors hover:text-primary ${pathname === link.href ? 'text-primary-dark border-b-2 border-primary-dark' : 'text-gray-700'
+                className={`text-xs md:text-sm font-semibold transition-colors hover:text-primary whitespace-nowrap ${pathname === link.href ? 'text-primary font-bold border-b-2 border-primary' : 'text-gray-700'
                   }`}
               >
                 {link.name}
@@ -314,6 +321,14 @@ export default function Navbar() {
         <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
           {/* Mobile Right Controls: Notifikasi, Chat & Cart (Cart hanya untuk pembeli) */}
           <div className="flex md:hidden items-center gap-1.5 sm:gap-2 shrink-0">
+            {!user && (
+              <Link
+                href="/login"
+                className="bg-primary text-white px-3 py-1.5 rounded-full text-xs font-black shadow-xs hover:bg-[#008810] transition-all"
+              >
+                Masuk
+              </Link>
+            )}
             {user && (
               <div className="relative">
                 <button
@@ -469,7 +484,7 @@ export default function Navbar() {
             {user ? (
               <button
                 type="button"
-                onClick={handleLogout}
+                onClick={(e) => { e.preventDefault(); void handleLogout(); }}
                 className="bg-primary text-white px-5 py-2 rounded-full text-sm font-bold hover:bg-[#008810] transition-all flex items-center gap-2 shadow-lg shadow-primary/10 cursor-pointer"
               >
                 <LogOut size={16} /> Logout
@@ -789,12 +804,108 @@ export default function Navbar() {
                   </>
                 )}
 
+                {/* TOMBOL LOGOUT MOBILE (UNTUK USER LOGIN) */}
+                {user && (
+                  <>
+                    <div className="h-px bg-white/10 my-3" />
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setIsSidebarOpen(false);
+                        void handleLogout();
+                      }}
+                      className="w-full flex items-center gap-3 p-3 rounded-xl transition-all font-bold text-sm text-red-100 hover:text-white bg-red-500/25 hover:bg-red-500/40 border border-red-400/40 cursor-pointer text-left shadow-sm"
+                    >
+                      <LogOut size={18} className="text-red-300" />
+                      <span>Keluar (Logout)</span>
+                    </button>
+                  </>
+                )}
+
                 {/* NOT LOGGED IN */}
                 {!user && (
-                  <Link href="/register" onClick={() => setIsSidebarOpen(false)}
-                    className="flex items-center gap-3 text-white/90 hover:text-white hover:bg-white/10 p-3 rounded-xl transition-all font-bold text-sm">
-                    <UserIcon size={20} /> Daftar Sekarang
-                  </Link>
+                  <div className="space-y-3 pt-1">
+                    {/* Welcome Card */}
+                    <div className="bg-white/10 rounded-2xl p-4 border border-white/10 text-white mb-4">
+                      <p className="font-black text-base">Selamat Datang!</p>
+                      <p className="text-white/70 text-xs mt-1">
+                        SegarTani menghadirkan produk pangan organik segar langsung dari petani lokal.
+                      </p>
+                      <div className="grid grid-cols-2 gap-2 mt-3">
+                        <Link
+                          href="/login"
+                          onClick={() => setIsSidebarOpen(false)}
+                          className="flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-white text-primary font-bold text-xs hover:bg-gray-100 transition-colors shadow-sm"
+                        >
+                          <LogIn size={14} /> Masuk
+                        </Link>
+                        <Link
+                          href="/register"
+                          onClick={() => setIsSidebarOpen(false)}
+                          className="flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-secondary text-primary font-black text-xs hover:bg-yellow-400 transition-colors shadow-sm"
+                        >
+                          <UserPlus size={14} /> Daftar
+                        </Link>
+                      </div>
+                    </div>
+
+                    <p className="text-[10px] font-black text-white/40 uppercase tracking-widest px-3">Halaman Utama</p>
+
+                    <Link
+                      href="/"
+                      onClick={() => setIsSidebarOpen(false)}
+                      className={`flex items-center gap-3 p-3 rounded-xl transition-all font-bold text-sm ${
+                        pathname === '/' ? 'bg-white text-primary shadow-lg' : 'text-white/90 hover:text-white hover:bg-white/10'
+                      }`}
+                    >
+                      <Home size={18} /> Beranda
+                    </Link>
+
+                    <Link
+                      href="/about"
+                      onClick={() => setIsSidebarOpen(false)}
+                      className={`flex items-center gap-3 p-3 rounded-xl transition-all font-bold text-sm ${
+                        pathname === '/about' ? 'bg-white text-primary shadow-lg' : 'text-white/90 hover:text-white hover:bg-white/10'
+                      }`}
+                    >
+                      <Info size={18} /> Tentang Kami
+                    </Link>
+
+                    <Link
+                      href="/service"
+                      onClick={() => setIsSidebarOpen(false)}
+                      className={`flex items-center gap-3 p-3 rounded-xl transition-all font-bold text-sm ${
+                        pathname === '/service' ? 'bg-white text-primary shadow-lg' : 'text-white/90 hover:text-white hover:bg-white/10'
+                      }`}
+                    >
+                      <Package size={18} /> Layanan
+                    </Link>
+
+                    <Link
+                      href="/contact"
+                      onClick={() => setIsSidebarOpen(false)}
+                      className={`flex items-center gap-3 p-3 rounded-xl transition-all font-bold text-sm ${
+                        pathname === '/contact' ? 'bg-white text-primary shadow-lg' : 'text-white/90 hover:text-white hover:bg-white/10'
+                      }`}
+                    >
+                      <Phone size={18} /> Kontak
+                    </Link>
+
+                    <div className="h-px bg-white/10 my-3" />
+
+                    <p className="text-[10px] font-black text-white/40 uppercase tracking-widest px-3">Katalog Belanja</p>
+
+                    <Link
+                      href="/ecommerce"
+                      onClick={() => setIsSidebarOpen(false)}
+                      className={`flex items-center gap-3 p-3 rounded-xl transition-all font-bold text-sm ${
+                        pathname === '/ecommerce' ? 'bg-white text-primary shadow-lg' : 'text-white/90 hover:text-white hover:bg-white/10'
+                      }`}
+                    >
+                      <Store size={18} /> Belanja Sekarang
+                    </Link>
+                  </div>
                 )}
               </div>
             </motion.div>

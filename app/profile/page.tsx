@@ -56,6 +56,7 @@ export default function ProfilePage() {
 
 	const isSeller = currentRole === 'seller';
 
+
 	const nameId = useId();
 	const phoneId = useId();
 	const addressId = useId();
@@ -139,7 +140,7 @@ export default function ProfilePage() {
 
 	return (
 		<div className="bg-gray-50 min-h-screen pt-12 pb-20 font-sans">
-			<div className="container mx-auto px-6 max-w-4xl" data-aos="fade-up">
+			<div className="container mx-auto px-4 sm:px-6 max-w-4xl" data-aos="fade-up">
 				<header className="mb-8 flex justify-between items-end">
 					<div>
 						{isSeller ? (
@@ -177,7 +178,7 @@ export default function ProfilePage() {
 				<div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
 					{/* Left: Avatar & Quick Links */}
 					<div className="lg:col-span-1 space-y-6">
-						<div className="bg-white rounded-4xl shadow-xl p-8 text-center border border-gray-100">
+						<div className="bg-white rounded-3xl sm:rounded-4xl shadow-xl p-5 sm:p-8 text-center border border-gray-100">
 							<div className="relative inline-block mb-6">
 								<div className="w-32 h-32 bg-primary/10 rounded-full flex items-center justify-center text-primary font-black text-4xl border-4 border-white shadow-inner">
 									{profile.full_name
@@ -262,13 +263,14 @@ export default function ProfilePage() {
 										</button>
 									</>
 								)}
+
 							</div>
 						</div>
 					</div>
 
 					{/* Right: Form */}
 					<div className="lg:col-span-2">
-						<div className="bg-white rounded-4xl shadow-xl p-8 md:p-12 border border-gray-100">
+						<div className="bg-white rounded-3xl sm:rounded-4xl shadow-xl p-5 sm:p-12 border border-gray-100">
 							<form onSubmit={handleSave} className="space-y-8">
 								<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 									<div>

@@ -398,7 +398,11 @@ function ChatPageContent() {
           fetchChatRooms(userId);
         }
       )
-      .subscribe();
+      .subscribe((status) => {
+        if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
+          // Prevent unhandled WebSocket rejection
+        }
+      });
 
     return () => {
       supabase.removeChannel(listChannel);
@@ -532,7 +536,11 @@ function ChatPageContent() {
           ));
         }
       )
-      .subscribe();
+      .subscribe((status) => {
+        if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
+          // Prevent unhandled WebSocket rejection
+        }
+      });
 
     // Fallback Polling every 3 seconds
     const interval = setInterval(() => {

@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
@@ -14,6 +14,12 @@ const geistSans = Geist({
   subsets: ["latin"],
   display: "swap",
 });
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+};
 
 export const metadata: Metadata = {
   title: "SegarTani - Sayur & Buah Organik Segar Berkualitas",
@@ -34,14 +40,34 @@ export default function RootLayout({
       <head>
         <link rel="preconnect" href="https://qjfuebkxlnnrdjgakdrm.supabase.co" crossOrigin="anonymous" />
         <link rel="dns-prefetch" href="https://qjfuebkxlnnrdjgakdrm.supabase.co" />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              if (typeof window !== 'undefined') {
+                window.addEventListener('unhandledrejection', function(event) {
+                  if (
+                    event &&
+                    (event.reason instanceof Event ||
+                     event.reason?.type === 'error' ||
+                     Object.prototype.toString.call(event.reason) === '[object Event]')
+                  ) {
+                    event.preventDefault();
+                    event.stopImmediatePropagation();
+                    console.warn('Unhandled [object Event] rejection suppressed:', event.reason);
+                  }
+                }, true);
+              }
+            `,
+          }}
+        />
       </head>
-      <body className="min-h-full flex flex-col font-sans">
+      <body className="min-h-full flex flex-col font-sans overflow-x-hidden w-full">
         <NotificationProvider>
           <WalletProvider>
             <CartProvider>
               <WishlistProvider>
                 <Navbar />
-                <main className="flex-grow pt-20">
+                <main className="flex-grow pt-20 w-full overflow-x-hidden">
                   {children}
                 </main>
                 <Footer />

@@ -169,7 +169,7 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     let cancelIdle: (() => void) | undefined;
 
-    supabase.auth.getSession().then(({ data }) => {
+    supabase.auth.getSession().catch(() => ({ data: { session: null } })).then(({ data }) => {
       const user = data?.session?.user;
       if (user) {
         setCurrentUserId(user.id);

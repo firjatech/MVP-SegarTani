@@ -501,7 +501,7 @@ export default function CheckoutPage() {
           <div className="lg:col-span-7 space-y-6">
             
             {/* STEP 1: ALAMAT PENGIRIMAN */}
-            <div className="bg-white rounded-3xl p-6 sm:p-7 shadow-xs border border-gray-200 transition-all hover:shadow-sm">
+            <div className="bg-white rounded-3xl p-4 sm:p-7 shadow-xs border border-gray-200 transition-all hover:shadow-sm">
               <div className="flex items-center justify-between pb-4 border-b border-gray-100 mb-5">
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center font-black text-sm">
@@ -610,7 +610,7 @@ export default function CheckoutPage() {
                     </span>
                     <span className="text-[10px] text-gray-400">Toleransi &plusmn;0,05 km</span>
                   </div>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-1.5">
                     {[
                       { label: 'Uji 7,0 km • Rp19.000', km: 7.0, lat: -7.217896, lng: 110.109055, name: 'Candiroto Timur (7,0 km)' },
                       { label: 'Uji 14,0 km • Rp33.000', km: 14.0, lat: -7.217882, lng: 110.172511, name: 'Area Temanggung (14,0 km)' },

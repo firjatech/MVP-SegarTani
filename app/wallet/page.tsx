@@ -366,7 +366,7 @@ export default function BuyerWalletPage() {
                     <label className="block text-xs font-bold text-gray-700 mb-2">
                       Pilih Nominal Cepat
                     </label>
-                    <div className="grid grid-cols-3 gap-2">
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                       {TOPUP_PRESETS.map((nominal) => (
                         <button
                           key={nominal}

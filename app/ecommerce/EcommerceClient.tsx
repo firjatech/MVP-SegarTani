@@ -89,7 +89,11 @@ export default function EcommerceClient({ initialProducts }: EcommerceClientProp
               }
             }
           )
-          .subscribe();
+          .subscribe((status) => {
+              if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
+                // Handled realtime channel status
+              }
+            });
       } catch (err) {
         console.error('Failed to init realtime channel:', err);
       }
@@ -141,7 +145,7 @@ export default function EcommerceClient({ initialProducts }: EcommerceClientProp
 
   return (
     <div className="bg-white min-h-screen pb-20 font-sans pt-4">
-      <div className="container mx-auto px-6 max-w-7xl">
+      <div className="container mx-auto px-4 sm:px-6 max-w-7xl">
         {/* Combined Filter Bar */}
         <div className="max-w-6xl mx-auto pt-3 pb-8 px-0 md:px-6">
           <div className="flex flex-col sm:flex-row items-center bg-white border border-gray-200 rounded-3xl overflow-hidden shadow-md focus-within:border-primary focus-within:ring-4 focus-within:ring-primary/10 transition-all duration-300">
@@ -188,7 +192,7 @@ export default function EcommerceClient({ initialProducts }: EcommerceClientProp
         </div>
 
         {/* Product Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-8">
           {filteredProducts.length > 0 ? (
             filteredProducts.map((product, index) => {
               const discountPrice = product.price - (product.price * product.discount) / 100;

@@ -90,7 +90,7 @@ export default function OrdersPage() {
 
   return (
     <div className="bg-gray-50 min-h-screen pt-16 pb-20 font-sans">
-      <div className="container mx-auto px-6 max-w-4xl">
+      <div className="container mx-auto px-4 sm:px-6 max-w-4xl">
         <header className="mb-12">
           <Link 
             href="/ecommerce"
@@ -113,7 +113,7 @@ export default function OrdersPage() {
         </header>
 
         {orders.length === 0 ? (
-          <div className="bg-white rounded-5xl p-16 text-center shadow-xl border border-gray-100 flex flex-col items-center">
+          <div className="bg-white rounded-3xl sm:rounded-5xl p-6 sm:p-16 text-center shadow-xl border border-gray-100 flex flex-col items-center">
             <div className="w-24 h-24 bg-gray-50 rounded-full flex items-center justify-center text-gray-300 mb-8">
               <ShoppingBag size={48} />
             </div>
@@ -123,7 +123,7 @@ export default function OrdersPage() {
             </p>
             <Link 
               href="/ecommerce"
-              className="bg-primary text-white px-12 py-4 rounded-2xl font-black shadow-xl shadow-primary/20 hover:scale-105 transition-transform"
+              className="bg-primary text-white w-full sm:w-auto px-6 sm:px-12 py-3.5 sm:py-4 rounded-2xl font-black shadow-xl shadow-primary/20 hover:scale-105 transition-transform"
             >
               Mulai Belanja
             </Link>
@@ -145,7 +145,7 @@ export default function OrdersPage() {
                   animate={{ opacity: 1, y: 0 }}
                   className="bg-white rounded-4xl shadow-lg border border-gray-100 overflow-hidden group hover:shadow-2xl transition-all duration-500"
                 >
-                  <div className="p-8">
+                  <div className="p-4 sm:p-8">
                     <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
                       <div className="flex items-center gap-4">
                         <div className={`p-3 rounded-2xl ${config.color}`}>
@@ -162,7 +162,7 @@ export default function OrdersPage() {
                       </div>
                     </div>
 
-                    <div className="space-y-6 mb-8 bg-gray-50/50 rounded-3xl p-6 border border-gray-50">
+                    <div className="space-y-6 mb-8 bg-gray-50/50 rounded-2xl sm:rounded-3xl p-3.5 sm:p-6 border border-gray-50">
                       {order.order_items.map((item, idx) => (
                         <div key={idx} className="flex items-center gap-4">
                           <div className="w-16 h-16 bg-white rounded-xl overflow-hidden shadow-sm shrink-0 border border-gray-100 relative">

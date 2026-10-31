@@ -224,7 +224,7 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
   useEffect(() => {
     let cancelIdle: (() => void) | undefined;
 
-    supabase.auth.getSession().then(({ data }) => {
+    supabase.auth.getSession().catch(() => ({ data: { session: null } })).then(({ data }) => {
       const user = data?.session?.user;
       if (user) {
         setCurrentUserId(user.id);
@@ -267,7 +267,11 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
           if (currentUserId) fetchNotifications(currentUserId);
         }
       )
-      .subscribe();
+      .subscribe((status) => {
+        if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
+          // Handled realtime channel status to prevent unhandled rejection
+        }
+      });
 
     return () => {
       cancelIdle?.();
