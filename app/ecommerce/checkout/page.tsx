@@ -819,7 +819,7 @@ export default function CheckoutPage() {
                     <div className="bg-white p-3 rounded-xl border border-gray-200 flex items-center justify-between">
                       <div>
                         <p className="font-black text-gray-900">BCA: <span className="font-mono text-sm tracking-wider">1234567890</span></p>
-                        <p className="text-[11px] text-gray-400">a.n. SegarTani Bandung Sejahtera</p>
+                        <p className="text-[11px] text-gray-400">a.n. SegarTani</p>
                       </div>
                       <button
                         type="button"
@@ -835,7 +835,7 @@ export default function CheckoutPage() {
                     <div className="bg-white p-3 rounded-xl border border-gray-200 flex items-center justify-between">
                       <div>
                         <p className="font-black text-gray-900">Mandiri: <span className="font-mono text-sm tracking-wider">1400012345678</span></p>
-                        <p className="text-[11px] text-gray-400">a.n. SegarTani Bandung Sejahtera</p>
+                        <p className="text-[11px] text-gray-400">a.n. SegarTani</p>
                       </div>
                       <button
                         type="button"
@@ -1352,7 +1352,9 @@ export default function CheckoutPage() {
                       <input
                         type="number"
                         step="any"
-                        placeholder="contoh: -7.2178"
+                        min="-90"
+                        max="90"
+                        placeholder="contoh: -6.9218"
                         value={tempLat}
                         onChange={(e) => { setTempLat(e.target.value); setGeoError(''); }}
                         className="w-full bg-white border border-gray-200 rounded-xl px-3 py-2 text-xs font-medium text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary placeholder-gray-300"
@@ -1365,7 +1367,9 @@ export default function CheckoutPage() {
                       <input
                         type="number"
                         step="any"
-                        placeholder="contoh: 110.1090"
+                        min="-180"
+                        max="180"
+                        placeholder="contoh: 107.6071"
                         value={tempLng}
                         onChange={(e) => { setTempLng(e.target.value); setGeoError(''); }}
                         className="w-full bg-white border border-gray-200 rounded-xl px-3 py-2 text-xs font-medium text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary placeholder-gray-300"
