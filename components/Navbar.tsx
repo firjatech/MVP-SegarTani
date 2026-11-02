@@ -255,8 +255,8 @@ export default function Navbar() {
               <Image
                 src="/images/logo.jpg"
                 alt="SegarTani Logo"
-                width={60}
-                height={60}
+                width={882}
+                height={586}
                 priority
                 className="h-11 sm:h-12 w-auto object-contain"
               />
@@ -267,8 +267,8 @@ export default function Navbar() {
               <Image
                 src="/images/logo.jpg"
                 alt="SegarTani Logo"
-                width={60}
-                height={60}
+                width={882}
+                height={586}
                 priority
                 className="h-11 sm:h-12 w-auto object-contain"
               />
@@ -279,8 +279,8 @@ export default function Navbar() {
               <Image
                 src="/images/logo.jpg"
                 alt="SegarTani Logo"
-                width={60}
-                height={60}
+                width={882}
+                height={586}
                 priority
                 className="h-11 sm:h-12 w-auto object-contain"
               />
@@ -291,8 +291,8 @@ export default function Navbar() {
               <Image
                 src="/images/logo.jpg"
                 alt="SegarTani Logo"
-                width={60}
-                height={60}
+                width={882}
+                height={586}
                 priority
                 className="h-11 sm:h-12 w-auto object-contain"
               />
