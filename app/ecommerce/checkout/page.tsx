@@ -65,17 +65,17 @@ export interface ShippingAddressData {
   longitude: number; // wajib ada
 }
 
-// Koordinat nyata Dusun Klombeyan, Desa Muntung, Candiroto, Temanggung
-const DEFAULT_LAT = -7.217896;
-const DEFAULT_LNG = 110.109055;
+// Koordinat default: Alun-Alun Bandung (titik tengah area layanan Bandung)
+const DEFAULT_LAT = -6.921796;
+const DEFAULT_LNG = 107.670515;
 
 const DEFAULT_ADDRESS: ShippingAddressData = {
   full_name: 'Pelanggan SegarTani',
   phone: '081234567890',
-  address: 'Jl. Sibajag KM 01, Dusun Klombeyan, Desa Muntung',
-  city: 'Temanggung',
-  province: 'Jawa Tengah',
-  postal_code: '56257',
+  address: 'Jl. Asia Afrika, Alun-Alun, Kec. Sumur Bandung',
+  city: 'Bandung',
+  province: 'Jawa Barat',
+  postal_code: '40111',
   latitude: DEFAULT_LAT,
   longitude: DEFAULT_LNG,
   // Jarak dihitung sekali saat modul dimuat
@@ -612,14 +612,14 @@ export default function CheckoutPage() {
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-1.5">
                     {[
-                      { label: 'Uji 7,0 km • Rp19.000', km: 7.0, lat: -7.217896, lng: 110.109055, name: 'Candiroto Timur (7,0 km)' },
-                      { label: 'Uji 14,0 km • Rp33.000', km: 14.0, lat: -7.217882, lng: 110.172511, name: 'Area Temanggung (14,0 km)' },
-                      { label: 'Uji 14,9 km • Rp34.800', km: 14.9, lat: -7.217880, lng: 110.180669, name: 'Batas Radius (14,9 km)' },
-                      { label: 'Uji 15,1 km • Diblokir', km: 15.1, lat: -7.217880, lng: 110.182482, name: 'Luar Radius (15,1 km)' },
-                      { label: 'Uji 16,0 km • Diblokir', km: 16.0, lat: -7.217877, lng: 110.190641, name: 'Luar Radius (16,0 km)' },
-                      { label: 'Uji 22,0 km • Diblokir', km: 22.0, lat: -7.217857, lng: 110.245031, name: 'Luar Jangkauan (22,0 km)' },
-                      { label: 'Muntung (1,0 km • Nyata)', km: 1.0, lat: -7.213900, lng: 110.053600, name: 'Desa Muntung, Candiroto (1,0 km)' },
-                      { label: 'Kota Temanggung (18,2 km)', km: 18.2, lat: -7.315000, lng: 110.175000, name: 'Alun-alun Temanggung (18,2 km)' },
+                      { label: 'Uji 7,0 km • Rp19.000', km: 7.0, lat: -6.921796, lng: 107.670515, name: 'Bandung Timur (7,0 km)' },
+                      { label: 'Uji 14,0 km • Rp33.000', km: 14.0, lat: -6.921783, lng: 107.733929, name: 'Cileunyi (14,0 km)' },
+                      { label: 'Uji 14,9 km • Rp34.800', km: 14.9, lat: -6.921781, lng: 107.742083, name: 'Batas Radius (14,9 km)' },
+                      { label: 'Uji 15,1 km • Diblokir', km: 15.1, lat: -6.921780, lng: 107.743895, name: 'Luar Radius (15,1 km)' },
+                      { label: 'Uji 16,0 km • Diblokir', km: 16.0, lat: -6.921778, lng: 107.752048, name: 'Luar Radius (16,0 km)' },
+                      { label: 'Uji 22,0 km • Diblokir', km: 22.0, lat: -6.921759, lng: 107.806403, name: 'Luar Jangkauan (22,0 km)' },
+                      { label: 'Masjid Agung (~0,2 km • Nyata)', km: 0.2, lat: -6.9211, lng: 107.6088, name: 'Masjid Agung Bandung (0,2 km)' },
+                      { label: 'Jl. Braga (~1,0 km • Nyata)', km: 1.0, lat: -6.9130, lng: 107.6070, name: 'Jl. Braga, Bandung (1,0 km)' },
                     ].map((preset) => {
                       const isSelected = Math.abs(distance - preset.km) < 0.05;
                       const isExceed = preset.km > MAX_DELIVERY_DISTANCE;
@@ -638,8 +638,8 @@ export default function CheckoutPage() {
                             const updatedAddr = {
                               ...shippingAddress,
                               address: preset.name,
-                              city: 'Temanggung',
-                              province: 'Jawa Tengah',
+                              city: 'Bandung',
+                              province: 'Jawa Barat',
                               distance: roundedDistance,
                               latitude: preset.lat,
                               longitude: preset.lng,
@@ -812,14 +812,14 @@ export default function CheckoutPage() {
                   >
                     <div className="flex items-center gap-2 text-gray-900 font-bold">
                       <Building2 size={16} className="text-primary" />
-                      <span>Nomor Rekening Resmi SegarTani Temanggung:</span>
+                      <span>Nomor Rekening Resmi SegarTani Bandung:</span>
                     </div>
 
                     {/* BCA */}
                     <div className="bg-white p-3 rounded-xl border border-gray-200 flex items-center justify-between">
                       <div>
                         <p className="font-black text-gray-900">BCA: <span className="font-mono text-sm tracking-wider">1234567890</span></p>
-                        <p className="text-[11px] text-gray-400">a.n. SegarTani Temanggung Sejahtera</p>
+                        <p className="text-[11px] text-gray-400">a.n. SegarTani Bandung Sejahtera</p>
                       </div>
                       <button
                         type="button"
@@ -835,7 +835,7 @@ export default function CheckoutPage() {
                     <div className="bg-white p-3 rounded-xl border border-gray-200 flex items-center justify-between">
                       <div>
                         <p className="font-black text-gray-900">Mandiri: <span className="font-mono text-sm tracking-wider">1400012345678</span></p>
-                        <p className="text-[11px] text-gray-400">a.n. SegarTani Temanggung Sejahtera</p>
+                        <p className="text-[11px] text-gray-400">a.n. SegarTani Bandung Sejahtera</p>
                       </div>
                       <button
                         type="button"

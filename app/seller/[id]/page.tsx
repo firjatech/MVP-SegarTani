@@ -76,9 +76,9 @@ export default function SellerProfilePage() {
             store_description: 'Toko resmi pusat SegarTani. Menyediakan aneka sayur-mayur, buah segar, daging, dan bumbu dapur langsung dari petani mitra pilihan dengan standar mutu dan kesegaran 100% terjamin.',
             logo_url: '/images/logo.jpg',
             banner_url: null,
-            store_address: 'Kecamatan Candiroto',
-            store_city: 'Kabupaten Temanggung',
-            store_province: 'Jawa Tengah',
+            store_address: 'Kec. Sumur Bandung',
+            store_city: 'Kota Bandung',
+            store_province: 'Jawa Barat',
             store_maps_url: null,
             created_at: new Date().toISOString(),
           });

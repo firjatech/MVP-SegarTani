@@ -1,22 +1,21 @@
 /**
  * Konfigurasi Titik Gudang Distribusi SegarTani & Utilitas Pengiriman
- * 
+ *
  * Sumber Koordinat:
- * - Data Pokok Pendidikan Kemendikdasmen RI (SMK Darul Falach Klombeyan, Candiroto, Temanggung)
- * - OpenStreetMap Geocoding (Klombeyan, Desa Muntung, Kec. Candiroto, Kab. Temanggung)
- * Koordinat Terverifikasi: Lintang (Lat) -7.2179, Bujur (Lng) 110.0456
+ * - OpenStreetMap Geocoding (Alun-Alun Bandung, Kec. Sumur Bandung, Kota Bandung)
+ * Koordinat Terverifikasi: Lintang (Lat) -6.9218, Bujur (Lng) 107.6071
  */
 
 export const WAREHOUSE_CONFIG = {
-  name: 'Gudang Klombeyan, Temanggung',
-  address: 'Jl. Sibajag KM 01 Klombeyan, Desa Muntung, Kec. Candiroto',
-  district: 'Candiroto',
-  city: 'Temanggung',
-  province: 'Jawa Tengah',
-  postalCode: '56257',
+  name: 'Gudang Bandung',
+  address: 'Jl. Asia Afrika, Alun-Alun, Kec. Sumur Bandung',
+  district: 'Sumur Bandung',
+  city: 'Bandung',
+  province: 'Jawa Barat',
+  postalCode: '40111',
   coordinates: {
-    lat: -7.2179,
-    lng: 110.0456,
+    lat: -6.9218,
+    lng: 107.6071,
   },
 } as const;
 
