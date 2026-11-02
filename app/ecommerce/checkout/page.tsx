@@ -180,17 +180,16 @@ export default function CheckoutPage() {
     shippingAddress.longitude >= -180 &&
     shippingAddress.longitude <= 180
   );
-  const distance = hasValidCoords
-    ? parseFloat(
-        calculateHaversineDistance(
-          WAREHOUSE_CONFIG.coordinates.lat,
-          WAREHOUSE_CONFIG.coordinates.lng,
-          shippingAddress.latitude,
-          shippingAddress.longitude,
-        ).toFixed(1)
+  const rawDistance = hasValidCoords
+    ? calculateHaversineDistance(
+        WAREHOUSE_CONFIG.coordinates.lat,
+        WAREHOUSE_CONFIG.coordinates.lng,
+        shippingAddress.latitude,
+        shippingAddress.longitude,
       )
     : 0;
-  const isDistanceExceeded = hasValidCoords && distance > MAX_DELIVERY_DISTANCE;
+  const distance = hasValidCoords ? parseFloat(rawDistance.toFixed(1)) : 0;
+  const isDistanceExceeded = hasValidCoords && rawDistance > MAX_DELIVERY_DISTANCE;
   const shippingFee = hasValidCoords ? calculateShippingFee(distance) : 0;
   const finalPrice = Math.max(0, totalPrice - discountAmount) + (isDistanceExceeded || !hasValidCoords ? 0 : shippingFee);
 
@@ -1389,14 +1388,13 @@ export default function CheckoutPage() {
                     const valid = tempLat.trim() !== '' && tempLng.trim() !== '' && !isNaN(lat) && !isNaN(lng)
                       && lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180;
                     if (!valid) return null;
-                    const d = parseFloat(
-                      calculateHaversineDistance(
-                        WAREHOUSE_CONFIG.coordinates.lat,
-                        WAREHOUSE_CONFIG.coordinates.lng,
-                        lat, lng,
-                      ).toFixed(1)
+                    const rawD = calculateHaversineDistance(
+                      WAREHOUSE_CONFIG.coordinates.lat,
+                      WAREHOUSE_CONFIG.coordinates.lng,
+                      lat, lng,
                     );
-                    const exceeded = d > MAX_DELIVERY_DISTANCE;
+                    const d = parseFloat(rawD.toFixed(1));
+                    const exceeded = rawD > MAX_DELIVERY_DISTANCE;
                     return (
                       <div className={`flex items-center justify-between rounded-xl px-3 py-2 border text-xs font-bold ${
                         exceeded
