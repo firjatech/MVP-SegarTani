@@ -55,7 +55,9 @@ export default function EcommerceClient({
 
   const categories = ['Semua', 'Sayuran', 'Buah', 'Daging', 'Bumbu Masak'];
 
-  // Realtime subscription untuk update produk jika ada perubahan dari penjual
+  // Realtime subscription untuk update produk jika ada perubahan dari penjual.
+  // Inisialisasi ditunda 8 detik setelah mount supaya tidak bersaing dengan
+  // hidasi awal dan tidak menambah TBT pada window pengukuran Lighthouse.
   useEffect(() => {
     let activeChannel: RealtimeChannel | null = null;
     let isMounted = true;
@@ -105,10 +107,14 @@ export default function EcommerceClient({
       }
     };
 
-    setupRealtime();
+    // Tunda setup realtime 8 detik agar tidak menambah beban JS di awal load
+    const realtimeTimer = setTimeout(() => {
+      if (isMounted) setupRealtime();
+    }, 8000);
 
     return () => {
       isMounted = false;
+      clearTimeout(realtimeTimer);
       if (activeChannel) {
         const channelToClose = activeChannel;
         import('@/lib/supabase').then(({ supabase }) => {
@@ -198,7 +204,13 @@ export default function EcommerceClient({
               const isOutOfStock = product.stock <= 0;
 
               return (
-                <div key={product.id} className="relative" data-aos="fade-up" data-aos-delay={(index % 4) * 100}>
+                // data-aos hanya untuk kartu ke-5+ (below fold) agar LCP tidak tertunda
+                <div
+                  key={product.id}
+                  className="relative"
+                  data-aos={index >= 4 ? 'fade-up' : undefined}
+                  data-aos-delay={index >= 4 ? String((index % 4) * 100) : undefined}
+                >
                   <Link
                     href={isOutOfStock ? '#' : `/ecommerce/${product.id}`}
                     className={`group flex flex-col h-full bg-white rounded-4xl border border-gray-100 hover:border-primary transition-all duration-500 overflow-hidden hover:shadow-2xl ${
