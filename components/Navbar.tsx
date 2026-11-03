@@ -258,7 +258,7 @@ export default function Navbar() {
                 width={882}
                 height={586}
                 priority
-                className="h-11 sm:h-12 w-auto object-contain"
+                className="h-11 sm:h-12 w-auto aspect-[882/586] object-contain"
               />
               <span className="text-base sm:text-2xl font-bold text-primary tracking-tight">Segar<span className="text-secondary">Tani</span></span>
             </Link>
@@ -270,7 +270,7 @@ export default function Navbar() {
                 width={882}
                 height={586}
                 priority
-                className="h-11 sm:h-12 w-auto object-contain"
+                className="h-11 sm:h-12 w-auto aspect-[882/586] object-contain"
               />
               <span className="text-base sm:text-2xl font-bold text-primary tracking-tight">Segar<span className="text-secondary">Tani</span></span>
             </div>
@@ -282,7 +282,7 @@ export default function Navbar() {
                 width={882}
                 height={586}
                 priority
-                className="h-11 sm:h-12 w-auto object-contain"
+                className="h-11 sm:h-12 w-auto aspect-[882/586] object-contain"
               />
               <span className="text-base sm:text-2xl font-bold text-primary tracking-tight">Segar<span className="text-secondary">Tani</span></span>
             </Link>
@@ -294,7 +294,7 @@ export default function Navbar() {
                 width={882}
                 height={586}
                 priority
-                className="h-11 sm:h-12 w-auto object-contain"
+                className="h-11 sm:h-12 w-auto aspect-[882/586] object-contain"
               />
               <span className="text-base sm:text-2xl font-bold text-primary tracking-tight">Segar<span className="text-secondary">Tani</span></span>
             </Link>

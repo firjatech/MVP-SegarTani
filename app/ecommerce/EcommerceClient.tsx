@@ -4,7 +4,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { Search, Star, ShoppingCart, ChevronDown, Store } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useRouter, useSearchParams, usePathname } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { useCart } from '@/context/CartContext';
 import WishlistButton from '@/components/WishlistButton';
 import { cleanImageUrl } from '@/lib/image';
@@ -35,17 +35,23 @@ const formatIDR = (amount: number) => {
 
 interface EcommerceClientProps {
   initialProducts: Product[];
+  initialQuery?: string;
+  initialCategory?: string;
 }
 
-export default function EcommerceClient({ initialProducts }: EcommerceClientProps) {
+export default function EcommerceClient({
+  initialProducts,
+  initialQuery = '',
+  initialCategory = 'Semua',
+}: EcommerceClientProps) {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const pathname = usePathname();
   const { addToCart } = useCart();
 
   const [products, setProducts] = useState<Product[]>(initialProducts);
-  const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || '');
-  const [activeCategory, setActiveCategory] = useState(searchParams.get('category') || 'Semua');
+  const [searchQuery, setSearchQuery] = useState(initialQuery);
+  const [activeCategory, setActiveCategory] = useState(initialCategory);
+  const isFirstMount = React.useRef(true);
 
   const categories = ['Semua', 'Sayuran', 'Buah', 'Daging', 'Bumbu Masak'];
 
@@ -121,27 +127,20 @@ export default function EcommerceClient({ initialProducts }: EcommerceClientProp
     });
   }, [searchQuery, activeCategory, products]);
 
-  // Sync to URL
+  // Sync to URL saat filter berubah
   useEffect(() => {
-    const currentParams = new URLSearchParams(searchParams.toString());
-    const newParams = new URLSearchParams(searchParams.toString());
-
-    if (searchQuery) {
-      newParams.set('q', searchQuery);
-    } else {
-      newParams.delete('q');
+    if (isFirstMount.current) {
+      isFirstMount.current = false;
+      return;
     }
+    const params = new URLSearchParams();
+    if (searchQuery) params.set('q', searchQuery);
+    if (activeCategory && activeCategory !== 'Semua') params.set('category', activeCategory);
 
-    if (activeCategory && activeCategory !== 'Semua') {
-      newParams.set('category', activeCategory);
-    } else {
-      newParams.delete('category');
-    }
-
-    if (currentParams.toString() !== newParams.toString()) {
-      router.replace(`${pathname}?${newParams.toString()}`, { scroll: false });
-    }
-  }, [searchQuery, activeCategory, pathname, router, searchParams]);
+    const qs = params.toString();
+    const url = qs ? `${pathname}?${qs}` : pathname;
+    window.history.replaceState(null, '', url);
+  }, [searchQuery, activeCategory, pathname]);
 
   return (
     <div className="bg-white min-h-screen pb-20 font-sans pt-4">

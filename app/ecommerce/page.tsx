@@ -1,4 +1,4 @@
-import React, { Suspense } from 'react';
+import React from 'react';
 import { supabase } from '@/lib/supabase';
 import { cleanImageUrl } from '@/lib/image';
 import EcommerceClient, { Product } from './EcommerceClient';
@@ -10,7 +10,15 @@ export const metadata = {
   description: 'Temukan aneka sayuran, buah-buahan, daging, dan bumbu organik segar langsung dari petani lokal.',
 };
 
-export default async function EcommercePage() {
+interface PageProps {
+  searchParams?: Promise<{ [key: string]: string | string[] | undefined }>;
+}
+
+export default async function EcommercePage({ searchParams }: PageProps) {
+  const resolvedParams = searchParams ? await searchParams : {};
+  const initialQuery = typeof resolvedParams?.q === 'string' ? resolvedParams.q : '';
+  const initialCategory = typeof resolvedParams?.category === 'string' ? resolvedParams.category : 'Semua';
+
   let initialProducts: Product[] = [];
 
   try {
@@ -36,8 +44,10 @@ export default async function EcommercePage() {
   }
 
   return (
-    <Suspense fallback={null}>
-      <EcommerceClient initialProducts={initialProducts} />
-    </Suspense>
+    <EcommerceClient
+      initialProducts={initialProducts}
+      initialQuery={initialQuery}
+      initialCategory={initialCategory}
+    />
   );
 }
