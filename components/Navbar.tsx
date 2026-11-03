@@ -2,7 +2,7 @@
 
 import React from 'react';
 
-import { AnimatePresence, motion } from 'framer-motion';
+// framer-motion removed to eliminate 118KB from critical path
 import {
   ArrowLeftRight,
   Bell,
@@ -175,38 +175,42 @@ export default function Navbar() {
       }
     });
 
-    // Realtime subscription for new messages â†’ update unread badge
-    const channel = supabase
-      .channel('navbar-unread-messages')
-      .on(
-        'postgres_changes',
-        { event: 'INSERT', schema: 'public', table: 'messages' },
-        () => {
-          if (currentUserId) fetchUnreadCount(currentUserId);
-        }
-      )
-      .on(
-        'postgres_changes',
-        { event: 'UPDATE', schema: 'public', table: 'messages' },
-        () => {
-          if (currentUserId) fetchUnreadCount(currentUserId);
-        }
-      )
-      .subscribe((status) => {
-        if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
-          // Prevent unhandled WebSocket rejection
-        }
-      });
+    // Realtime subscription for new messages (hanya saat user login & ditunda agar tidak membebani TBT)
+    let channel: ReturnType<typeof supabase.channel> | null = null;
+    let pollInterval: ReturnType<typeof setInterval> | null = null;
 
-    // Poll every 30s as fallback
-    const pollInterval = setInterval(() => {
-      if (currentUserId) fetchUnreadCount(currentUserId);
-    }, 30000);
+    const cancelIdle = runWhenIdle(() => {
+      if (!currentUserId) return;
+
+      channel = supabase
+        .channel('navbar-unread-messages')
+        .on(
+          'postgres_changes',
+          { event: 'INSERT', schema: 'public', table: 'messages' },
+          () => {
+            if (currentUserId) fetchUnreadCount(currentUserId);
+          }
+        )
+        .on(
+          'postgres_changes',
+          { event: 'UPDATE', schema: 'public', table: 'messages' },
+          () => {
+            if (currentUserId) fetchUnreadCount(currentUserId);
+          }
+        )
+        .subscribe();
+
+      // Poll every 30s as fallback
+      pollInterval = setInterval(() => {
+        if (currentUserId) fetchUnreadCount(currentUserId);
+      }, 30000);
+    }, 4000);
 
     return () => {
       subscription.unsubscribe();
-      supabase.removeChannel(channel);
-      clearInterval(pollInterval);
+      cancelIdle();
+      if (channel) supabase.removeChannel(channel);
+      if (pollInterval) clearInterval(pollInterval);
     };
   }, [fetchUnreadCount]);
 
@@ -512,22 +516,14 @@ export default function Navbar() {
 
 
       {/* Sidebar Drawer (Placeholder) */}
-      <AnimatePresence>
-        {isSidebarOpen && (
+      {isSidebarOpen && (
           <>
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
+            <div
               onClick={() => setIsSidebarOpen(false)}
-              className="fixed inset-0 bg-black/20 backdrop-blur-sm z-60"
+              className="fixed inset-0 bg-black/20 backdrop-blur-sm z-60 transition-opacity duration-200"
             />
-            <motion.div
-              initial={{ x: '-100%' }}
-              animate={{ x: 0 }}
-              exit={{ x: '-100%' }}
-              transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-              className="fixed left-0 top-0 h-full w-72 bg-primary shadow-2xl z-70 flex flex-col"
+            <div
+              className="fixed left-0 top-0 h-full w-72 bg-primary shadow-2xl z-70 flex flex-col transition-transform duration-300 ease-out"
             >
               {/* Header */}
               <div className="flex justify-between items-center px-5 pt-5 pb-4 shrink-0">
@@ -908,10 +904,9 @@ export default function Navbar() {
                   </div>
                 )}
               </div>
-            </motion.div>
+            </div>
           </>
         )}
-      </AnimatePresence>
     </nav>
   );
 }
