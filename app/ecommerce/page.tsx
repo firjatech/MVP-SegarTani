@@ -39,22 +39,14 @@ const getCachedProducts = unstable_cache(
   { revalidate: 60, tags: ['products'] }
 );
 
-interface PageProps {
-  searchParams?: Promise<{ [key: string]: string | string[] | undefined }>;
-}
+export const revalidate = 60;
 
-export default async function EcommercePage({ searchParams }: PageProps) {
-  const resolvedParams = searchParams ? await searchParams : {};
-  const initialQuery = typeof resolvedParams?.q === 'string' ? resolvedParams.q : '';
-  const initialCategory = typeof resolvedParams?.category === 'string' ? resolvedParams.category : 'Semua';
-
+export default async function EcommercePage() {
   const initialProducts = await getCachedProducts();
 
   return (
     <EcommerceClient
       initialProducts={initialProducts}
-      initialQuery={initialQuery}
-      initialCategory={initialCategory}
     />
   );
 }
