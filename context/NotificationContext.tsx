@@ -220,65 +220,72 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
     }
   }, [getReadLocalIds, getDeletedLocalIds]);
 
-  // Auth & Realtime Listener
+  // Auth & Realtime Listener (ditunda dan hanya tersambung saat user login)
   useEffect(() => {
     let cancelIdle: (() => void) | undefined;
+    let cancelChannelIdle: (() => void) | undefined;
+    let channel: ReturnType<typeof supabase.channel> | null = null;
+
+    const setupUserNotifications = (userId: string) => {
+      setCurrentUserId(userId);
+      cancelIdle = runWhenIdle(() => fetchNotifications(userId), 1500);
+
+      if (!channel) {
+        cancelChannelIdle = runWhenIdle(() => {
+          channel = supabase
+            .channel('notif-changes')
+            .on(
+              'postgres_changes',
+              { event: '*', schema: 'public', table: 'notifications' },
+              () => fetchNotifications(userId)
+            )
+            .on(
+              'postgres_changes',
+              { event: '*', schema: 'public', table: 'orders' },
+              () => fetchNotifications(userId)
+            )
+            .subscribe();
+        }, 4000);
+      }
+    };
+
+    const clearUserNotifications = () => {
+      setCurrentUserId(null);
+      setNotifications([]);
+      setUnreadCount(0);
+      setLoading(false);
+      cancelChannelIdle?.();
+      if (channel) {
+        supabase.removeChannel(channel);
+        channel = null;
+      }
+    };
 
     supabase.auth.getSession().catch(() => ({ data: { session: null } })).then(({ data }) => {
       const user = data?.session?.user;
       if (user) {
-        setCurrentUserId(user.id);
-        cancelIdle = runWhenIdle(() => fetchNotifications(user.id), 1500);
+        setupUserNotifications(user.id);
       } else {
-        setCurrentUserId(null);
-        setNotifications([]);
-        setUnreadCount(0);
-        setLoading(false);
+        clearUserNotifications();
       }
     });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       const user = session?.user;
       if (user) {
-        setCurrentUserId(user.id);
-        cancelIdle = runWhenIdle(() => fetchNotifications(user.id), 1500);
+        setupUserNotifications(user.id);
       } else {
-        setCurrentUserId(null);
-        setNotifications([]);
-        setUnreadCount(0);
-        setLoading(false);
+        clearUserNotifications();
       }
     });
 
-    // Realtime channel untuk tabel notifications
-    const channel = supabase
-      .channel('notif-changes')
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'notifications' },
-        () => {
-          if (currentUserId) fetchNotifications(currentUserId);
-        }
-      )
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'orders' },
-        () => {
-          if (currentUserId) fetchNotifications(currentUserId);
-        }
-      )
-      .subscribe((status) => {
-        if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
-          // Handled realtime channel status to prevent unhandled rejection
-        }
-      });
-
     return () => {
       cancelIdle?.();
+      cancelChannelIdle?.();
       subscription.unsubscribe();
-      supabase.removeChannel(channel);
+      if (channel) supabase.removeChannel(channel);
     };
-  }, [currentUserId, fetchNotifications]);
+  }, [fetchNotifications]);
 
   // Tandai satu notifikasi sebagai dibaca
   const markAsRead = async (id: string) => {
