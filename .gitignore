@@ -40,3 +40,9 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# test artifacts & evidence
+/bukti/
+/bukti_responsif_360/
+/public/bukti/
+
