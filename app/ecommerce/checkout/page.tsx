@@ -322,16 +322,31 @@ export default function CheckoutPage() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Sesi Anda berakhir. Silakan login kembali.');
 
+      // Validasi: tolak pesanan jika berisi produk milik toko pengguna sendiri
+      const ownItems = selectedItems.filter(item => item.seller_id && item.seller_id === user.id);
+      if (ownItems.length > 0) {
+        alert('Tidak dapat memproses pesanan: Keranjang Anda berisi produk dari toko Anda sendiri. Silakan hapus produk tersebut terlebih dahulu.');
+        setLoading(false);
+        return;
+      }
+
       for (const item of selectedItems) {
         const { data: product, error: stockCheckError } = await supabase
           .from('products')
-          .select('stock')
+          .select('stock, seller_id')
           .eq('id', item.id)
           .single();
 
         if (stockCheckError) throw new Error(`Gagal mengecek stok untuk ${item.name}`);
-        if (product && product.stock < item.quantity) {
-          throw new Error(`Stok produk ${item.name} tidak mencukupi (Tersisa: ${product.stock})`);
+        if (product) {
+          if (product.seller_id && product.seller_id === user.id) {
+            alert(`Tidak dapat memesan produk "${item.name}" karena merupakan produk dari toko Anda sendiri.`);
+            setLoading(false);
+            return;
+          }
+          if (product.stock < item.quantity) {
+            throw new Error(`Stok produk ${item.name} tidak mencukupi (Tersisa: ${product.stock})`);
+          }
         }
       }
 

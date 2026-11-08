@@ -1,6 +1,7 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { supabase } from '@/lib/supabase';
 
 export interface CartItem {
   id: number;
@@ -48,15 +49,42 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [appliedVoucher, setAppliedVoucher] = useState<Voucher | null>(null);
   const [isInitialized, setIsInitialized] = useState(false);
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
 
-  // Load cart and voucher from localStorage
+  // Monitor status autentikasi pengguna
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data }) => {
+      setCurrentUserId(data.session?.user?.id ?? null);
+    }).catch(() => {
+      setCurrentUserId(null);
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setCurrentUserId(session?.user?.id ?? null);
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, []);
+
+  // Load cart and voucher from localStorage & buang item milik pengguna sendiri jika ada
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const savedCart = localStorage.getItem('segar-tani-cart');
       if (savedCart) {
         try {
           const parsed = JSON.parse(savedCart);
-          Promise.resolve().then(() => setCart(parsed));
+          supabase.auth.getSession().then(({ data }) => {
+            const uid = data.session?.user?.id;
+            const validItems = uid && Array.isArray(parsed)
+              ? parsed.filter((i: CartItem) => !i.seller_id || i.seller_id !== uid)
+              : (Array.isArray(parsed) ? parsed : []);
+            setCart(validItems);
+          }).catch((err) => {
+            console.error('Failed to get session during cart restore', err);
+            setCart(Array.isArray(parsed) ? parsed : []);
+          });
         } catch (e) {
           console.error('Failed to parse cart', e);
         }
@@ -74,6 +102,16 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       Promise.resolve().then(() => setIsInitialized(true));
     }
   }, []);
+
+  // Buang item milik sendiri jika currentUserId berubah atau terdeteksi
+  useEffect(() => {
+    if (currentUserId && isInitialized) {
+      setCart((prevCart) => {
+        const cleaned = prevCart.filter((item) => !item.seller_id || item.seller_id !== currentUserId);
+        return cleaned;
+      });
+    }
+  }, [currentUserId, isInitialized]);
 
   // Save cart to localStorage
   useEffect(() => {
@@ -94,6 +132,12 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   }, [appliedVoucher, isInitialized]);
 
   const addToCart = (item: Omit<CartItem, 'selected'>) => {
+    // Tolak penambahan item jika seller_id sama dengan id pengguna yang sedang login
+    if (currentUserId && item.seller_id && item.seller_id === currentUserId) {
+      alert('Anda tidak dapat membeli produk dari toko Anda sendiri.');
+      return;
+    }
+
     setCart((prevCart) => {
       const existingItem = prevCart.find((i) => i.id === item.id);
       if (existingItem) {

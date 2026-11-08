@@ -19,6 +19,7 @@ import {
 	Send,
 	Store,
 	ArrowRight,
+	AlertCircle,
 } from "lucide-react";
 import Image from "next/image";
 import { useCart } from "@/context/CartContext";
@@ -219,6 +220,7 @@ export default function ProductDetailPage() {
 	const discountPrice =
 		product.price - (product.price * product.discount) / 100;
 	const isOutOfStock = product.stock <= 0;
+	const isOwnProduct = Boolean(user?.id && product.seller_id && product.seller_id === user.id);
 
 	return (
 		<div className="bg-gray-50 min-h-screen pt-16 pb-20">
@@ -330,8 +332,19 @@ export default function ProductDetailPage() {
 								</p>
 							</div>
 
+							{/* Banner jika produk milik penjual yang login */}
+							{isOwnProduct && (
+								<div className="mb-6 p-4 bg-amber-50 border border-amber-200 rounded-2xl flex items-center gap-3 text-amber-800">
+									<AlertCircle className="w-5 h-5 shrink-0 text-amber-600" />
+									<div>
+										<p className="text-sm font-bold">Ini produk toko Anda</p>
+										<p className="text-xs text-amber-700">Anda tidak dapat membeli produk atau mengirim pesan ke toko Anda sendiri.</p>
+									</div>
+								</div>
+							)}
+
 							{/* Quantity Picker */}
-							{!isOutOfStock && (
+							{!isOutOfStock && !isOwnProduct && (
 								<div className="mb-10">
 									<h3 className="text-xs font-black text-gray-400 uppercase tracking-widest mb-4">
 										Jumlah Pesanan
@@ -363,8 +376,9 @@ export default function ProductDetailPage() {
 
 							<div className="flex flex-col sm:flex-row gap-4 mb-4">
 								<button
-									disabled={isOutOfStock}
-									onClick={() =>
+									disabled={isOutOfStock || isOwnProduct}
+									onClick={() => {
+										if (isOwnProduct) return;
 										addToCart({
 											id: product.id,
 											name: product.name,
@@ -374,16 +388,18 @@ export default function ProductDetailPage() {
 											category: product.category,
 											seller_id: product.seller_id,
 											seller_name: product.seller_name || 'SegarTani Official',
-										})
-									}
-									className={`flex-1 font-black py-5 rounded-2xl transition-all shadow-xl flex items-center justify-center gap-3 text-lg active:scale-95 ${
-										isOutOfStock
+										});
+									}}
+									className={`flex-1 font-black py-5 rounded-2xl transition-all shadow-xl flex items-center justify-center gap-3 text-lg ${
+										isOwnProduct
+											? "bg-gray-100 text-gray-400 border border-gray-200 cursor-not-allowed shadow-none"
+											: isOutOfStock
 											? "bg-gray-200 text-gray-400 cursor-not-allowed shadow-none"
-											: "bg-primary hover:bg-[#008810] text-white shadow-primary/20"
+											: "bg-primary hover:bg-[#008810] text-white shadow-primary/20 active:scale-95"
 									}`}
 								>
 									<ShoppingCart size={22} />
-									{isOutOfStock ? "Maaf, Stok Habis" : "Tambah ke Keranjang"}
+									{isOwnProduct ? "Ini Produk Toko Anda" : isOutOfStock ? "Maaf, Stok Habis" : "Tambah ke Keranjang"}
 								</button>
 								<button
 									onClick={() =>
@@ -411,11 +427,16 @@ export default function ProductDetailPage() {
 							{/* Chat Penjual Button */}
 							<button
 								type="button"
+								disabled={isOwnProduct}
 								onClick={handleChatSeller}
-								className="w-full bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 font-black py-4 px-6 rounded-2xl transition-all flex items-center justify-center gap-2.5 text-base shadow-xs active:scale-98 cursor-pointer mt-3"
+								className={`w-full font-black py-4 px-6 rounded-2xl transition-all flex items-center justify-center gap-2.5 text-base mt-3 ${
+									isOwnProduct
+										? "bg-gray-100 text-gray-400 border border-gray-200 cursor-not-allowed"
+										: "bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 shadow-xs active:scale-98 cursor-pointer"
+								}`}
 							>
-								<MessageSquare size={20} className="text-primary" />
-								<span>Chat Penjual Sekarang</span>
+								<MessageSquare size={20} className={isOwnProduct ? "text-gray-400" : "text-primary"} />
+								<span>{isOwnProduct ? "Chat Dinonaktifkan (Toko Anda)" : "Chat Penjual Sekarang"}</span>
 							</button>
 
 

@@ -3,10 +3,11 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
+import type { User } from '@supabase/supabase-js';
 import {
   Store, MapPin, MessageSquare, ArrowLeft, Share2, Star,
   ShoppingCart, ShieldCheck, Check, Package, Loader2,
-  ExternalLink
+  ExternalLink, AlertCircle
 } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -58,12 +59,19 @@ export default function SellerProfilePage() {
   const [loading, setLoading] = useState(true);
   const [copied, setCopied] = useState(false);
   const [activeCategory, setActiveCategory] = useState('Semua');
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
 
   const sellerId = typeof id === 'string' ? id : Array.isArray(id) ? id[0] : '';
   const isOfficial = !sellerId || sellerId === 'official';
+  const isOwnStore = Boolean(currentUser?.id && sellerId && currentUser.id === sellerId && !isOfficial);
 
   useEffect(() => {
     let cancelled = false;
+
+    // Ambil info pengguna login
+    supabase.auth.getUser().then(({ data }) => {
+      if (!cancelled) setCurrentUser(data?.user ?? null);
+    });
 
     const run = async () => {
       setLoading(true);
@@ -202,6 +210,17 @@ export default function SellerProfilePage() {
       </div>
 
       <div className="max-w-6xl mx-auto px-4 pt-6 space-y-6">
+        {/* Banner pemberitahuan jika melihat toko sendiri */}
+        {isOwnStore && (
+          <div className="bg-amber-50 border border-amber-200 text-amber-800 px-5 py-3.5 rounded-2xl flex items-center gap-3 text-sm font-bold shadow-xs">
+            <AlertCircle size={20} className="text-amber-600 shrink-0" />
+            <div>
+              <p className="font-black">Ini adalah toko Anda sendiri</p>
+              <p className="text-xs text-amber-700 font-medium">Sebagai pemilik toko, Anda tidak dapat menambahkan atau membeli produk dari toko Anda sendiri.</p>
+            </div>
+          </div>
+        )}
+
         {/* Banner & Store Header Card */}
         <div className="bg-white rounded-4xl border border-gray-100 shadow-sm overflow-hidden">
           {/* Banner */}
@@ -251,13 +270,20 @@ export default function SellerProfilePage() {
 
             {/* Actions */}
             <div className="flex items-center gap-3 shrink-0">
-              <Link
-                href={`/chat`}
-                className="bg-primary hover:bg-[#008810] text-white font-black px-5 py-3 rounded-2xl text-sm flex items-center gap-2 shadow-lg shadow-primary/20 transition-all hover:scale-105 active:scale-95"
-              >
-                <MessageSquare size={16} />
-                <span>Chat Penjual</span>
-              </Link>
+              {isOwnStore ? (
+                <span className="bg-gray-100 text-gray-400 font-bold px-5 py-3 rounded-2xl text-sm flex items-center gap-2 border border-gray-200 cursor-not-allowed">
+                  <MessageSquare size={16} />
+                  <span>Toko Anda Sendiri</span>
+                </span>
+              ) : (
+                <Link
+                  href={`/chat`}
+                  className="bg-primary hover:bg-[#008810] text-white font-black px-5 py-3 rounded-2xl text-sm flex items-center gap-2 shadow-lg shadow-primary/20 transition-all hover:scale-105 active:scale-95"
+                >
+                  <MessageSquare size={16} />
+                  <span>Chat Penjual</span>
+                </Link>
+              )}
               {store.store_maps_url && (
                 <a
                   href={store.store_maps_url}
@@ -378,10 +404,11 @@ export default function SellerProfilePage() {
 
                       <button
                         type="button"
-                        disabled={isOutOfStock}
+                        disabled={isOutOfStock || isOwnStore}
                         onClick={(e) => {
                           e.preventDefault();
                           e.stopPropagation();
+                          if (isOwnStore) return;
                           addToCart({
                             id: p.id,
                             name: p.name,
@@ -394,11 +421,13 @@ export default function SellerProfilePage() {
                           });
                         }}
                         className={`p-2.5 rounded-xl transition-all ${
-                          isOutOfStock
+                          isOwnStore
+                            ? 'bg-gray-100 text-gray-300 cursor-not-allowed border border-gray-200'
+                            : isOutOfStock
                             ? 'bg-gray-100 text-gray-300 cursor-not-allowed'
                             : 'bg-emerald-50 hover:bg-primary text-emerald-800 hover:text-white shadow-xs'
                         }`}
-                        title="Tambah ke Keranjang"
+                        title={isOwnStore ? 'Produk toko Anda sendiri' : isOutOfStock ? 'Stok Habis' : 'Tambah ke Keranjang'}
                       >
                         <ShoppingCart size={16} />
                       </button>

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useSyncExternalStore } from 'react';
 import { Search, Star, ShoppingCart, ChevronDown, Store } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -33,6 +33,47 @@ const formatIDR = (amount: number) => {
   }).format(amount).replace(/\s/g, '');
 };
 
+function ProductSkeletonCard() {
+  return (
+    <div className="flex flex-col h-full bg-white rounded-4xl border border-gray-100 overflow-hidden shadow-xs animate-pulse">
+      <div className="aspect-square w-full bg-gray-100" />
+      <div className="p-6 flex flex-col grow space-y-3">
+        <div className="flex items-center gap-2">
+          <div className="h-3 w-12 bg-gray-200 rounded" />
+          <div className="h-3 w-16 bg-gray-200 rounded" />
+        </div>
+        <div className="h-4 w-28 bg-gray-200 rounded" />
+        <div className="h-5 w-4/5 bg-gray-200 rounded" />
+        <div className="mt-auto pt-4 flex items-center justify-between border-t border-gray-50">
+          <div className="h-6 w-20 bg-gray-200 rounded" />
+          <div className="h-10 w-10 bg-gray-200 rounded-2xl" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Cek sinkron apakah ada sesi login Supabase tersimpan di localStorage browser
+function hasSavedAuthSession(): boolean {
+  if (typeof window === 'undefined') return false;
+  try {
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key && key.includes('-auth-token')) {
+        const value = localStorage.getItem(key);
+        if (value && value.includes('access_token')) {
+          return true;
+        }
+      }
+    }
+  } catch {
+    return false;
+  }
+  return false;
+}
+
+const emptySubscribe = () => () => {};
+
 interface EcommerceClientProps {
   initialProducts: Product[];
   initialQuery?: string;
@@ -51,7 +92,62 @@ export default function EcommerceClient({
   const [products, setProducts] = useState<Product[]>(initialProducts);
   const [searchQuery, setSearchQuery] = useState(initialQuery);
   const [activeCategory, setActiveCategory] = useState(initialCategory);
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+  const [authResolved, setAuthResolved] = useState(false);
   const isFirstMount = React.useRef(true);
+
+  // useSyncExternalStore memastikan render pertama di server dan di browser selalu identik (false),
+  // sehingga HTML server tetap berisi daftar produk utuh (ISR/LCP) tanpa hydration mismatch.
+  // Skeleton hanya muncul setelah hydration jika ada sesi login tersimpan di localStorage.
+  const hasStoredSession = useSyncExternalStore(
+    emptySubscribe,
+    hasSavedAuthSession,
+    () => false
+  );
+
+  const showSkeleton = hasStoredSession && !authResolved;
+
+  // Ambil user ID yang sedang login untuk menyaring produk toko sendiri
+  useEffect(() => {
+    let isMounted = true;
+    let authSubscription: { unsubscribe: () => void } | null = null;
+
+    import('@/lib/supabase').then(({ supabase }) => {
+      if (!isMounted) return;
+
+      supabase.auth.getSession().then(({ data }) => {
+        if (isMounted) {
+          setCurrentUserId(data.session?.user?.id ?? null);
+          setAuthResolved(true);
+        }
+      }).catch(() => {
+        if (isMounted) {
+          setCurrentUserId(null);
+          setAuthResolved(true);
+        }
+      });
+
+      const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+        if (isMounted) {
+          setCurrentUserId(session?.user?.id ?? null);
+          setAuthResolved(true);
+        }
+      });
+
+      authSubscription = subscription;
+    }).catch(() => {
+      if (isMounted) {
+        setAuthResolved(true);
+      }
+    });
+
+    return () => {
+      isMounted = false;
+      if (authSubscription) {
+        authSubscription.unsubscribe();
+      }
+    };
+  }, []);
 
   const categories = ['Semua', 'Sayuran', 'Buah', 'Daging', 'Bumbu Masak'];
 
@@ -124,14 +220,15 @@ export default function EcommerceClient({
     };
   }, []);
 
-  // Filter Logic
+  // Filter Logic: kecualikan produk milik penjual yang sedang login
   const filteredProducts = useMemo(() => {
     return products.filter((product) => {
       const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase());
       const matchesCategory = activeCategory === 'Semua' || product.category === activeCategory;
-      return matchesSearch && matchesCategory;
+      const isOwnProduct = Boolean(currentUserId && product.seller_id === currentUserId);
+      return matchesSearch && matchesCategory && !isOwnProduct;
     });
-  }, [searchQuery, activeCategory, products]);
+  }, [searchQuery, activeCategory, products, currentUserId]);
 
   // Sync to URL saat filter berubah
   useEffect(() => {
@@ -197,8 +294,12 @@ export default function EcommerceClient({
         </div>
 
         {/* Product Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-8">
-          {filteredProducts.length > 0 ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-8 min-h-[500px]">
+          {showSkeleton ? (
+            Array.from({ length: 8 }).map((_, i) => (
+              <ProductSkeletonCard key={i} />
+            ))
+          ) : filteredProducts.length > 0 ? (
             filteredProducts.map((product, index) => {
               const discountPrice = product.price - (product.price * product.discount) / 100;
               const isOutOfStock = product.stock <= 0;
