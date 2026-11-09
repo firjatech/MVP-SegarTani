@@ -43,6 +43,7 @@ function AdminProductsContent() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState(searchParams.get('q') || '');
   const [userId, setUserId] = useState('');
+  const [isAdmin, setIsAdmin] = useState(false);
   
   // Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -57,18 +58,28 @@ function AdminProductsContent() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchProducts = useCallback(async () => {
+  const fetchProducts = useCallback(async (adminUser?: boolean, currentUid?: string) => {
     setLoading(true);
-    const { data, error } = await supabase
+    const admin = adminUser !== undefined ? adminUser : isAdmin;
+    const uid = currentUid !== undefined ? currentUid : userId;
+
+    let query = supabase
       .from('products')
       .select('*')
       .order('created_at', { ascending: false });
+
+    // Jika bukan admin, hanya ambil produk milik pengguna ini
+    if (!admin && uid) {
+      query = query.eq('seller_id', uid);
+    }
+
+    const { data, error } = await query;
 
     if (!error && data) {
       setProducts(data.map(p => ({ ...p, image: cleanImageUrl(p.image) })));
     }
     setLoading(false);
-  }, []);
+  }, [isAdmin, userId]);
 
   const checkUserAndFetch = useCallback(async () => {
     const { data: { user } } = await supabase.auth.getUser();
@@ -85,8 +96,10 @@ function AdminProductsContent() {
       return;
     }
 
+    const userIsAdmin = Boolean(profile?.is_admin);
     setUserId(user.id);
-    fetchProducts();
+    setIsAdmin(userIsAdmin);
+    fetchProducts(userIsAdmin, user.id);
   }, [router, fetchProducts]);
 
   useEffect(() => {
@@ -143,11 +156,22 @@ function AdminProductsContent() {
 
     try {
       if (isEditing && targetId) {
+        if (!isAdmin && currentProduct.seller_id && currentProduct.seller_id !== userId) {
+          alert('Anda tidak memiliki izin untuk mengedit produk ini.');
+          setSaving(false);
+          return;
+        }
+
         // Optimistic UI for Update
         setProducts(products.map(p => p.id === targetId ? { ...p, ...payload, id: targetId } as Product : p));
         setIsModalOpen(false);
 
-        const { data: updatedData, error } = await supabase.from('products').update(payload).eq('id', targetId).select();
+        let updateQuery = supabase.from('products').update(payload).eq('id', targetId);
+        if (!isAdmin) {
+          updateQuery = updateQuery.eq('seller_id', userId);
+        }
+
+        const { data: updatedData, error } = await updateQuery.select();
         if (error) {
           setProducts(previousProducts);
           alert('Gagal mengupdate produk: ' + error.message);
@@ -174,13 +198,24 @@ function AdminProductsContent() {
   };
 
   const handleDelete = async (id: number) => {
+    const targetProduct = products.find(p => p.id === id);
+    if (!isAdmin && targetProduct && targetProduct.seller_id !== userId) {
+      alert('Anda tidak memiliki izin untuk menghapus produk ini.');
+      return;
+    }
+
     if (!confirm('Apakah Anda yakin ingin menghapus produk ini?')) return;
     
     // Optimistic UI for Delete
     const previousProducts = [...products];
     setProducts(products.filter(p => p.id !== id));
     
-    const { error } = await supabase.from('products').delete().eq('id', id);
+    let deleteQuery = supabase.from('products').delete().eq('id', id);
+    if (!isAdmin) {
+      deleteQuery = deleteQuery.eq('seller_id', userId);
+    }
+
+    const { error } = await deleteQuery;
     if (error) {
       setProducts(previousProducts);
       alert('Gagal menghapus: ' + error.message);
@@ -195,6 +230,10 @@ function AdminProductsContent() {
   };
 
   const openModalForEdit = (p: Product) => {
+    if (!isAdmin && p.seller_id !== userId) {
+      alert('Anda tidak memiliki izin untuk mengedit produk ini.');
+      return;
+    }
     setCurrentProduct(p);
     setIsEditing(true);
     setError(null);
@@ -310,20 +349,22 @@ function AdminProductsContent() {
                         )}
                       </div>
                       {/* Action buttons overlay */}
-                      <div className="absolute top-3 right-3 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <button
-                          onClick={() => openModalForEdit(p)}
-                          className="w-8 h-8 rounded-full bg-white shadow-md text-blue-600 flex items-center justify-center hover:bg-blue-50 transition-colors"
-                        >
-                          <Edit2 size={14} />
-                        </button>
-                        <button
-                          onClick={() => handleDelete(p.id)}
-                          className="w-8 h-8 rounded-full bg-white shadow-md text-red-500 flex items-center justify-center hover:bg-red-50 transition-colors"
-                        >
-                          <Trash2 size={14} />
-                        </button>
-                      </div>
+                      {(isAdmin || p.seller_id === userId) && (
+                        <div className="absolute top-3 right-3 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                          <button
+                            onClick={() => openModalForEdit(p)}
+                            className="w-8 h-8 rounded-full bg-white shadow-md text-blue-600 flex items-center justify-center hover:bg-blue-50 transition-colors"
+                          >
+                            <Edit2 size={14} />
+                          </button>
+                          <button
+                            onClick={() => handleDelete(p.id)}
+                            className="w-8 h-8 rounded-full bg-white shadow-md text-red-500 flex items-center justify-center hover:bg-red-50 transition-colors"
+                          >
+                            <Trash2 size={14} />
+                          </button>
+                        </div>
+                      )}
                     </div>
 
                     {/* Content */}
@@ -362,20 +403,22 @@ function AdminProductsContent() {
                           </span>
                         </div>
                         {/* Bottom action row */}
-                        <div className="flex gap-2 mt-3">
-                          <button
-                            onClick={() => openModalForEdit(p)}
-                            className="flex-1 flex items-center justify-center gap-1.5 py-2 bg-blue-50 text-blue-600 rounded-xl text-xs font-black hover:bg-blue-100 transition-colors"
-                          >
-                            <Edit2 size={12} /> Edit
-                          </button>
-                          <button
-                            onClick={() => handleDelete(p.id)}
-                            className="flex-1 flex items-center justify-center gap-1.5 py-2 bg-red-50 text-red-500 rounded-xl text-xs font-black hover:bg-red-100 transition-colors"
-                          >
-                            <Trash2 size={12} /> Hapus
-                          </button>
-                        </div>
+                        {(isAdmin || p.seller_id === userId) && (
+                          <div className="flex gap-2 mt-3">
+                            <button
+                              onClick={() => openModalForEdit(p)}
+                              className="flex-1 flex items-center justify-center gap-1.5 py-2 bg-blue-50 text-blue-600 rounded-xl text-xs font-black hover:bg-blue-100 transition-colors"
+                            >
+                              <Edit2 size={12} /> Edit
+                            </button>
+                            <button
+                              onClick={() => handleDelete(p.id)}
+                              className="flex-1 flex items-center justify-center gap-1.5 py-2 bg-red-50 text-red-500 rounded-xl text-xs font-black hover:bg-red-100 transition-colors"
+                            >
+                              <Trash2 size={12} /> Hapus
+                            </button>
+                          </div>
+                        )}
                       </div>
                     </div>
                   </motion.div>
